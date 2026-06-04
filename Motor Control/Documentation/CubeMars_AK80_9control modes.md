@@ -66,9 +66,9 @@ Before attempting to calibrate the driver board or run any operating modes, comp
 4. Connect the power supply (18–52 V).
 5. Launch the **CubeMars AK Config Tool**.
 
-![Hardware Setup Connection](<img width="1600" height="900" alt="WhatsApp Image 2026-06-04 at 12 52 15" src="https://github.com/user-attachments/assets/c280e381-3587-457d-95d7-dc8bd6ea08c4" />
+<img width="1600" height="900" alt="WhatsApp Image 2026-06-04 at 12 52 15" src="https://github.com/user-attachments/assets/c280e381-3587-457d-95d7-dc8bd6ea08c4" />
 
-)
+
 
 ### 2. Establish Communication
 1. Navigate to the **Connection** panel in the software.
@@ -148,8 +148,8 @@ Servo Mode offloads position and velocity loops to the actuator's internal drive
 
 > **Warning:** The motor may move at high speed while returning to the origin position. Ensure the workspace is clear before executing this command.
 
-![Servo Mode Configuration and Curve Testing](<img width="1920" height="1080" alt="Screenshot (104)" src="https://github.com/user-attachments/assets/b1d35a3f-6128-4897-b472-1294b936613d" />
-)
+<img width="1920" height="1080" alt="Screenshot (104)" src="https://github.com/user-attachments/assets/98f2d4a5-1214-446d-a355-d6a3774e2790" />
+
 
 ---
 
@@ -223,8 +223,8 @@ Monitor the following parameters during testing:
 2. Disconnect power if required.
 3. Verify parameter values before restarting the actuator.
 
-![MIT Mode Configuration and Slider Controls](<img width="1920" height="1080" alt="Screenshot (103)" src="https://github.com/user-attachments/assets/a9a6286f-7679-4d03-b699-e7414d8cd783" />
-)
+<img width="1920" height="1080" alt="Screenshot (103)" src="https://github.com/user-attachments/assets/e434aeed-4a62-43c4-bbd5-1245a6fc766f" />
+
 
 ---
 
