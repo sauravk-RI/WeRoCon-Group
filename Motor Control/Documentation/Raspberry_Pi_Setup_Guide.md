@@ -102,11 +102,4 @@ prosthetic-leg.local
 
 ---
 
-# Future Tasks
 
-- CAN communication setup
-- CubeMars AK80-9 integration
-- IMU interfacing
-- Gait phase detection
-- Neural network deployment
-- Real-time prosthetic control
