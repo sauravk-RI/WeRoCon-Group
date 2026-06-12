@@ -1,28 +1,17 @@
 """
-imu_matlab_r0.4.py  —  MPU9250 Kalman Filter + CSV Logger for MATLAB
+imu_thigh_angle  —  MPU9250 Kalman Filter + CSV Logger for MATLAB
 ======================================================================
 Raspberry Pi 5  |  MPU9250 via I2C  |  AK8963 magnetometer
-
-Changes from r0.3:
-  - Gyro range changed to ±500 °/s  (was ±250 — was clipping during fast swing)
-  - Hardware DLPF set to 20 Hz      (was 41 Hz — rejects socket vibration noise)
-  - R_measure tuned for leg use     (was 0.3 — too trusting of accel on leg)
-  - R_HOLD_CYCLES added             (blocks noisy accel after heel strike spike)
-  - Dynamic R blending              (smooth transition between still/moving modes)
-  - BLEND_G threshold               (tune after running noise_profiler.py)
-  - CSV and print output unchanged  (MATLAB script needs no changes)
-
 Usage:
     pip install smbus2 numpy --break-system-packages
-    python3 imu_matlab_r0.4.py
 
 Output:
-    imu_data.csv  (same format as r0.3 — MATLAB compatible)
+    imu_data.csv  
     Auto-stops after RUN_DURATION seconds.
     Press Ctrl+C to stop early.
 
 TUNING:
-    Run noise_profiler.py first, then paste the printed values into
+    Run tuning_constant.py first, then paste the printed values into
     the TUNING CONSTANTS section below.
 """
 
@@ -276,7 +265,7 @@ def main():
     kf_yaw   = KalmanFilter()
 
     # ── Calibration offsets ───────────────────────────────────────
-    # Paste values from noise_profiler.py output here.
+    # Paste values from tuning_constant.py  output here.
     # Until then, zeros = no correction applied.
     gyro_off  = {'gx': 0.0, 'gy': 0.0, 'gz': 0.0}
     accel_off = {'x':  0.0, 'y':  0.0, 'z':  0.0}
@@ -370,7 +359,7 @@ def main():
             if last_yaw >  180: last_yaw -= 360
             if last_yaw < -180: last_yaw += 360
 
-        # ── Write CSV row (same columns as r0.3) ──────────────────
+        # ── Write CSV row  ──────────────────
         f_csv.write(
             f"{round(t_rel,  4)},"
             f"{round(roll,   4)},"
