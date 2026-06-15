@@ -201,7 +201,7 @@ Connect using **4 jumper wires** only:
 
 > ⚠️ Always use **3.3V** for VCC — never 5V. The MPU6250 is a 3.3V sensor and 5V will damage it.
 
-<img width="1500" height="700" alt="image" src="https://github.com/user-attachments/assets/c3178f22-eb6b-4f78-b594-0fc0bf74391c" />
+<img width="1100" height="500" alt="image" src="https://github.com/user-attachments/assets/c3178f22-eb6b-4f78-b594-0fc0bf74391c" />
 
 
 
