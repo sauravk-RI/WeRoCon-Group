@@ -64,12 +64,12 @@ WiFi Password:  [your WiFi password]
 
 **Services Tab:**
 ```
-✅ Enable SSH  ← Must turn this ON
+ Enable SSH  ← Must turn this ON
 ```
 
 Click **Save → Yes → Yes**.
 
-> ⏳ Flashing takes about 5–10 minutes.
+>  Flashing takes about 5–10 minutes.
 
 ---
 
@@ -111,7 +111,7 @@ Once connected, run:
 sudo apt update && sudo apt upgrade -y
 ```
 
-Done! Your Raspberry Pi 5 is ready to use. ✅
+Done! Your Raspberry Pi 5 is ready to use. 
 
 ---
 
@@ -130,7 +130,7 @@ Download Raspberry Pi Imager on laptop
             │
   Insert microSD into Pi 5 → Power ON
             │
-   ssh pi@raspberrypi.local ✅
+   ssh pi@raspberrypi.local 
 ```
 
 ---
@@ -148,6 +148,8 @@ Download Raspberry Pi Imager on laptop
 | MPU6250 Module | 6-axis IMU (Accelerometer + Gyroscope) |
 | Jumper Wires | 4x Female-to-Female |
 | Breadboard | Optional, for easy wiring |
+
+
 
 ---
 
@@ -199,27 +201,9 @@ Connect using **4 jumper wires** only:
 
 > ⚠️ Always use **3.3V** for VCC — never 5V. The MPU6250 is a 3.3V sensor and 5V will damage it.
 
-### Pi 5 GPIO Diagram (relevant pins)
+<img width="2016" height="1168" alt="image" src="https://github.com/user-attachments/assets/c3178f22-eb6b-4f78-b594-0fc0bf74391c" />
 
-```
-[Pin 1]  3.3V  ← VCC
-[Pin 2]  5V
-[Pin 3]  GPIO2 (SDA) ← SDA
-[Pin 4]  5V
-[Pin 5]  GPIO3 (SCL) ← SCL
-[Pin 6]  GND   ← GND
-```
 
-### AD0 Pin — I2C Address
-
-| AD0 | I2C Address |
-|---|---|
-| GND (or unconnected) | `0x68` ← default |
-| 3.3V | `0x69` |
-
-Leave AD0 unconnected to use the default address `0x68`.
-
----
 
 ## Step 10 — Install Required Libraries
 
@@ -278,97 +262,12 @@ Expected output:
 70: -- -- -- -- -- -- -- --
 ```
 
-> `68` appearing = MPU6250 successfully detected ✅
+> `68` appearing = MPU6250 successfully detected
+> I2C Address Of MPU6250 = 0x68 (hexadecimal)
 > Nothing showing = recheck your wiring
 
 ---
 
-## Step 12 — Read IMU Data
-
-Create a Python script:
-
-```bash
-nano read_mpu.py
-```
-
-Paste this code:
-
-```python
-import smbus2
-import time
-
-MPU6250_ADDR = 0x68   # Change to 0x69 if AD0 is connected to 3.3V
-PWR_MGMT_1   = 0x6B
-ACCEL_XOUT_H = 0x3B
-GYRO_XOUT_H  = 0x43
-TEMP_OUT_H   = 0x41
-
-bus = smbus2.SMBus(1)
-
-# Wake up the MPU6250
-bus.write_byte_data(MPU6250_ADDR, PWR_MGMT_1, 0x00)
-time.sleep(0.1)
-
-def read_word(reg):
-    high  = bus.read_byte_data(MPU6250_ADDR, reg)
-    low   = bus.read_byte_data(MPU6250_ADDR, reg + 1)
-    value = (high << 8) | low
-    if value >= 0x8000:
-        value -= 65536
-    return value
-
-def get_accel():
-    ax = read_word(ACCEL_XOUT_H)     / 16384.0
-    ay = read_word(ACCEL_XOUT_H + 2) / 16384.0
-    az = read_word(ACCEL_XOUT_H + 4) / 16384.0
-    return ax, ay, az
-
-def get_gyro():
-    gx = read_word(GYRO_XOUT_H)     / 131.0
-    gy = read_word(GYRO_XOUT_H + 2) / 131.0
-    gz = read_word(GYRO_XOUT_H + 4) / 131.0
-    return gx, gy, gz
-
-def get_temp():
-    raw = read_word(TEMP_OUT_H)
-    return (raw / 340.0) + 36.53
-
-print("MPU6250 Live Data — Press Ctrl+C to stop\n")
-
-try:
-    while True:
-        ax, ay, az = get_accel()
-        gx, gy, gz = get_gyro()
-        temp       = get_temp()
-
-        print(f"Accel (g)    X:{ax:+.3f}  Y:{ay:+.3f}  Z:{az:+.3f}")
-        print(f"Gyro (°/s)   X:{gx:+.3f}  Y:{gy:+.3f}  Z:{gz:+.3f}")
-        print(f"Temp (°C)    {temp:.2f}")
-        print("-" * 45)
-        time.sleep(0.5)
-
-except KeyboardInterrupt:
-    print("Stopped.")
-```
-
-Save with `Ctrl+X → Y → Enter`.
-
-Run it:
-
-```bash
-python3 read_mpu.py
-```
-
-### Expected Output
-
-```
-Accel (g)    X:-0.012  Y:+0.004  Z:+1.001
-Gyro (°/s)   X:+0.213  Y:-0.152  Z:+0.031
-Temp (°C)    28.54
----------------------------------------------
-```
-
----
 
 ## Troubleshooting
 
@@ -394,6 +293,5 @@ Enable I2C → sudo raspi-config
             │
   source .venv/bin/activate
   pip install smbus2 mpu6050-raspberrypi
-            │
-  python3 read_mpu.py  ✅  Live IMU readings!
+ 
 ```
