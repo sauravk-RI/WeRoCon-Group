@@ -201,7 +201,7 @@ Connect using **4 jumper wires** only:
 
 > ⚠️ Always use **3.3V** for VCC — never 5V. The MPU6250 is a 3.3V sensor and 5V will damage it.
 
-<img width="2016" height="1168" alt="image" src="https://github.com/user-attachments/assets/c3178f22-eb6b-4f78-b594-0fc0bf74391c" />
+<img width="1900" height="900" alt="image" src="https://github.com/user-attachments/assets/c3178f22-eb6b-4f78-b594-0fc0bf74391c" />
 
 
 
@@ -262,36 +262,8 @@ Expected output:
 70: -- -- -- -- -- -- -- --
 ```
 
-> `68` appearing = MPU6250 successfully detected
-> I2C Address Of MPU6250 = 0x68 (hexadecimal)
+> `68` appearing = MPU6250 successfully detected ,
+>  I2C Address Of MPU6250 = 0x68 (hexadecimal)
 > Nothing showing = recheck your wiring
 
 ---
-
-
-## Troubleshooting
-
-| Problem | Fix |
-|---|---|
-| `i2cdetect` shows nothing | Recheck wiring — SDA→Pin3, SCL→Pin5, VCC→3.3V, GND→GND |
-| Permission denied on I2C | Run `sudo usermod -aG i2c pi` then log out and back in |
-| `ModuleNotFoundError: smbus2` | Run `source .venv/bin/activate` then `pip install smbus2` |
-| All readings are 0 | Reinstall: `pip uninstall smbus2 && pip install smbus2` |
-| Address shows `69` not `68` | Change `MPU6250_ADDR = 0x69` in the script |
-
----
-
-## Full Flow Summary
-
-```
-Enable I2C → sudo raspi-config
-            │
-  Wire MPU6250:
-  VCC→Pin1(3.3V) | GND→Pin6 | SDA→Pin3 | SCL→Pin5
-            │
-  sudo i2cdetect -y 1 → confirm "68"
-            │
-  source .venv/bin/activate
-  pip install smbus2 mpu6050-raspberrypi
- 
-```
