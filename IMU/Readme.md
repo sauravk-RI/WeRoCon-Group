@@ -6,7 +6,6 @@
 ![Kalman Filter](https://img.shields.io/badge/Filter-Kalman-FF6B35?style=flat-square)
 ![WebSocket](https://img.shields.io/badge/Stream-WebSocket-4ADE80?style=flat-square&logo=websocket&logoColor=white)
 ![MATLAB](https://img.shields.io/badge/Analysis-MATLAB-E16737?style=flat-square&logo=mathworks&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
 ![PRs](https://img.shields.io/badge/PRs-welcome-blueviolet?style=flat-square)
 
