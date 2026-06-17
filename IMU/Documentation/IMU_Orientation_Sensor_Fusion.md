@@ -6,7 +6,7 @@ A simple explanation of how devices like a Raspberry Pi + MPU-9250 figure out wh
 
 ## What's inside
 
-This repo contains a documentation file (`IMU_Orientation_Sensor_Fusion.pdf`) that explains:
+This repo explains:
 
 - How orientation (roll, pitch, yaw) is measured
 - Why a common method (Euler angles) breaks down in certain positions
@@ -15,7 +15,7 @@ This repo contains a documentation file (`IMU_Orientation_Sensor_Fusion.pdf`) th
 
 ## Why this matters
 
-If you're working with drones, robots, IMUs, or anything that needs to know its own orientation, you'll run into these exact concepts. This doc breaks them down without assuming prior knowledge.
+If you're working with drones, robots, IMUs, or anything that needs to know its own orientation, you'll run into these exact concepts. This file breaks them down without assuming prior knowledge.
 
 ## Key concepts (quick summary)
 
