@@ -79,11 +79,3 @@ The MPU-9250 has 3 sensors packed into one chip. Each one measures something dif
 ## One-line summary
 
 > Gyroscope is fast but drifts. Accelerometer and magnetometer are stable but get fooled easily. Quaternions avoid gimbal lock in the math, and the Kalman filter blends all 3 sensors so their weaknesses cancel out — giving an accurate, stable orientation reading.
-
-## File
-
-- `IMU_Orientation_Sensor_Fusion.docx` — Full documentation with explanations, diagrams, and formulas
-
-## Tags
-
-`imu` `mpu9250` `sensor-fusion` `kalman-filter` `quaternion` `quaternions` `euler-angles` `gimbal-lock` `raspberry-pi` `embedded-systems` `embedded-systems-engineering` `robotics` `gyroscope` `accelerometer` `magnetometer` `9-axis` `orientation-estimation` `attitude-estimation` `drone` `motion-tracking` `arduino` `inertial-navigation` `ahrs` `complementary-filter` `documentation` `electronics`
