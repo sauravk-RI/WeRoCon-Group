@@ -41,6 +41,11 @@ The trajectory is obtained from Winter gait data and scaled to a peak flexion an
 | RMS Error | 1.85° |
 | Peak Error | 9.21° |
 | Peak Current | 2.27 A |
+
+## Tracking Results
+
+![Knee Tracking Results](knee_trajectory graph.jpeg)
+
 | Peak Torque | 0.26 Nm |
 
 ## Source Code
