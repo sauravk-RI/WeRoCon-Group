@@ -1,7 +1,5 @@
 # IMU Orientation Measurement — Euler Angles, Quaternions & Sensor Fusion
 
-![Topic](https://img.shields.io/badge/Topic-IMU-blue) ![Sensor](https://img.shields.io/badge/Sensor-MPU9250-orange) ![Filter](https://img.shields.io/badge/Filter-Kalman-red) ![Math](https://img.shields.io/badge/Math-Quaternion-purple) ![Board](https://img.shields.io/badge/Board-Raspberry%20Pi-c51a4a) ![Domain](https://img.shields.io/badge/Domain-Embedded%20Systems-yellow) ![Status](https://img.shields.io/badge/Status-Active-brightgreen) ![Docs](https://img.shields.io/badge/Type-Documentation-lightgrey)
-
 A simple explanation of how devices like a Raspberry Pi + MPU-9250 figure out which way they are facing in 3D space.
 
 ## What's inside
