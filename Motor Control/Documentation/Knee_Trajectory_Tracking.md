@@ -31,9 +31,7 @@ The trajectory is obtained from Winter gait data and scaled to a peak flexion an
 
 ## Source Code
 
-Located in:
-
-Motor Control/Codes/knee_trajectory.py
+This script loads Winter gait data, builds a continuous multi-cycle knee trajectory, then runs a real-time PID + feedforward velocity controller on the AK80-9 to track it. At the end of each run, it saves a CSV log and generates a 5-panel tracking plot automatically.
 
 ## Complete Knee Trajectory Tracking Code
 
