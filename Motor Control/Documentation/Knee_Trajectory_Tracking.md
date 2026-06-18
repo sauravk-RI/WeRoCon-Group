@@ -8,8 +8,11 @@ The trajectory is obtained from Winter gait data and scaled to a peak flexion an
 
 ## Hardware Used
 
-- CubeMars AK80-9 V3
+- CubeMars AK80-9 V3 (gear ratio 9:1, Kt = 0.091 Nm/A)
 - Raspberry Pi 4
+- USB-C 5V Power Adapter
+- MicroSD Card (RPi OS)
+- Windows Laptop (SSH into RPi)
 - Waveshare CAN Hat
 - 40V Battery
 - Emergency Stop
@@ -17,6 +20,9 @@ The trajectory is obtained from Winter gait data and scaled to a peak flexion an
 ## Software
 
 - Python
+- Git
+- PowerShell / Windows Terminal
+- PuTTY
 - OpenSourceLeg
 - NumPy
 - Pandas
