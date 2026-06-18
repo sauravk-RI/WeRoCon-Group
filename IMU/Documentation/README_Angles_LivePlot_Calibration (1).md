@@ -456,7 +456,8 @@ The Low Pass Filter smooths noise but cannot fix bias. Calibration fixes bias.
 
 ### Before Calibration — Actual Plot
 
-![Before Calibration](before_calibration.png)
+![Before Calibration](<img width="981" height="609" alt="Screenshot 2026-06-18 151133" src="https://github.com/user-attachments/assets/ed0531ed-c31b-49b8-bf67-9dcffc4709fe" />
+)
 
 > X axis sitting at ~65 m/s² instead of 0, Z at ~13 m/s² instead of 9.81 m/s² — clear sensor bias.
 
@@ -471,7 +472,8 @@ The Low Pass Filter smooths noise but cannot fix bias. Calibration fixes bias.
 
 ### After Calibration — Actual Plot
 
-![After Calibration](after_calibration.png)
+![After Calibration](<img width="949" height="562" alt="Screenshot 2026-06-18 151335" src="https://github.com/user-attachments/assets/54fe2af6-a9ba-4b88-bba0-bac2f7709bb3" />
+)
 
 > X axis now at ~0 m/s², Z sitting cleanly at ~9.81 m/s² (gravity). Calibration successful ✅
 
