@@ -688,6 +688,24 @@ finally:
 | Velocity Limit | 100 |
 
 
+## Dataset
+
+Dataset Used:
+
+```text
+walk_Winter1.csv
+```
+
+Trajectory Source: Winter Gait Dataset
+
+Dataset Parameters:
+
+- knee_time (s)
+- knee_position (rad)
+- knee_torque (Nm)
+
+
+
 ## Tracking Results
 
 ![Knee Tracking Results](knee_trajectory_graph.jpeg)
