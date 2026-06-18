@@ -456,7 +456,7 @@ The Low Pass Filter smooths noise but cannot fix bias. Calibration fixes bias.
 
 ### Before Calibration — Actual Plot
 
-![Before Calibration](<img width="981" height="609" alt="Screenshot 2026-06-18 151133" src="https://github.com/user-attachments/assets/ed0531ed-c31b-49b8-bf67-9dcffc4709fe" />
+![Before Calibration](before_calibration.png)
 )
 
 > X axis sitting at ~65 m/s² instead of 0, Z at ~13 m/s² instead of 9.81 m/s² — clear sensor bias.
@@ -465,19 +465,12 @@ The Low Pass Filter smooths noise but cannot fix bias. Calibration fixes bias.
 
 | | Without Calibration | With Calibration |
 |---|---|---|
-| Accel X at rest | ~63.8 m/s² ❌ | ~0.0 m/s² ✅ |
-| Accel Y at rest | ~-2.9 m/s² ❌ | ~0.0 m/s² ✅ |
-| Accel Z at rest | ~11.8 m/s² ❌ | ~9.81 m/s² ✅ |
-| Angles accurate | ❌ Offset | ✅ Correct |
+| Accel X at rest | ~63.8 m/s²  | ~0.0 m/s²  |
+| Accel Y at rest | ~-2.9 m/s²  | ~0.0 m/s²  |
+| Accel Z at rest | ~11.8 m/s² | ~9.81 m/s²  |
+| Angles accurate | Offset | Correct |
 
-### After Calibration — Actual Plot
 
-![After Calibration](<img width="949" height="562" alt="Screenshot 2026-06-18 151335" src="https://github.com/user-attachments/assets/54fe2af6-a9ba-4b88-bba0-bac2f7709bb3" />
-)
-
-> X axis now at ~0 m/s², Z sitting cleanly at ~9.81 m/s² (gravity). Calibration successful ✅
-
----
 
 ## 7. How to Calibrate the MPU6250
 
@@ -639,6 +632,13 @@ MPU6250 giving raw accel data ✅
 Signal path:
   Raw accel → Low Pass Filter (α=0.2) → atan2 angle formula → Clean angle
 ```
+
+---
+### After Calibration — Actual Plot
+
+![After Calibration](after_calibration.png)
+
+> X axis now at ~0 m/s², Z sitting cleanly at ~9.81 m/s² (gravity). Calibration successful ✅
 
 ---
 
