@@ -778,12 +778,12 @@ Winter gait ankle trajectory dataset.
 
 ## Tracking Results
 
-![Ankle Trajectory Tracking](ankle_trajectory_graph.jpeg)
+![Ankle Trajectory Tracking](ankle_trajectory_tracking.png)
 
 The figure below shows the desired and actual ankle trajectories over three continuous gait cycles along with velocity tracking, position error, motor current, and output torque.
 
 ## Note
-Current and torque values shown are measured under no-load conditions.
+Current and torque values shown are measured under no-load conditions. Also the desired peak shown at 29.5 degree is with respect to 0 degrees as minimum angle in the whole trajectory.
 
 ## Trajectory Information
 
