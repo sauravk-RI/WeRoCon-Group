@@ -818,5 +818,3 @@ Current and torque values shown are measured under no-load conditions. Also the 
 - Current and torque values remained low during no-load testing.
 
 
-
-Current and torque values shown are measured under no-load conditions.
