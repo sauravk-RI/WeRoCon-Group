@@ -44,11 +44,22 @@ To be added.
 
 ## Tracking Results
 
-To be added.
+![Ankle Trajectory Tracking](ankle_trajectory_graph.jpeg)
+
+The figure below shows the desired and actual ankle trajectories over three continuous gait cycles along with velocity tracking, position error, motor current, and output torque.
 
 ## Performance Summary
 
-To be added.
+| Metric | Value |
+|----------|----------|
+| Target ROM | 29.5° |
+| RMS Position Error | 1.85° |
+| Peak Position Error | 9.21° |
+| Actual Peak Current | 2.27 A |
+| Actual RMS Current | 0.35 A |
+| Actual Peak Torque | 0.26 Nm |
+| Actual RMS Torque | 0.04 Nm |
+
 
 ## Dataset
 
