@@ -770,16 +770,6 @@ finally:
 | Lead Time | 0.13 s |
 
 
-## Trajectory Information
-
-| Parameter | Value |
-|------------|------------|
-| Range of Motion | 29.5° |
-| Number of Cycles | 3 |
-| Time Scaling | 2.0 |
-| Control Mode | Velocity |
-| Motor ID | 100 |
-
 
 ## Dataset
 
@@ -794,6 +784,17 @@ The figure below shows the desired and actual ankle trajectories over three cont
 
 ## Note
 Current and torque values shown are measured under no-load conditions.
+
+## Trajectory Information
+
+| Parameter | Value |
+|------------|------------|
+| Range of Motion | 29.5° |
+| Number of Cycles | 3 |
+| Time Scaling | 2.0 |
+| Control Mode | Velocity |
+| Motor ID | 100 |
+
 
 
 ## Performance Summary
