@@ -32,6 +32,7 @@ The trajectory was scaled to a range of motion of 29.5° and executed for three 
 
 ## Source Code
 
+```python
 from opensourceleg.actuators.tmotor import TMotorServoActuator
 import pandas as pd
 import numpy as np
@@ -752,6 +753,8 @@ finally:
         n_cycles=N_CYCLES,
         target_deg=TARGET_DEG
     )
+
+```
 
 
 ## Controller Parameters
