@@ -16,15 +16,10 @@ The trajectory was scaled to a range of motion of 29.5° and executed for three 
 | Dataset | Winter Gait Dataset |
 | Battery | 40 V Battery |
 
-## Trajectory Information
 
-| Parameter | Value |
-|------------|------------|
-| Range of Motion | 29.5° |
-| Number of Cycles | 3 |
-| Time Scaling | 2.0 |
-| Control Mode | Velocity |
-| Motor ID | 100 |
+## Source Code
+
+To be added.
 
 ## Controller Parameters
 
@@ -38,9 +33,17 @@ The trajectory was scaled to a range of motion of 29.5° and executed for three 
 | Velocity Limit | 100 |
 | Lead Time | 0.13 s |
 
-## Source Code
 
-To be added.
+
+## Trajectory Information
+
+| Parameter | Value |
+|------------|------------|
+| Range of Motion | 29.5° |
+| Number of Cycles | 3 |
+| Time Scaling | 2.0 |
+| Control Mode | Velocity |
+| Motor ID | 100 |
 
 ## Tracking Results
 
@@ -60,11 +63,22 @@ The figure below shows the desired and actual ankle trajectories over three cont
 | Actual Peak Torque | 0.26 Nm |
 | Actual RMS Torque | 0.04 Nm |
 
+## Observations
+
+- The actuator successfully tracked the ankle trajectory over three continuous gait cycles.
+- Desired and actual trajectories closely matched throughout the motion.
+- RMS tracking error remained below 2°.
+- Velocity tracking remained stable across all gait cycles.
+- Current and torque values remained low during no-load testing.
+
+## Note
+Current and torque values shown are measured under no-load conditions.
+
 
 ## Dataset
 
 Winter gait ankle trajectory dataset.
 
-## Note
+
 
 Current and torque values shown are measured under no-load conditions.
