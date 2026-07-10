@@ -295,6 +295,7 @@ vehicle IMU) has different noise characteristics.
 ```bash
 cd imu_project   # if not already there
 source sensor_env/bin/activate
+nano imu_thigh_angle.py
 python3 imu_thigh_angle.py
 ```
 
