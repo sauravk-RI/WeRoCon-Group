@@ -133,7 +133,7 @@ hostname -I
 **On the Raspberry Pi:**
 ```bash
 source sensor_env/bin/activate
-nano gv7_live_logger.py // paste the code in it (ctrl + o -> enter -> ctrl + x)
+nano gv7_live_logger.py
 python3 gv7_live_logger.py
 ```
 
