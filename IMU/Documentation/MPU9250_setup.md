@@ -19,7 +19,7 @@ end up with a working thigh-angle logger and MATLAB plots.
 |---|---|
 | `verify_mpu9250.py` | Checks whether your board is a genuine MPU9250/GY-91 or a fake/relabeled clone (Section 6) |
 | `imu_thigh_angle.py` | Main Kalman-filter logger, writes `imu_data.csv` |
-| `plot_imu_data.m` | MATLAB script to plot the CSV output |
+| `plot_imu.m` | MATLAB script to plot the CSV output |
 
 **Everything in this guide happens inside one project folder.** Create
 it first and keep all three files above inside it — every command
@@ -53,7 +53,8 @@ The MPU9250 talks over I2C — only 4 wires needed:
 Reference for the full 40-pin header (this guide only uses pins 1, 3,
 5, and 6, but keep this handy if you add other sensors later):
 
-![Raspberry Pi 5 GPIO pinout](images/raspberry_pi5_gpio_pinout.png)
+![Raspberry Pi 5 GPIO pinout]<img width="2016" height="1168" alt="image" src="https://github.com/user-attachments/assets/eec8f2a8-98b5-4abe-bb5c-a0de12762ce7" />
+
 
 - Leave **AD0 tied to GND** — this keeps the accel/gyro at I2C address
   `0x68`. If AD0 is pulled high instead, the address becomes `0x69`
@@ -97,6 +98,9 @@ running both on the same Pi):
 | Nothing at all | Check wiring (Section 2), check the Pi is powered, and check you actually rebooted after enabling I2C |
 | `UU` instead of an address | A kernel driver has already claimed that address — usually harmless for our purposes, but means you can't talk to it directly over raw I2C without unloading that driver first |
 
+![If MPU9250 has all sensors]<img width="2171" height="724" alt="image" src="https://github.com/user-attachments/assets/b3e2b86b-8b4a-4af0-a6bb-4101da4f20ab" />
+
+
 A typical **first scan**, right after wiring and before running any
 script, looks like this:
 ```
@@ -104,7 +108,7 @@ script, looks like this:
 00:          -- -- -- -- -- -- -- -- -- -- -- -- --
 60: -- -- -- -- -- -- -- -- 68 -- -- -- -- -- -- --
 70: -- -- -- -- -- -- 76 --
-```
+`
 That's a genuine board with only `68` (accel/gyro) and `76` (BMP280)
 visible — the `0C` (magnetometer) hasn't shown up yet because bypass
 mode isn't enabled until the Python script runs. This is normal, not
