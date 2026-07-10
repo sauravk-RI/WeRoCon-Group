@@ -125,7 +125,7 @@ If your sensor enumerates as a different port (e.g. `/dev/ttyUSB0` or
 
 ## 7. Run it
 
-**Find the Pi's IP address** (run this in a separate terminal on the Pi):
+**Find the Pi's IP address** (note it down, used to connect dashboard to terminal):
 ```bash
 hostname -I
 ```
