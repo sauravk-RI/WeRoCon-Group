@@ -135,9 +135,9 @@ Download Raspberry Pi Imager on laptop
 
 ---
 
-# MPU6250 — Wiring & Setup Guide
+# MPU6050 — Wiring & Setup Guide
 
-> Connect and read accelerometer + gyroscope data from the MPU6250 using I2C on Raspberry Pi 5.
+> Connect and read accelerometer + gyroscope data from the MPU6050 using I2C on Raspberry Pi 5.
 
 ---
 
@@ -145,7 +145,7 @@ Download Raspberry Pi Imager on laptop
 
 | Item | Details |
 |---|---|
-| MPU6250 Module | 6-axis IMU (Accelerometer + Gyroscope) |
+| MPU6050 Module | 6-axis IMU (Accelerometer + Gyroscope) |
 | Jumper Wires | 4x Female-to-Female |
 | Breadboard | Optional, for easy wiring |
 
@@ -155,7 +155,7 @@ Download Raspberry Pi Imager on laptop
 
 ## Step 8 — Enable I2C on Raspberry Pi 5
 
-The MPU6250 communicates via **I2C**, which is disabled by default. Enable it:
+The MPU6050 communicates via **I2C**, which is disabled by default. Enable it:
 
 ```bash
 sudo raspi-config
@@ -188,18 +188,18 @@ ls /dev/i2c*
 
 ---
 
-## Step 9 — Wire the MPU6250 to Raspberry Pi 5
+## Step 9 — Wire the MPU6050 to Raspberry Pi 5
 
 Connect using **4 jumper wires** only:
 
-| MPU6250 Pin | Raspberry Pi 5 Pin | Description |
+| MPU6050 Pin | Raspberry Pi 5 Pin | Description |
 |---|---|---|
 | **VCC** | Pin 1 — 3.3V | Power |
 | **GND** | Pin 6 — GND | Ground |
 | **SDA** | Pin 3 — GPIO 2 | I2C Data |
 | **SCL** | Pin 5 — GPIO 3 | I2C Clock |
 
-> ⚠️ Always use **3.3V** for VCC — never 5V. The MPU6250 is a 3.3V sensor and 5V will damage it.
+> ⚠️ Always use **3.3V** for VCC — never 5V. The MPU6050 is a 3.3V sensor and 5V will damage it.
 
 <img width="800" height="300" alt="image" src="https://github.com/user-attachments/assets/c3178f22-eb6b-4f78-b594-0fc0bf74391c" />
 
@@ -234,13 +234,13 @@ pip install mpu6050-raspberrypi
 | Library | Purpose |
 |---|---|
 | `smbus2` | Communicate with I2C devices from Python |
-| `mpu6050-raspberrypi` | Ready-made driver to read MPU6250/6050 data |
+| `mpu6050-raspberrypi` | Ready-made driver to read MPU6050 data |
 | `i2c-tools` | Scan and detect I2C devices on the bus |
 | `python3-smbus` | System-level I2C support |
 
 ---
 
-## Step 11 — Detect MPU6250 on I2C Bus
+## Step 11 — Detect MPU6050 on I2C Bus
 
 Run a scan to confirm the sensor is wired correctly and detected:
 
@@ -262,8 +262,8 @@ Expected output:
 70: -- -- -- -- -- -- -- --
 ```
 
-> `68` appearing = MPU6250 successfully detected ,
->  I2C Address Of MPU6250 = 0x68 (hexadecimal)
+> `68` appearing = MPU6050 successfully detected ,
+>  I2C Address Of MPU6050 = 0x68 (hexadecimal)
 > Nothing showing = recheck your wiring
 
 ---
