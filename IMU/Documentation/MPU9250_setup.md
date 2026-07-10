@@ -30,7 +30,8 @@ The MPU9250 talks over I2C — only 4 wires needed:
 Reference for the full 40-pin header (this guide only uses pins 1, 3,
 5, and 6, but keep this handy if you add other sensors later):
 
-![Raspberry Pi 5 GPIO pinout](images/raspberry_pi5_gpio_pinout.png)
+![Raspberry Pi 5 GPIO pinout]<img width="2016" height="1168" alt="image" src="https://github.com/user-attachments/assets/3abd1738-c3a5-4fe1-8ebb-aabffc17d5b5" />
+
 
 - Leave **AD0 tied to GND** — this keeps the accel/gyro at I2C address
   `0x68`. If AD0 is pulled high instead, the address becomes `0x69`
