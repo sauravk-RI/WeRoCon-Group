@@ -125,9 +125,15 @@ If your sensor enumerates as a different port (e.g. `/dev/ttyUSB0` or
 
 ## 7. Run it
 
+**Find the Pi's IP address** (run this in a separate terminal on the Pi):
+```bash
+hostname -I
+```
+
 **On the Raspberry Pi:**
 ```bash
 source sensor_env/bin/activate
+nano gv7_live_logger.py // paste the code in it (ctrl + o -> enter -> ctrl + x)
 python3 gv7_live_logger.py
 ```
 
@@ -141,10 +147,6 @@ You should see:
       Find Pi IP with: hostname -I
 ```
 
-**Find the Pi's IP address** (run this in a separate terminal on the Pi):
-```bash
-hostname -I
-```
 
 **On your laptop:**
 1. Open `dashboard_gv7.html` in any browser (double-click it, or serve
