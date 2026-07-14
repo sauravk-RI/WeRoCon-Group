@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Thigh IMU - Live Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    --pitch: #58a6ff;
+    --sensor-rate: #f85149;
+    --derived-rate: #3fb950;
+    --phase: #d29922;
+    --portrait: #ff7b72;
+    --ok: #3fb950;
+    --bad: #f85149;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    padding: 20px;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.2px;
+  }
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--bad);
+    transition: background 0.2s;
+  }
+  .dot.connected { background: var(--ok); }
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+  input[type="text"] {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    width: 220px;
+  }
+  button {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--muted); }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .panel h2 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    margin: 0 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .chart-wrap {
+    position: relative;
+    height: 240px;
+  }
+  .readouts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .readout {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+  .readout .label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .readout .value {
+    font-size: 22px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    margin-top: 2px;
+  }
+  .readout .unit {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Thigh IMU &mdash; Live Dashboard</h1>
+  <div class="controls">
+    <input type="text" id="wsUrl" value="ws://raspberrypi.local:8765">
+    <button id="connectBtn">Connect</button>
+  </div>
+  <div class="status">
+    <span class="dot" id="statusDot"></span>
+    <span id="statusText">Disconnected</span>
+  </div>
+</header>
+
+<div class="readouts">
+  <div class="readout">
+    <div class="label">Pitch</div>
+    <div class="value" id="rPitch">&mdash;<span class="unit">&deg;</span></div>
+  </div>
+  <div class="readout">
+    <div class="label">Derived Ang. Vel.</div>
+    <div class="value" id="rRate">&mdash;<span class="unit">&deg;/s</span></div>
+  </div>
+  <div class="readout">
+    <div class="label">Phase Variable</div>
+    <div class="value" id="rPhase">&mdash;</div>
+  </div>
+  <div class="readout">
+    <div class="label">Samples / sec</div>
+    <div class="value" id="rHz">&mdash;<span class="unit">Hz</span></div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="panel">
+    <h2>Thigh Pitch Angle</h2>
+    <div class="chart-wrap"><canvas id="pitchChart"></canvas></div>
+  </div>
+  <div class="panel">
+    <h2>Angular Velocity &mdash; Sensor vs Derived</h2>
+    <div class="chart-wrap"><canvas id="rateChart"></canvas></div>
+  </div>
+  <div class="panel">
+    <h2>Phase Portrait (Pitch vs Derived Ang. Vel.)</h2>
+    <div class="chart-wrap"><canvas id="portraitChart"></canvas></div>
+  </div>
+  <div class="panel">
+    <h2>Phase Variable</h2>
+    <div class="chart-wrap"><canvas id="phaseChart"></canvas></div>
+  </div>
+</div>
+
+<script>
+const WINDOW_SECONDS = 10;
+const MAX_PORTRAIT_POINTS = 1500;
+
+let ws = null;
+let t0 = null;
+let sampleCount = 0;
+let lastHzCheck = performance.now();
+let hzCounter = 0;
+let redrawCounter = 0;
+const REDRAW_EVERY_N = 4;
+
+const pitchData = [];
+const rateData = { sensor: [], derived: [] };
+const phaseData = [];
+const portraitData = [];
+
+const chartDefaults = {
+  animation: false,
+  responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    x: {
+      type: "linear",
+      ticks: { color: "#8b949e", maxTicksLimit: 6 },
+      grid: { color: "#21262d" },
+      title: { display: true, text: "Time (s)", color: "#8b949e" }
+    },
+    y: {
+      ticks: { color: "#8b949e" },
+      grid: { color: "#21262d" }
+    }
+  },
+  plugins: { legend: { labels: { color: "#c9d1d9", boxWidth: 12, font: { size: 11 } } } }
+};
+
+const pitchChart = new Chart(document.getElementById("pitchChart"), {
+  type: "line",
+  data: { datasets: [{ label: "Pitch (deg)", data: pitchData, borderColor: "#58a6ff", backgroundColor: "transparent", pointRadius: 0, borderWidth: 1.5 }] },
+  options: JSON.parse(JSON.stringify(chartDefaults))
+});
+
+const rateChart = new Chart(document.getElementById("rateChart"), {
+  type: "line",
+  data: {
+    datasets: [
+      { label: "Sensor (estAngularRateY)", data: rateData.sensor, borderColor: "#f85149", backgroundColor: "transparent", pointRadius: 0, borderWidth: 1.2 },
+      { label: "Derived (filtered)", data: rateData.derived, borderColor: "#3fb950", backgroundColor: "transparent", pointRadius: 0, borderWidth: 1.2 }
+    ]
+  },
+  options: JSON.parse(JSON.stringify(chartDefaults))
+});
+
+const phaseChart = new Chart(document.getElementById("phaseChart"), {
+  type: "line",
+  data: { datasets: [{ label: "Phase (0-1)", data: phaseData, borderColor: "#d29922", backgroundColor: "transparent", pointRadius: 0, borderWidth: 1.5 }] },
+  options: (() => {
+    const o = JSON.parse(JSON.stringify(chartDefaults));
+    o.scales.y.min = 0;
+    o.scales.y.max = 1;
+    return o;
+  })()
+});
+
+const portraitChart = new Chart(document.getElementById("portraitChart"), {
+  type: "scatter",
+  data: { datasets: [{ label: "Pitch vs Derived Ang. Vel.", data: portraitData, borderColor: "#ff7b72", backgroundColor: "#ff7b72", pointRadius: 1.5, showLine: false }] },
+  options: {
+    animation: false,
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: { title: { display: true, text: "Pitch (deg)", color: "#8b949e" }, ticks: { color: "#8b949e" }, grid: { color: "#21262d" } },
+      y: { title: { display: true, text: "Derived Ang. Vel. (deg/s)", color: "#8b949e" }, ticks: { color: "#8b949e" }, grid: { color: "#21262d" } }
+    },
+    plugins: { legend: { display: false } }
+  }
+});
+
+function pruneWindow(arr, tNow) {
+  while (arr.length && (tNow - arr[0].x) > WINDOW_SECONDS) arr.shift();
+}
+
+function handleSample(msg) {
+  if (t0 === null) t0 = msg.t;
+  const tRel = msg.t - t0;
+
+  hzCounter++;
+  const now = performance.now();
+  if (now - lastHzCheck >= 1000) {
+    document.getElementById("rHz").innerHTML = `${hzCounter}<span class="unit">Hz</span>`;
+    hzCounter = 0;
+    lastHzCheck = now;
+  }
+
+  document.getElementById("rPitch").innerHTML = `${msg.pitch_deg.toFixed(1)}<span class="unit">&deg;</span>`;
+  if (msg.derived_ang_vel_deg_s !== null) {
+    document.getElementById("rRate").innerHTML = `${msg.derived_ang_vel_deg_s.toFixed(1)}<span class="unit">&deg;/s</span>`;
+  }
+  document.getElementById("rPhase").textContent = msg.phase_var !== null ? msg.phase_var.toFixed(3) : "\u2014";
+
+  pitchData.push({ x: tRel, y: msg.pitch_deg });
+  pruneWindow(pitchData, tRel);
+
+  if (msg.sensor_ang_vel_deg_s !== null) {
+    rateData.sensor.push({ x: tRel, y: msg.sensor_ang_vel_deg_s });
+    pruneWindow(rateData.sensor, tRel);
+  }
+  if (msg.derived_ang_vel_deg_s !== null) {
+    rateData.derived.push({ x: tRel, y: msg.derived_ang_vel_deg_s });
+    pruneWindow(rateData.derived, tRel);
+  }
+
+  if (msg.phase_var !== null) {
+    phaseData.push({ x: tRel, y: msg.phase_var });
+    pruneWindow(phaseData, tRel);
+  }
+
+  if (msg.derived_ang_vel_deg_s !== null) {
+    portraitData.push({ x: msg.pitch_deg, y: msg.derived_ang_vel_deg_s });
+    if (portraitData.length > MAX_PORTRAIT_POINTS) portraitData.shift();
+  }
+
+  const xMin = tRel - WINDOW_SECONDS;
+  [pitchChart, rateChart, phaseChart].forEach(c => {
+    c.options.scales.x.min = xMin;
+    c.options.scales.x.max = tRel;
+  });
+
+  redrawCounter++;
+  if (redrawCounter >= REDRAW_EVERY_N) {
+    redrawCounter = 0;
+    pitchChart.update("none");
+    rateChart.update("none");
+    phaseChart.update("none");
+    portraitChart.update("none");
+  }
+}
+
+function setStatus(connected, text) {
+  document.getElementById("statusDot").classList.toggle("connected", connected);
+  document.getElementById("statusText").textContent = text;
+}
+
+function connect() {
+  const url = document.getElementById("wsUrl").value.trim();
+  if (!url) return;
+
+  if (ws) { ws.close(); }
+
+  setStatus(false, "Connecting...");
+  ws = new WebSocket(url);
+
+  ws.onopen = () => setStatus(true, "Connected");
+  ws.onclose = () => setStatus(false, "Disconnected");
+  ws.onerror = () => setStatus(false, "Connection error");
+  ws.onmessage = (event) => {
+    try {
+      const msg = JSON.parse(event.data);
+      handleSample(msg);
+    } catch (e) {
+      console.error("Bad message:", e);
+    }
+  };
+}
+
+document.getElementById("connectBtn").addEventListener("click", connect);
+</script>
+
+</body>
+</html>
