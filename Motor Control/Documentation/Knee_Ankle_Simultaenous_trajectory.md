@@ -4,8 +4,7 @@
 
 This document demonstrates simultaneous trajectory tracking of the knee and ankle joints using two CubeMars AK80-9 actuators connected through a CAN bus.
 
-Each actuator follows its own predefined trajectory while both motors are controlled within the same synchronized control loop. The knee and ankle trajectories are loaded from separate CSV files and executed simultaneously to achieve coordinated lower-limb motion.
-
+Each actuator follows its own predefined gait trajectory while both motors are controlled within the same synchronized control loop. The knee and ankle joints execute coordinated gait cycles simultaneously, enabling synchronized lower-limb motion.
 ## Hardware Requirements
 
 - Raspberry Pi 4
