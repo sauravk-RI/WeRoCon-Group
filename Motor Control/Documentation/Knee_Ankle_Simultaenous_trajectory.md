@@ -5,6 +5,8 @@
 This document demonstrates simultaneous trajectory tracking of the knee and ankle joints using two CubeMars AK80-9 actuators connected through a CAN bus.
 
 Each actuator follows its own predefined gait trajectory while both motors are controlled within the same synchronized control loop. The knee and ankle joints execute coordinated gait cycles simultaneously, enabling synchronized lower-limb motion.
+
+
 ## Hardware Requirements
 
 - Raspberry Pi 4
@@ -46,13 +48,21 @@ The following wiring diagram shows the hardware setup used for simultaneous knee
 ### 2. Enable the CAN Interface
 
 ```bash
+sudo ip link set can0 down
+```
+
+```bash
 sudo ip link set can0 up type can bitrate 1000000
+```
+
+```bash
+sudo ip link set can0 up
 ```
 
 Verify that the CAN interface is active:
 
 ```bash
-ip link show can0
+candump can0
 ```
 
 ### 3. Run the Simultaneous Trajectory Tracking Program
@@ -1226,16 +1236,17 @@ The simultaneous trajectory tracking program was successfully executed on two Cu
 
 ## Features
 
-- Simultaneous control of knee and ankle actuators.
-- Independent trajectory generation for each joint.
-- Synchronized real-time control loop.
+- Simultaneous trajectory tracking of knee and ankle joints.
+- Independent trajectory generation for both actuators.
+- Synchronized real-time control loop for coordinated gait execution.
+- Knee motor configured with CAN ID **100** and ankle motor configured with CAN ID **001**.
 - Continuous monitoring of motor position, velocity, current, and output torque.
-- Built-in safety mechanism for excessive joint rotation.
-- Automatic generation of tracking logs and plots.
+- Built-in safety mechanism that stops trajectory execution if either joint rotates beyond **±101°** from its starting position.
+- Automatic return of both motors to their initial positions after a safety shutdown.
+- Automatic generation of tracking logs and trajectory plots for both joints.
 
 
-
-  ## Conclusion
+## Conclusion
 
 The simultaneous trajectory tracking of the knee and ankle joints was successfully implemented using two CubeMars AK80-9 actuators connected over a CAN bus.
 
