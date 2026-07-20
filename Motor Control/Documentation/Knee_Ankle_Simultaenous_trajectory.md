@@ -71,7 +71,7 @@ candump can0
 python3 kneeankle_101.py
 ```
 
-The program simultaneously controls the knee and ankle actuators by executing their respective trajectories. During execution, the script continuously logs motor position, velocity, current, and torque data while monitoring safety limits for both joints. :contentReference[oaicite:1]{index=1}
+The program simultaneously controls the knee and ankle actuators by executing their respective trajectories. During execution, the script continuously logs motor position, velocity, current, and torque data while monitoring safety limits for both joints.
 
 
 ## Source Code
