@@ -27,7 +27,7 @@ Each actuator follows its own predefined gait trajectory while both motors are c
 - NumPy
 - Pandas
 
-  ## Circuit Diagram
+## Circuit Diagram
 
 The following wiring diagram shows the hardware setup used for simultaneous knee and ankle trajectory tracking.
 
