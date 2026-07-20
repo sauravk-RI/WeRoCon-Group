@@ -14,7 +14,6 @@ Each actuator follows its own predefined gait trajectory while both motors are c
 - Emergency Stop Switch
 - CAN Bus Wiring
 
-  
 ## Software Requirements
 
 - Linux (Raspberry Pi OS)
