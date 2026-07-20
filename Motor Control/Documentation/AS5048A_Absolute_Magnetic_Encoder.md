@@ -64,26 +64,6 @@ Unlike incremental encoders, the AS5048B always reports the absolute position im
 
 ---
 
-# Software Implementation
-
-The encoder was integrated into both the knee and ankle trajectory tracking programs.
-
-Two Python programs were developed:
-
-- `kneewithencoder.py`
-- `anklewithencoder.py`
-
-Both programs:
-
-- Initialize the AS5048B encoder.
-- Read encoder position continuously.
-- Execute the Winter gait trajectory.
-- Compare external encoder readings with the motor's internal encoder.
-- Log all measurements into CSV files.
-- Generate comparison plots automatically.
-
----
-
 # Program Features
 
 Both implementations include:
@@ -100,19 +80,6 @@ Both implementations include:
 
 ---
 
-## Knee Encoder Results
-
-Figure 1 shows the comparison between the external AS5048B encoder and the motor's internal encoder during knee trajectory tracking.
-
-![Knee Encoder Comparison](kneewithencoder.png)
-
----
-
-## Ankle Encoder Results
-
-Figure 2 shows the comparison between the external AS5048B encoder and the motor's internal encoder during ankle trajectory tracking.
-
-![Ankle Encoder Comparison](anklewithencoder.png)
 
 # Knee Encoder Source Code
 
@@ -1927,6 +1894,20 @@ These programs perform:
 - Plot generation
 
 ---
+## Knee Encoder Results
+
+Figure 1 shows the comparison between the external AS5048B encoder and the motor's internal encoder during knee trajectory tracking.
+
+![Knee Encoder Comparison](kneewithencoder.png)
+
+---
+
+## Ankle Encoder Results
+
+Figure 2 shows the comparison between the external AS5048B encoder and the motor's internal encoder during ankle trajectory tracking.
+
+![Ankle Encoder Comparison](anklewithencoder.png)
+
 
 # Conclusion
 
