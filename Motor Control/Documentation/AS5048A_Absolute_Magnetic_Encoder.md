@@ -1923,3 +1923,20 @@ Figure 2 shows the comparison between the external AS5048B encoder and the motor
 The AS5048B magnetic encoder was successfully integrated with both the knee and ankle control systems. It provided reliable joint angle measurements throughout gait execution and served as an independent validation of the motor's internal encoder.
 
 The comparison between the external and internal encoders showed high correlation for both joints while also highlighting small differences caused by transmission compliance and mechanical backlash. This makes the encoder a valuable diagnostic tool and provides a foundation for future closed-loop joint control and advanced control strategies.
+
+# References
+
+1. ams OSRAM. *AS5048B 14-bit Rotary Position Sensor with I²C Interface – Datasheet.*
+2. Cubemars AK80-9 Servo Motor Documentation.
+3. OpenSourceLeg Documentation.
+
+---
+
+# Official Documentation
+
+The official AS5048B datasheet is provided in this repository for reference.
+
+- [AS5048B Datasheet](AS5048B_Datasheet.pdf)
+
+
+
