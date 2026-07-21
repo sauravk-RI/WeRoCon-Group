@@ -66,23 +66,21 @@ Unlike incremental encoders, the AS5048B always reports the absolute position im
 
 ---
 
-# Encoder Mounting
+## AS5048B Encoder PCB
 
-The AS5048B encoder was mounted directly above a diametrically magnetized magnet fixed to the rotating shaft. The encoder senses the magnetic field produced by the rotating magnet to determine the absolute angular position of the joint.
+![AS5048B PCB](AS5048B.png)
 
-For reliable operation, the magnet should be centered over the sensing chip and the distance between the magnet and the AS5048B sensing chip should be **no more than 2 mm**. Proper alignment ensures accurate angle measurements and stable encoder performance.
-
-![AS5048B PCB](encoder_pcb.png)
-
-**Figure 1.** AS5048B encoder PCB showing the sensing chip. The magnet should be positioned directly above the sensing chip with a maximum separation of **2 mm**.
+**Figure 1.** AS5048B encoder PCB showing the sensing chip. The rotating magnet should be centered directly above the sensing chip with a maximum separation of **2 mm** for reliable operation.
 
 ## Encoder Mounted on the Test Rig
 
-The figure below shows the AS5048B encoder mounted on the prosthetic joint test setup. The encoder is fixed to the stationary bracket while the magnet is attached to the rotating shaft. As the shaft rotates, the encoder measures the joint angle without physical contact.
+![Magnetic Encoder Mounted](magnetic_encoder.JPG)
 
-![Encoder Mounted](encoder_mount.jpg)
+**Figure 2.** AS5048B magnetic encoder mounted on the prosthetic joint test rig. The encoder PCB is fixed to the stationary support, while a diametrically magnetized magnet is mounted on the rotating shaft directly above the sensing chip. The magnet is positioned at a maximum distance of **2 mm** from the sensing chip to ensure accurate angle measurements.
 
-**Figure 2.** AS5048B magnetic encoder mounted on the prosthetic joint test setup.
+
+
+
 
 
 # Knee Encoder Source Code
