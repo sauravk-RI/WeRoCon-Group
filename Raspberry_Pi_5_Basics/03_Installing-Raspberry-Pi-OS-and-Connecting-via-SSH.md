@@ -290,27 +290,131 @@ Wait approximately **30–60 seconds** for the first boot to complete.
 
 # Step 12: Find the Raspberry Pi's IP Address
 
-To connect remotely, you first need to know the Raspberry Pi's IP address.
+To connect to your Raspberry Pi remotely using **SSH**, you first need to know its IP address.
 
-- Make sure the Raspberry Pi is powered on and lets hope that it is successfully connected to the internet over the dame network that your laptop/computer is connected to. Amen ! 😇🧔🏽
+Before proceeding, ensure that:
 
-- Make sure your laptop/computer is also connected to the same internet network.
+- The Raspberry Pi has finished booting.
+- The Raspberry Pi is connected to the intended Wi-Fi network.
+- Your laptop/computer is connected to the **same Wi-Fi network**.
 
-- Step 1: Lets check if our RPi has actually successfully connected to our intended computer network and is ONLINE or not. Open the command promt on your windows laptop/computer and run the following command:
+## Method 1 (Recommended): Using the Raspberry Pi Hostname
 
-   ```
-   ping -4 [your_rpi_hostname].local
-   ```
+If everything has been configured correctly, your computer should be able to discover the Raspberry Pi using its hostname.
 
-   If you see some terminal results like these you are good to go :
+Open a terminal.
 
-   ```
-   Pinging rpi1.local [10.148.24.8] with 32 bytes of data:                                                                 Reply from 10.148.24.8: bytes=32 time=9ms TTL=64                                                                        Reply from 10.148.24.8: bytes=32 time=9ms TTL=64                                                                        Reply from 10.148.24.8: bytes=32 time=11ms TTL=64                                                                       Reply from 10.148.24.8: bytes=32 time=57ms TTL=64                                                                                                                                                                                               Ping statistics for 10.148.24.8:                                                                                            Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),                                                                Approximate round trip times in milli-seconds:                                                                              Minimum = 9ms, Maximum = 57ms, Average = 21ms 
-   ``` 
+On Windows, you can use:
 
-   - Observe the number inside the square bracket in the first line of the ouput. That is your RPi connection's IP !
+- Command Prompt
+- Windows Terminal
+- PowerShell
 
-   > Example: In the above terminal log observe the first line -- `Pinging rpi1.local [10.148.24.8] with 32 bytes of data`. Here, 10.148.24.8 is the IP of your RPi.
+Run:
+
+```bash
+ping -4 <your_rpi_hostname>.local
+```
+
+Example:
+
+```bash
+ping -4 rpi1.local
+```
+
+If the Raspberry Pi is reachable, you should see output similar to:
+
+```text
+Pinging rpi1.local [10.148.24.8] with 32 bytes of data:
+Reply from 10.148.24.8: bytes=32 time=9ms TTL=64
+Reply from 10.148.24.8: bytes=32 time=9ms TTL=64
+Reply from 10.148.24.8: bytes=32 time=11ms TTL=64
+Reply from 10.148.24.8: bytes=32 time=57ms TTL=64
+```
+
+The IP address appears inside the square brackets on the first line.
+
+For example:
+
+```
+Pinging rpi1.local [10.148.24.8]
+```
+
+Here,
+
+```
+10.148.24.8
+```
+
+is the Raspberry Pi's IP address.
+
+---
+
+## What If `ping rpi1.local` Does Not Work?
+
+On some networks—especially university, laboratory, or enterprise Wi-Fi networks—the Raspberry Pi's hostname may not be discoverable because of network security policies or multicast (mDNS) restrictions.
+
+If the hostname cannot be resolved, use the alternative method described below.
+
+---
+
+## Alternative Method: Find the Raspberry Pi's IP Address Using a Monitor
+
+If your computer cannot discover the Raspberry Pi on the network, you can temporarily connect a monitor and keyboard directly to the Raspberry Pi to determine its current IP address.
+
+This method is particularly useful when:
+
+- `ping <hostname>.local` does not work.
+- Angry IP Scanner cannot find the Raspberry Pi.
+- Your network blocks device discovery.
+- The Raspberry Pi has obtained a new IP address after connecting to a different Wi-Fi network.
+
+### Step 1: Connect a Monitor and Keyboard
+
+Temporarily connect:
+
+- An HDMI monitor
+- A USB keyboard
+
+Log in to Raspberry Pi OS.
+
+### Step 2: Display the IP Address
+
+Open a terminal and run:
+
+```bash
+hostname -I
+```
+
+Example output:
+
+```text
+10.148.24.8
+```
+
+The displayed value is the Raspberry Pi's current IP address.
+
+> **Note:** If multiple IP addresses are displayed, the first one is usually the address assigned to the active Wi-Fi connection.
+
+### Step 3: Verify Network Connectivity
+
+Ensure that your laptop is connected to the same Wi-Fi network.
+
+Open a terminal (or Command Prompt on Windows) and run:
+
+```bash
+ping 10.148.24.8
+```
+
+Replace the example IP address with the one displayed by your Raspberry Pi.
+
+If you receive replies, the Raspberry Pi is successfully connected to the same WiFi network as your computer and is reachable from your computer.
+
+### Step 4: Connect Using SSH
+
+You can now connect using the discovered IP address.
+
+> **Practical Tip:** This is one of the quickest and most reliable methods for recovering the Raspberry Pi's IP address whenever automatic discovery tools fail or when working on enterprise or university Wi-Fi networks.
 
 ---
 
