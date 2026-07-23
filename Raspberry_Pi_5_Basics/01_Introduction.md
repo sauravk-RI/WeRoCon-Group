@@ -1,5 +1,6 @@
 # Introduction to Raspberry Pi 5
 
+@FirstAuthor: Pritam Ranjan Kalita, Project Assitant, WeRoCon Laboratory, July 2026.
 
 ## What is Raspberry Pi 5?
 

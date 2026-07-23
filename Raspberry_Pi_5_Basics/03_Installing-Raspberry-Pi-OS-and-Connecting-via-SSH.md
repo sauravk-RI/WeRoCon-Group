@@ -1,6 +1,7 @@
-# Lesson 2: Installing Raspberry Pi OS and Connecting via SSH
+# Lesson 3: Installing Raspberry Pi OS and Connecting via SSH
 
-Author: Pritam Ranjan Kalita, Project Assitant, WeRoCon Lab
+@FirstAuthor: Pritam Ranjan Kalita, Project Assitant, WeRoCon Laboratory, July 2026.
+@Credits: Install Raspberry Pi OS without a Monitor (Part 1) - Raspberry Pi 5 Tutorial (#2) | Robotics Backend YT Channel
 
 **This tutorial is majorly inspired from the lesson 2 of *Raspberry Pi 5 Tutorials for Beginners* YouTube Series. It is recomended that you watch the video first and then come to this written lesson for following the steps properly.** 
 
@@ -376,6 +377,8 @@ pi@raspberrypi:~ $
 ```
 
 Congratulations! You are now connected to your Raspberry Pi through SSH.
+
+> 💡 Note: In case, you want to break out and exit of the Raspberry Pi SSH connection just type `exit` and press enter in your terminal that is currently connected to the RPi. 
 
 ---
 

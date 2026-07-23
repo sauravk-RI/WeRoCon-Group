@@ -1,4 +1,8 @@
-# Clean Formatting An SD Card Previously Used In A Raspberry Pi 
+# Lesson 2: Clean Formatting An SD Card Previously Used In A Raspberry Pi
+
+@FirstAuthor: Pritam Ranjan Kalita, Project Assitant, WeRoCon Laboratory, July 2026.
+@Credits: How to Format and Reuse a Raspberry Pi SD Card | Coding With Ashwin YT Channel
+
 
 1. Mount the SD Card into your computer/laptop using a SD Card Reader.
 
