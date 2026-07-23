@@ -1,6 +1,6 @@
 # Lesson 1: Introduction to Raspberry Pi 5
 
-@FirstAuthor: Pritam Ranjan Kalita, Project Assitant, WeRoCon Laboratory, July 2026.
+@FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026.
 
 ## What is Raspberry Pi 5?
 
@@ -29,8 +29,8 @@ The Raspberry Pi 5 can be used for:
 The figure below shows the major components and connectors available on the Raspberry Pi 5. While not every connector is required in every project, understanding their purpose makes it much easier to build hardware systems.
 
 <figure>
-  <img src="ImageFiles/2026-07-22-13-03-30.png" alt="40 GPIO Pin Description of Raspberry Pi 5">
-  <figcaption>Figure: Components of Raspberry Pi 5 of Raspberry Pi 5. <br> <i>Source: https://techtonics.in/product/raspberry-pi-5-model-8gb/</i></figcaption>
+  <img src="ImageFiles/2026-07-22-13-03-30.png" alt="Components of Raspberry Pi 5">
+  <figcaption>Figure: Components of Raspberry Pi 5. <br> <i>Source: https://techtonics.in/product/raspberry-pi-5-model-8gb/</i></figcaption>
 </figure>
 
 <figure>

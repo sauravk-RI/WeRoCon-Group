@@ -1,6 +1,6 @@
 # Lesson 4: Configuring Remote Desktop Access in Raspberry Pi 5 with VNC
 
-@FirstAuthor: Pritam Ranjan Kalita, Project Assitant, WeRoCon Laboratory, July 2026.
+@FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026.
 @Credits: Install Raspberry Pi OS without a Monitor (Part 2) - Raspberry Pi 5 Tutorial (#3) | Robotics Backend YT Channel
 
 ## Learning Objectives
@@ -100,7 +100,7 @@ sudo raspi-config
 
 Upon successfully running the command, you see a menu like this inside your terminal environment:
 
-![alt text](ImageFIles/image.png)
+![alt text](ImageFiles/image.png)
 
 Use the **arrow keys**, **Enter**, and **Tab** to navigate through the menus.
 
@@ -117,7 +117,7 @@ Interface Options
 ```
 Press **Enter**.
 
-![alt text](ImageFIles/image2.png)
+![alt text](ImageFiles/image2.png)
 
 Select:
 
@@ -142,7 +142,7 @@ Yes
 
 After enabling VNC, return to the main menu.
 
-![](ImageFiles\2026-07-23-11-27-52.png)
+![](ImageFiles/2026-07-23-11-27-52.png)
 
 ---
 
@@ -179,7 +179,7 @@ After selecting the desired option, return to the main menu.
 
 `System Options >> Auto Login >> Click *ENTER*`
 
-![](ImageFiles\2026-07-23-11-43-32.png)
+![](ImageFiles/2026-07-23-11-43-32.png)
 
 You will be asked : ***Would you like to automatically login to the console ?***
 
@@ -206,7 +206,7 @@ When prompted to reboot:
 Yes
 ```
 
-![](ImageFiles\2026-07-23-11-51-17.png)
+![](ImageFiles/2026-07-23-11-51-17.png)
 
 Your SSH connection will immediately close because the Raspberry Pi is restarting.
 
@@ -411,7 +411,7 @@ These changes are optional and simply improve readability.
 
 ---
 
-# Step 12: Raspberry Pi Configuration
+# Step 11: Raspberry Pi Configuration
 
 Open and Explore these Raspberry Pi Settings:
 

@@ -1,6 +1,6 @@
-# Tutorial 5: Changing the Wi-Fi Network of Your Raspberry Pi
+# Lesson 5: Changing the Wi-Fi Network of Your Raspberry Pi
 
-@FirstAuthor: Pritam Ranjan Kalita, Project Assitant, WeRoCon Laboratory, July 2026.
+@FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026.
 
 ## When Will You Need This Tutorial?
 
