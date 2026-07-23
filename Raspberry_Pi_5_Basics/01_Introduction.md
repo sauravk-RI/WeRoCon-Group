@@ -1,4 +1,4 @@
-# Introduction to Raspberry Pi 5
+# Lesson 1: Introduction to Raspberry Pi 5
 
 @FirstAuthor: Pritam Ranjan Kalita, Project Assitant, WeRoCon Laboratory, July 2026.
 
