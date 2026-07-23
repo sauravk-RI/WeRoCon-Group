@@ -1,7 +1,7 @@
 # Lesson 4: Configuring Remote Desktop Access in Raspberry Pi 5 with VNC
 
 @FirstAuthor: Pritam Ranjan Kalita, Project Assitant, WeRoCon Laboratory, July 2026.
-@Credits: Install Raspberry Pi OS without a Monitor (Part 1) - Raspberry Pi 5 Tutorial (#2) | Robotics Backend YT Channel
+@Credits: Install Raspberry Pi OS without a Monitor (Part 2) - Raspberry Pi 5 Tutorial (#3) | Robotics Backend YT Channel
 
 ## Learning Objectives
 
