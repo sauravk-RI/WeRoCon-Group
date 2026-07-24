@@ -12,9 +12,9 @@ Sensor Connect setup:
     Enable the Estimation Filter "Attitude (Quaternion)" channel.
 
 Usage:
-    python3 imu_logger_csv_v2.py
-    python3 imu_logger_csv_v2.py --out walking_trial_1.csv
-    python3 imu_logger_csv_v2.py --seconds 15
+    python3 micro_strain_side_mount.py
+    python3 micro_strain_side_mount.py --out walking_trial_1.csv
+    python3 micro_strain_side_mount.py --seconds 15
 
 Calibration:
     Stand neutral and hold still when prompted. Re-run the script for a
