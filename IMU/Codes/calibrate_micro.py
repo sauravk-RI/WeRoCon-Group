@@ -1,6 +1,6 @@
 """
 Standalone calibration - run this once, save the reference quaternion to a
-file. imu_logger_csv_v2.py can then load it instead of re-calibrating every
+file. micro_strain_front_mount.py can then load it instead of re-calibrating every
 single run.
 
 Requires:
@@ -165,7 +165,7 @@ def main():
         json.dump(data, f, indent=2)
 
     print(f"\nSaved calibration to: {os.path.abspath(args.out)}")
-    print("Use this with: python3 imu_logger_csv_v2.py --calibration " + args.out)
+    print("Use this with: python3 micro_strain_front_mount.py --calibration " + args.out)
 
 
 if __name__ == "__main__":
