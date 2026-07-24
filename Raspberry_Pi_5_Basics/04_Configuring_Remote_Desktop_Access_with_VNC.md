@@ -2,9 +2,9 @@
 
 @FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026. <br>
 @Credits: Install Raspberry Pi OS Without a Monitor (Part 2) - Raspberry Pi 5 Tutorial (#3) | "Robotics Back-End" YT Channel | Video Link: https://www.youtube.com/watch?v=oqDvhNqPHBo&list=PLLSegLrePWgIDKJTkdLyyQskh2HDdEL3y&index=4&t=934s <br>
-@Disclaimer: AI has been used in the framing and editing of this document with a human-in-loop.
+@Disclaimer: This tutorial was written and reviewed by the author. AI-assisted tools were used to support drafting, editing, and language refinement, with all technical content verified by the author.
 
-> **This tutorial is heavily inspired from the lesson 3 of *Raspberry Pi 5 Tutorials for Beginners* YouTube Series by Robotics Back-End. It is recomended that you watch the video first and then come to this written lesson for following the steps properly. Check Credits for Video Link.** 
+> **This tutorial is heavily inspired from the lesson 3 of *Raspberry Pi 5 Tutorials for Beginners* YouTube Series by Robotics Back-End. It is recomMended that you watch the video first and then come to this written lesson for following the steps properly. Check Credits for Video Link.** 
 
 ## Learning Objectives
 
@@ -167,7 +167,7 @@ Boot
 ![](ImageFiles/2026-07-23-11-39-06.png)
 
 - **Console** (If you want to just see the RPi OS Terminal after connecting to it. Can already do this using SSH so this is not needed.)
-- **Desktop GUI** (If you want to see the home screen of Raspberry Pi OS right after you connect to your RPi Board form your Laptop/Computer.)
+- **Desktop GUI** (If you want to see the home screen of Raspberry Pi OS right after you connect to your RPi Board from your Laptop/Computer.)
 
 Choose **Desktop GUI**.
 

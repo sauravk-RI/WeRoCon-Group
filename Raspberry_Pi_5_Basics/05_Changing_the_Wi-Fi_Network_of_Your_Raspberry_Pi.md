@@ -1,7 +1,7 @@
 # Lesson 5: Changing the Wi-Fi Network of Your Raspberry Pi
 
 @FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026. <br>
-@Disclaimer: AI has been used in the framing and editing of this document with a human-in-loop.
+@Disclaimer: This tutorial was written and reviewed by the author. AI-assisted tools were used to support drafting, editing, and language refinement, with all technical content verified by the author.
 
 ## When Will You Need This Tutorial?
 
@@ -51,7 +51,7 @@ nmcli device wifi list
 ![](ImageFiles/2026-07-24-12-59-41.png)
 
 
-If you cannot see you network on the list, try this command instead:
+If you cannot see your network on the list, try this command instead:
 
 ```bash
 sudo iwlist wlan0 scan | grep ESSID
@@ -134,7 +134,7 @@ sudo nmcli connection modify WiFi_Name \
 Replace:
 
 - `YOUR_INTERNET_ACCESS_ID` with your official Internet Access ID.
-- `YOUR_INTERNET_ACCESS_PASSWORD` with your offical Internet Access password.
+- `YOUR_INTERNET_ACCESS_PASSWORD` with your official Internet Access password.
 
 <br>
 

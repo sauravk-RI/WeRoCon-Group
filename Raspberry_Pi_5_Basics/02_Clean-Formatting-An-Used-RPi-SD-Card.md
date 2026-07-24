@@ -2,7 +2,7 @@
 
 @FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026. <br>
 @Credits: How to Format and Reuse a Raspberry Pi SD Card | "Coding With Ashwin" YT Channel | Video Link: https://www.youtube.com/watch?v=otztORT2zxk <br>
-@Disclaimer: AI has been used in the framing and editing of this document with a human-in-loop.
+@Disclaimer: This tutorial was written and reviewed by the author. AI-assisted tools were used to support drafting, editing, and language refinement, with all technical content verified by the author.
 
 > 💡 Note: Skip this lesson if you're using a brand-new microSD card — go straight to Lesson 3
 
@@ -14,7 +14,7 @@
 
     ![](ImageFiles/2026-07-22-11-10-26.png)
 
-1. Click on the ***Create and Format Hard Disk Partitions*** option. This opens up the **Disk Manangement** Window. 
+1. Click on the ***Create and Format Hard Disk Partitions*** option. This opens up the **Disk Management** Window. 
 
     ![](ImageFiles/2026-07-22-11-13-37.png)
 
@@ -24,7 +24,7 @@
 
     ![](ImageFiles/2026-07-22-11-19-35.png)
 
-    > 📝 **Note**: Make sure to select the correct disk/drive from the Disk Management Window. If you choose and format a wrong drive, it will lead to loss of potentially important infomation stored on your computer/laptop's hard disk or can also lead to the damage of the OS installation in your computer/laptop.
+    > 📝 **Note**: Make sure to select the correct disk/drive from the Disk Management Window. If you choose and format a wrong drive, it will lead to loss of potentially important information stored on your computer/laptop's hard disk or can also lead to the damage of the OS installation in your computer/laptop.
 
 1. After all the partition of your SD card's disk are deleted, you will see the space inside the SD card's disk shown as Unallocated (*With Black Ribbon Bar*).
 

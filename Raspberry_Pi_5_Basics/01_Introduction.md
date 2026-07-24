@@ -1,7 +1,7 @@
 # Lesson 1: Introduction to Raspberry Pi 5
 
 @FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026. <br>
-@Disclaimer: AI has been used in the framing and editing of this document with a human-in-loop.
+@Disclaimer: This tutorial was written and reviewed by the author. AI-assisted tools were used to support drafting, editing, and language refinement, with all technical content verified by the author.
 
 ## What is Raspberry Pi 5?
 

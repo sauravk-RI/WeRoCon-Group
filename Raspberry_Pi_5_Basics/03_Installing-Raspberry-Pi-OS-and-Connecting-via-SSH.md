@@ -2,9 +2,9 @@
 
 @FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026. <br>
 @Credits: Install Raspberry Pi OS Without a Monitor (Part 1) - Raspberry Pi 5 Tutorial (#2) | "Robotics Back-End" YT Channel | Video Link: https://www.youtube.com/watch?v=d5AheGVw2yo&list=PLLSegLrePWgIDKJTkdLyyQskh2HDdEL3y&index=3 <br>
-@Disclaimer: AI has been used in the framing and editing of this document with a human-in-loop.
+@Disclaimer: This tutorial was written and reviewed by the author. AI-assisted tools were used to support drafting, editing, and language refinement, with all technical content verified by the author.
 
-**This tutorial is heavily inspired from the lesson 2 of *Raspberry Pi 5 Tutorials for Beginners* YouTube Series by Robotics Back-End. It is recomended that you watch the video first and then come to this written lesson for following the steps properly. Check Credits for Video Link.** 
+**This tutorial is heavily inspired from the lesson 2 of *Raspberry Pi 5 Tutorials for Beginners* YouTube Series by Robotics Back-End. It is recommended that you watch the video first and then come to this written lesson for following the steps properly. Check Credits for Video Link.** 
 
 ## Learning Objectives
 
@@ -222,7 +222,7 @@ This is one of the most important settings for a headless Raspberry Pi setup.
 
 Click **Next**.
 
-> 💡 **Note**: You can skip **Enable Raspberry Pi Connect** Step. Just click next. ***Raspberry Pi Connect*** basically allows us to connect to the RPi board using our laptop/computer sitting from anywhere arround the world online. As far as personal projects/lab work is concerned, we can just use SSH to connect with our Pi over the same WiFi network.  
+> 💡 **Note**: You can skip **Enable Raspberry Pi Connect** Step. Just click next. ***Raspberry Pi Connect*** basically allows us to connect to the RPi board using our laptop/computer sitting from anywhere  the world online. As far as personal projects/lab work is concerned, we can just use SSH to connect with our Pi over the same WiFi network.  
 
 ---
 
@@ -424,7 +424,7 @@ You can now connect using the discovered IP address.
 
 # Step 13: Connect to the Raspberry Pi Using SSH
 
-Open a terminal. You can you the old terminal from the previous steps as well.
+Open a terminal. You can use the same terminal from the previous steps as well.
 
 On Windows:
 
