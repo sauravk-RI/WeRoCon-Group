@@ -60,6 +60,8 @@ This is important because during setup, Raspberry Pi Imager automatically detect
 
 > **Important:** Your computer and Raspberry Pi should be connected to the **same Wi-Fi network**. Otherwise, you may not be able to discover the Raspberry Pi on the network later.
 
+> 💡 Note: Use the hotspot connection of your phone while setting up the Raspberry Pi for the first time using the Raspberry Pi Imager software. The software, does not have the provision to configure the Raspberry Pi to connect to the institute's WPA2 Enterprise security type WiFi Network. Once the OS installation of the Raspberry Pi is complete, you can set it up to connect to the Institute's Wifi using RPi's Terminal or GUI.
+
 ---
 
 # Step 3: Insert the MicroSD Card
