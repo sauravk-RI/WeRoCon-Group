@@ -13,7 +13,7 @@ This README has two parts:
   wiring, I2C, checking your board isn't a counterfeit, and installing
   Python dependencies. Do this once per sensor/Pi.
 - **[Part 2 — Logger Software](#part-2--logger-software)**: calibration,
-  Kalman filter tuning, understanding how `imu_thigh_angle.py` actually
+  Kalman filter tuning, understanding how `phase_variable_mpu_9250.py` actually
   works, running it, plotting in MATLAB, and troubleshooting. Do this
   per calibration cycle / per trial.
 
@@ -33,8 +33,8 @@ This README has two parts:
 | File | Purpose |
 |---|---|
 | `verify_mpu9250.py` | Checks whether your board is a genuine MPU9250/GY-91 or a fake/relabeled clone (Section 4) |
-| `imu_thigh_angle.py` | Main Kalman-filter logger + gait phase variable, writes `phase_variable_mpu_9250.csv` |
-| `plot_phase_var.m` | MATLAB script to verify/plot the phase variable output |
+| `phase_variable_mpu_9250.py` | Main Kalman-filter logger + gait phase variable, writes `phase_variable_mpu_9250.csv` |
+| `matlab_phase-variable_mpu_9250.m` | MATLAB script to verify/plot the phase variable output |
 
 **Everything in this guide happens inside one project folder.** Create
 it first and keep all three files above inside it — every command
@@ -45,9 +45,9 @@ mkdir imu_project
 cd imu_project
 ```
 
-Copy `verify_mpu9250.py` and `imu_thigh_angle.py` into this folder
+Copy `verify_mpu9250.py` and `phase_variable_mpu_9250.py` into this folder
 (and later copy the output CSV out of it into wherever your MATLAB
-project lives, or just also drop `plot_phase_var.m` in here and run
+project lives, or just also drop `matlab_phase-variable_mpu_9250.m` in here and run
 MATLAB pointed at this folder). The virtual environment (`sensor_env`)
 also gets created inside this same folder — see Part 1, Section 5.
 
@@ -109,7 +109,7 @@ you what's plugged in. Use this table to read the result:
 |---|---|
 | `68` | MPU9250/MPU9255/MPU6500 accel+gyro die, with **AD0 tied to GND** (the default wiring in Section 2) |
 | `69` | Same accel+gyro die, but with **AD0 tied to 3.3V** instead — if you see this instead of `68`, update `MPU_ADDR` in every script to `0x69` |
-| `0C` | AK8963 magnetometer — **only appears after bypass mode is enabled**, which only happens once you run `imu_thigh_angle.py` or `verify_mpu9250.py`. A bare `i2cdetect` right after wiring, before running any script, will normally show `68` alone with `0C` absent — that's expected, not a fault |
+| `0C` | AK8963 magnetometer — **only appears after bypass mode is enabled**, which only happens once you run `phase_variable_mpu_9250.py` or `verify_mpu9250.py`. A bare `i2cdetect` right after wiring, before running any script, will normally show `68` alone with `0C` absent — that's expected, not a fault |
 | `76` or `77` | BMP280 barometer — present on genuine GY-91 boards. Its presence does **not** confirm the IMU part is genuine (see Section 4) |
 | Nothing at all | Check wiring (Section 2), check the Pi is powered, and check you actually rebooted after enabling I2C |
 | `UU` instead of an address | A kernel driver has already claimed that address — usually harmless for our purposes, but means you can't talk to it directly over raw I2C without unloading that driver first |
@@ -491,7 +491,7 @@ final phase variable.
 ```bash
 cd imu_project   # if not already there
 source sensor_env/bin/activate
-python3 imu_thigh_angle.py
+python3 phase_variable_mpu_9250.py
 ```
 
 Expected output:
@@ -532,12 +532,12 @@ Saved 1000 rows → phase_variable_mpu_9250.csv
 
 ## 5. Plot the CSV in MATLAB
 
-`plot_phase_var.m` is built specifically to verify the phase variable
+`matlab_phase-variable_mpu_9250.m` is built specifically to verify the phase variable
 (not a general-purpose orientation plotter) — it checks that
 `phase_var` genuinely sweeps 0 → 1 and looks like a sawtooth, and
 overlays the two raw signals that feed it.
 
-1. Copy your output CSV into the same folder as `plot_phase_var.m`,
+1. Copy your output CSV into the same folder as `matlab_phase-variable_mpu_9250.m`,
    **or edit the filename inside the script** — as written, it loads
    a specific hardcoded file:
    ```matlab
@@ -593,7 +593,7 @@ plotting/scatter functions.
 | Values look noisy/jittery | Check DLPF settings weren't changed, and confirm the sensor is mounted rigidly (loose mounting = vibration noise) |
 | `fault=True` appears in the live output | Phase variable has been clamped for 50+ consecutive samples (Section 3.2) — check `PHASE_A`/`PHASE_B` against this trial's actual pitch/rate range, or re-check sensor mounting |
 | `phase_var` range comes back well under 1.0 in MATLAB | `PHASE_A`/`PHASE_B` don't match this trial's amplitude — re-tune in the Python script and re-run, per the MATLAB script's own printed guidance |
-| MATLAB `readtable` errors, or loads the wrong/old file | `plot_phase_var.m` has a hardcoded filename (`imu_phase_15june_7th.csv`) that won't automatically match the Python script's actual output (`phase_variable_mpu_9250.csv`) — rename one to match the other, or edit the script (Section 5) |
+| MATLAB `readtable` errors, or loads the wrong/old file | `matlab_phase-variable_mpu_9250.m` has a hardcoded filename (`imu_phase_15june_7th.csv`) that won't automatically match the Python script's actual output (`phase_variable_mpu_9250.csv`) — rename one to match the other, or edit the script (Section 5) |
 | CSV missing or looks truncated | Check the run wasn't killed harder than Ctrl+C (e.g. `kill -9`, power loss) — the `finally`-style flush/close only runs on normal exit or a caught `SIGINT` |
 | Magnetometer never works, no matter what you try | Run `verify_mpu9250.py` (Part 1, Section 4) — you may have a fake/relabeled MPU6500 board with no magnetometer die at all |
 
@@ -608,38 +608,71 @@ plotting/scatter functions.
 
 ---
 
-## Appendix A: `imu_thigh_angle.py` (full source)
+## Appendix A: `verify_mpu9250.py` (full source)
 
 ```python
-"""
-imu_thigh_angle.py  —  MPU9250 Kalman Filter + CSV Logger for MATLAB
-======================================================================
-Raspberry Pi 5  |  MPU9250 via I2C  |  AK8963 magnetometer
+% matlab_phase-variable_mpu_9250.m
+% Verifies that phase_var moves from 0 to 1 correctly over time
+% Load CSV output from imu_thigh_angle_phase.py and plot phase_var vs time
+clear; clc; close all;
+%% ── Load data ────────────────────────────────────────────────────────
+data = readtable('imu_phase_15june_7th.csv');
+t         = data.time_s;
+phase_var = data.phase_var;
+pitch     = data.pitch_centered_deg;
+gyro_filt = data.gyro_pitch_filt;
+%% ── Plot 1: phase_var vs time ────────────────────────────────────────
+figure('Name', 'Phase Variable vs Time', 'NumberTitle', 'off');
+subplot(3,1,1);
+plot(t, phase_var, 'b', 'LineWidth', 1.2);
+yline(0, 'k--', 'LineWidth', 0.8);
+yline(1, 'k--', 'LineWidth', 0.8);
+ylim([-0.1 1.1]);
+xlabel('Time (s)');
+ylabel('\phi (0 \rightarrow 1)');
+title('Phase Variable over Time');
+grid on;
+subplot(3,1,2);
+plot(t, pitch, 'r', 'LineWidth', 1.0);
+xlabel('Time (s)');
+ylabel('Pitch centered (deg)');
+title('pitch\_centered\_deg  [A = 20 deg]');
+yline(20,  'r--', '+A');
+yline(-20, 'r--', '-A');
+grid on;
+subplot(3,1,3);
+plot(t, gyro_filt, 'm', 'LineWidth', 1.0);
+xlabel('Time (s)');
+ylabel('Gyro filtered (deg/s)');
+title('gyro\_pitch\_filt  [B = 100 deg/s]');
+yline(100,  'm--', '+B');
+yline(-100, 'm--', '-B');
+grid on;
+sgtitle('Phase Variable Verification  (A=20 deg, B=100 deg/s)');
+%% ── Plot 2: phase portrait with phase colour ─────────────────────────
+figure('Name', 'Phase Portrait coloured by phi', 'NumberTitle', 'off');
+scatter(pitch, gyro_filt, 8, phase_var, 'filled');
+colormap(hsv);
+cb = colorbar;
+cb.Label.String = '\phi (0 \rightarrow 1)';
+xlabel('pitch\_centered\_deg');
+ylabel('gyro\_pitch\_filt (deg/s)');
+title('Phase Portrait — colour = phase variable \phi');
+xline(0, 'k--'); yline(0, 'k--');
+grid on;
+%% ── Print summary stats ──────────────────────────────────────────────
+fprintf('\n── Phase variable stats ──\n');
+fprintf('  Min  : %.4f\n', min(phase_var));
+fprintf('  Max  : %.4f\n', max(phase_var));
+fprintf('  Range: %.4f\n', max(phase_var) - min(phase_var));
+fprintf('  Mean : %.4f\n', mean(phase_var));
+fprintf('\n  If range ≈ 1.0 and plot shows sawtooth → phase is working correctly.\n');
+fprintf('  If range is small → A or B needs adjustment (signal not reaching limits).\n\n');
+```
 
-Changes from r0.4:
-  - Calibrated tuning constants pasted from noise_profiler output
-  - DC_OFFSET_PITCH constant added  (from noise_profiler walking trial)
-  - gyro_pitch_dps column added     (gy after offset subtraction — angular velocity)
-  - pitch_centered_deg column added (pitch minus DC_OFFSET_PITCH — zero centered)
-  - R_dynamic column added          (dynamic R per sample — diagnostic)
-  - gyro_pitch_filt column added    (Kalman-filtered angular velocity — replaces EMA)
-  - phase_var column added          (gait phase 0→1 via atan2 with fixed A=20, B=100)
-  - All original equations, logic, and Kalman filter unchanged
+## Appendix B: `phase_variable_mpu_9250.py` (full source)
 
-Usage:
-    pip install smbus2 numpy --break-system-packages
-    python3 imu_matlab_r0.4.py
-
-Output:
-    imu_data.csv  (same format as r0.3 — MATLAB compatible)
-    Auto-stops after RUN_DURATION seconds.
-    Press Ctrl+C to stop early.
-
-TUNING:
-    Run noise_profiler.py first, then paste the printed values into
-    the TUNING CONSTANTS section below.
-"""
-
+```python
 import math, struct, time, signal, sys
 import smbus2
 import numpy as np
@@ -1084,10 +1117,10 @@ if __name__ == "__main__":
 
 ---
 
-## Appendix B: `plot_phase_var.m` (full source)
+## Appendix C: `matlab_phase-variable_mpu_9250.m` (full source)
 
 ```matlab
-% plot_phase_var.m
+% matlab_phase-variable_mpu_9250.m
 % Verifies that phase_var moves from 0 to 1 correctly over time
 % Load CSV output from imu_thigh_angle_phase.py and plot phase_var vs time
 clear; clc; close all;
