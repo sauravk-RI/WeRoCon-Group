@@ -71,7 +71,7 @@ johnsmith/MyProject
 
 You do **not** have permission to directly modify it.
 
-Instead, GitHub creates your own personal copy of the repository.
+Instead, GitHub lets you create your own personal copy of the repository.
 
 ```
 Your GitHub Account
@@ -114,11 +114,15 @@ https://github.com/johnsmith/MyProject
 
 Click the **Fork** button in the top-right corner.
 
+![](Raspberry_Pi_5_Basics\ImageFiles\2026-07-24-16-10-34.png)
+
 GitHub creates
 
 ```
 yourname/MyProject
 ```
+
+![](Raspberry_Pi_5_Basics\ImageFiles\2026-07-24-16-12-18.png)
 
 This repository belongs entirely to you.
 
@@ -128,21 +132,26 @@ You now have complete freedom to edit it.
 
 # 5. Step 2 – Clone Your Fork
 
-Copy the URL of **your fork**, not the original repository.
+Copy the URL of **your fork**, not the original repository. In your personal forked repository, go to <b><span style="background-color: lightgreen; color: black">Code</span></b> -> **Local** Tab -> Copy the link you see under **Clone**.
 
 Example:
 
 ```
 https://github.com/yourname/MyProject.git
 ```
+![](Raspberry_Pi_5_Basics\ImageFiles\2026-07-24-16-15-02.png)
 
-Clone it:
+Open a Terminal inside the folder that you want to copy your codebase in your local computer. Run the following command to clone the repository into that folder:
 
 ```bash
-git clone https://github.com/yourname/MyProject.git
+git clone <paste the copied link here>
 ```
 
-Move into the project folder:
+![](Raspberry_Pi_5_Basics\ImageFiles\2026-07-24-16-33-10.png)
+
+> 💡 **Note:** Cloning is different from simply downloading the entire repositiory. For Open-source contribution, it is always recomended that you clone a project and not download it directly. Although, github also provides the feature for downloading the entire repository or any of the codes/files within it.
+
+Run the following command in the same terminal to move inside the project folder:
 
 ```bash
 cd MyProject
@@ -221,6 +230,14 @@ main
 
 This keeps your work isolated.
 
+You can always check on which branch you currently are in your working repository by running the following command:
+
+```
+git branch
+```
+
+> 💡 **Note:** You can run the `git branch` command from any folder or sub-folder inside the main repository. 
+
 ---
 
 # 8. Step 5 – Make Your Changes
@@ -278,7 +295,7 @@ Push your new branch to GitHub.
 git push origin add-installation-guide
 ```
 
-Your fork now contains
+Your fork now contains 2 branches:
 
 ```
 main
