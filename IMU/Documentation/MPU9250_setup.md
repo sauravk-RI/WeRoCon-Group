@@ -34,7 +34,7 @@ This README has two parts:
 |---|---|
 | `verify_mpu9250.py` | Checks whether your board is a genuine MPU9250/GY-91 or a fake/relabeled clone (Section 4) |
 | `phase_variable_mpu_9250.py` | Main Kalman-filter logger + gait phase variable, writes `phase_variable_mpu_9250.csv` |
-| `matlab_phase-variable_mpu_9250.m` | MATLAB script to verify/plot the phase variable output |
+| `matlab_phase_variable_mpu_9250.m` | MATLAB script to verify/plot the phase variable output |
 
 **Everything in this guide happens inside one project folder.** Create
 it first and keep all three files above inside it — every command
@@ -47,7 +47,7 @@ cd imu_project
 
 Copy `verify_mpu9250.py` and `phase_variable_mpu_9250.py` into this folder
 (and later copy the output CSV out of it into wherever your MATLAB
-project lives, or just also drop `matlab_phase-variable_mpu_9250.m` in here and run
+project lives, or just also drop `matlab_phase_variable_mpu_9250.m` in here and run
 MATLAB pointed at this folder). The virtual environment (`sensor_env`)
 also gets created inside this same folder — see Part 1, Section 5.
 
@@ -532,12 +532,12 @@ Saved 1000 rows → phase_variable_mpu_9250.csv
 
 ## 5. Plot the CSV in MATLAB
 
-`matlab_phase-variable_mpu_9250.m` is built specifically to verify the phase variable
+`matlab_phase_variable_mpu_9250.m` is built specifically to verify the phase variable
 (not a general-purpose orientation plotter) — it checks that
 `phase_var` genuinely sweeps 0 → 1 and looks like a sawtooth, and
 overlays the two raw signals that feed it.
 
-1. Copy your output CSV into the same folder as `matlab_phase-variable_mpu_9250.m`,
+1. Copy your output CSV into the same folder as `matlab_phase_variable_mpu_9250.m`,
    **or edit the filename inside the script** — as written, it loads
    a specific hardcoded file:
    ```matlab
@@ -593,7 +593,7 @@ plotting/scatter functions.
 | Values look noisy/jittery | Check DLPF settings weren't changed, and confirm the sensor is mounted rigidly (loose mounting = vibration noise) |
 | `fault=True` appears in the live output | Phase variable has been clamped for 50+ consecutive samples (Section 3.2) — check `PHASE_A`/`PHASE_B` against this trial's actual pitch/rate range, or re-check sensor mounting |
 | `phase_var` range comes back well under 1.0 in MATLAB | `PHASE_A`/`PHASE_B` don't match this trial's amplitude — re-tune in the Python script and re-run, per the MATLAB script's own printed guidance |
-| MATLAB `readtable` errors, or loads the wrong/old file | `matlab_phase-variable_mpu_9250.m` has a hardcoded filename (`imu_phase_15june_7th.csv`) that won't automatically match the Python script's actual output (`phase_variable_mpu_9250.csv`) — rename one to match the other, or edit the script (Section 5) |
+| MATLAB `readtable` errors, or loads the wrong/old file | `matlab_phase_variable_mpu_9250.m` has a hardcoded filename (`imu_phase_15june_7th.csv`) that won't automatically match the Python script's actual output (`phase_variable_mpu_9250.csv`) — rename one to match the other, or edit the script (Section 5) |
 | CSV missing or looks truncated | Check the run wasn't killed harder than Ctrl+C (e.g. `kill -9`, power loss) — the `finally`-style flush/close only runs on normal exit or a caught `SIGINT` |
 | Magnetometer never works, no matter what you try | Run `verify_mpu9250.py` (Part 1, Section 4) — you may have a fake/relabeled MPU6500 board with no magnetometer die at all |
 
@@ -1188,10 +1188,10 @@ if __name__ == "__main__":
 
 ---
 
-## Appendix C: `matlab_phase-variable_mpu_9250.m` (full source)
+## Appendix C: `matlab_phase_variable_mpu_9250.m` (full source)
 
 ```matlab
-% matlab_phase-variable_mpu_9250.m
+% matlab_phase_variable_mpu_9250.m
 % Verifies that phase_var moves from 0 to 1 correctly over time
 % Load CSV output from imu_thigh_angle_phase.py and plot phase_var vs time
 clear; clc; close all;
