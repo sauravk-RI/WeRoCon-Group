@@ -8,12 +8,17 @@ writes straight to CSV per trial. It is a sibling to a WebSocket/live-dashboard
 version (`imu_dashboard_ws.py`) — same math, different output path. If you
 just want to run a walking trial and get a CSV + plots, this is the one to use.
 
-This README has two parts:
+The sensor is mounted **vertically on the thigh** for this pipeline.
+
+This README has three parts:
 
 - **[Part 1 — Hardware & SensorConnect](#part-1--hardware--sensorconnect)**:
   mounting the sensor and getting it configured and streaming the right
   channels via MicroStrain's official tool. Do this once per sensor/mount.
-- **[Part 2 — Logger Software](#part-2--logger-software)**: installing the
+- **[Part 2 — One-Time Calibration](#part-2--one-time-calibration)**:
+  using `calibrate_imu.py` to save a reference quaternion to a JSON file so
+  `micro_strain_front_mount.py` doesn't need to re-calibrate every run.
+- **[Part 3 — Logger Software](#part-3--logger-software)**: installing the
   Python environment, understanding how `micro_strain_front_mount.py` works, running
   it, plotting results, and troubleshooting. Do this per machine / per trial.
 
@@ -23,7 +28,7 @@ This README has two parts:
 
 *Do this once per sensor/mount — get the hardware physically set up and
 the right channels streaming from SensorConnect. Section numbers below
-restart at 1 in Part 2, so each part can be followed independently.*
+restart at 1 in each part, so each part can be followed independently.*
 
 ## 1. What you need
 
@@ -37,6 +42,7 @@ restart at 1 in Part 2, so each part can be followed independently.*
 
 ## 2. Mount the sensor correctly
 
+- Mounted **vertically on the thigh** for this pipeline.
 - **Vent must NOT face up.** Mounting it vent-up can compromise the
   IP68 seal or clog airflow to the internal pressure sensor.
 - Use the correct MicroStrain cable — the IP68 rating only holds if
@@ -45,7 +51,7 @@ restart at 1 in Part 2, so each part can be followed independently.*
   permanently damage the unit.
 - Default axis convention: **X = direction of travel, Z = down**. Exact
   mounting angle on the thigh doesn't matter for this logger — see
-  Part 2, Section 2, since it calibrates against whatever pose you're standing in.
+  Part 3, Section 3, since it calibrates against whatever pose you're standing in.
 
 ---
 
@@ -70,11 +76,11 @@ setup won't give you by default:
      (this is the channel `micro_strain_front_mount.py` actually reads; plain
      roll/pitch/yaw Euler output is not used by this script)
    - **Estimated Angular Rate**, specifically the axis you'll set as
-     `THIGH_AXIS` in the script (default `y` — see Part 2, Section 2)
+     `THIGH_AXIS` in the script (default `y` — see Part 3, Section 2)
    Set your sample rate (up to 1000 Hz on the GV7-AR; 100 Hz is the
    default this script's loop timing assumes).
 2. **Mounting transform** — not required for this script. Because it
-   works in relative-quaternion space (Part 2, Section 3), an arbitrary mount
+   works in relative-quaternion space (Part 3, Section 3), an arbitrary mount
    angle is corrected out automatically at calibration time.
 3. **Capture gyro bias** — do this once after mounting, sensor and leg
    completely stationary. Save to non-volatile memory so it survives
@@ -88,7 +94,71 @@ setup won't give you by default:
 
 ---
 
-# Part 2 — Logger Software
+# Part 2 — One-Time Calibration
+
+*Run this once (per session, per remount) to save a reference quaternion to
+a JSON file. `micro_strain_front_mount.py` can then load it with
+`--calibration <file>.json` instead of prompting you to stand still and
+re-calibrating every single run.*
+
+## 1. What it does
+
+`calibrate_imu.py` connects to the sensor, asks you to **stand neutral and
+hold still**, buffers incoming quaternions, and once it detects a
+sufficiently still window (max angular deviation within the buffer under
+`CALIBRATION_STILL_STD_DEG * 3`), it saves that quaternion as the reference
+pose. If it never detects stillness within `CALIBRATION_TIMEOUT_S`, it falls
+back to the last reading and warns you.
+
+## 2. Running it
+
+```bash
+pip install python-mscl --break-system-packages
+
+python3 calibrate_imu.py
+# or, with a custom output filename:
+python3 calibrate_imu.py --out my_calibration.json
+```
+
+Stand neutral and hold still when prompted. Re-run this any time you want a
+fresh zero (new session, sensor remounted, etc).
+
+## 3. Output file format
+
+The script writes a JSON file (default name `imu_side_mounted_calibration.json`)
+shaped like this:
+
+```json
+{
+  "reference_quaternion": {
+    "w": 0.7305218577384949,
+    "x": -0.03269679844379425,
+    "y": 0.6811332702636719,
+    "z": 0.036416616290807724
+  },
+  "calibrated_at": "2026-07-13 12:47:45"
+}
+```
+
+- `reference_quaternion` — the `(w, x, y, z)` orientation captured while you
+  stood still and neutral; this is what every subsequent quaternion is
+  measured relative to.
+- `calibrated_at` — local timestamp (`%Y-%m-%d %H:%M:%S`) of when the
+  calibration was captured, for traceability across trials/sessions.
+
+## 4. Using the saved calibration
+
+Pass the file straight to the logger to skip live calibration:
+
+```bash
+python3 micro_strain_front_mount.py --calibration my_calibration.json
+```
+
+---
+
+---
+
+# Part 3 — Logger Software
 
 *Do this per logging machine (once) and per trial (running the script).
 Assumes Part 1 is already done: sensor is mounted, SensorConnect is
@@ -118,7 +188,7 @@ ls -l /dev/ttyACM0
 
 If your sensor enumerates as a different port (e.g. `/dev/ttyUSB0` or
 `COM5` on Windows), update `SERIAL_PORT` near the top of
-`micro_strain_front_mount.py`.
+`micro_strain_front_mount.py` (and in `calibrate_imu.py` if you use it).
 
 > **Note on MSCL install methods.** MicroStrain's official MSCL is
 > archived (last release `v68.1.0`) and traditionally ships as a
@@ -187,9 +257,10 @@ This script sidesteps both by:
 1. Reading the sensor's **quaternion** attitude estimate (`estAttitudeQuaternion`
    or equivalent, via `read_estimation_filter()`), never the sensor's own
    Euler output.
-2. **Calibrating a reference quaternion** (`calibrate_reference_quat()`)
-   while you stand still in a neutral pose, whatever that pose's absolute
-   orientation happens to be.
+2. **Calibrating a reference quaternion** (`calibrate_reference_quat()`, or
+   loading one saved earlier by `calibrate_imu.py` — see Part 2) while you
+   stand still in a neutral pose, whatever that pose's absolute orientation
+   happens to be.
 3. At every timestep, computing the **relative rotation** between the
    current quaternion and that reference (`quat_relative_euler_deg()`), and
    converting *that* to Euler angles.
@@ -202,7 +273,8 @@ the script's docstring.
 
 ### 3.2 Calibration loop
 
-`calibrate_reference_quat()`:
+`calibrate_reference_quat()` (used live by `micro_strain_front_mount.py`, and
+by `calibrate_imu.py` in Part 2 to produce a reusable JSON file):
 - Buffers incoming quaternions for `CALIBRATION_SECONDS` worth of samples.
 - Once the buffer is full, checks the **maximum angular deviation** between
   the most recent sample and every other sample in the window (via
@@ -215,11 +287,12 @@ the script's docstring.
   hanging forever.
 - There's no live re-zero mid-run in this version (unlike
   `imu_dashboard_ws.py`) — it's meant for one calibration, then one clean
-  trial. Re-run the script per trial for a fresh calibration.
+  trial. Re-run the script per trial for a fresh calibration, or reuse a
+  saved JSON file via `--calibration`.
 
 You can skip live calibration entirely with `--calibration path.json`, which
-loads a previously saved reference quaternion (as written by a separate
-`calibrate_imu.py` helper) instead of prompting you to stand still.
+loads a previously saved reference quaternion (as written by
+`calibrate_imu.py`, Part 2) instead of prompting you to stand still.
 
 ### 3.3 Main logging loop
 
@@ -282,7 +355,7 @@ python3 micro_strain_front_mount.py
 # Custom filename and duration
 python3 micro_strain_front_mount.py --out walking_trial_1.csv --seconds 15
 
-# Skip live calibration, reuse a saved reference pose
+# Skip live calibration, reuse a saved reference pose (see Part 2)
 python3 micro_strain_front_mount.py --calibration ref_pose.json
 
 # Skip auto-plotting
@@ -331,7 +404,7 @@ script, update the MATLAB script's field references to match.
 | Script hangs at "Calibrating: stand neutral..." | No quaternion data arriving — confirm `Attitude (Quaternion)` is enabled in SensorConnect's Sampling tile, and that SensorConnect itself is disconnected (only one program can hold the serial port) |
 | Calibration warns "never found a still window" | You moved during the 3s calibration window, or `CALIBRATION_STILL_STD_DEG` is too tight — hold genuinely still, or loosen the threshold |
 | `pitch_deg` seems to swing the wrong axis | `THIGH_AXIS` doesn't match how the sensor is actually mounted — re-check against a known movement and swap to `"x"`/`"z"` if needed |
-| `phase_var` looks nothing like a sawtooth | `A_PITCH`/`B_GYRO` are still MPU9250-derived placeholders — recalibrate them against real GV7-AR trial data (Section 2 above) |
+| `phase_var` looks nothing like a sawtooth | `A_PITCH`/`B_GYRO` are still MPU9250-derived placeholders — recalibrate them against real GV7-AR trial data (Part 3, Section 2 above) |
 | `sensor_ang_vel_deg_s` and `derived_ang_vel_deg_s` disagree a lot | Expected during initial GV7-AR bring-up — this is exactly why both are logged; compare across a few trials before picking one to trust |
 | CSV has gaps or looks noisy at first | Gyro bias not captured in SensorConnect yet, or sensor still settling — the 3s post-calibration stabilization window helps but isn't a substitute for capturing gyro bias in Part 1, Section 4 |
 | Existing file silently missing after re-run | It isn't silent — you're prompted `[y/N]` before overwrite; answering anything but `y` aborts without touching the file |
@@ -348,7 +421,186 @@ script, update the MATLAB script's field references to match.
 
 ---
 
-## Appendix A: `micro_strain_front_mount.py` (full source)
+## Appendix A: `calibrate_imu.py` (full source)
+
+```python
+"""
+Standalone calibration - run this once, save the reference quaternion to a
+file. micro_strain_front_mount.py can then load it instead of re-calibrating every
+single run.
+
+Requires:
+    pip install python-mscl --break-system-packages
+
+Usage:
+    python3 calibrate_imu.py
+    python3 calibrate_imu.py --out my_calibration.json
+
+Stand neutral and hold still when prompted. Re-run this any time you want
+a fresh zero (new session, sensor remounted, etc).
+"""
+
+import argparse
+import json
+import math
+import os
+import time
+
+from python_mscl import mscl
+
+SERIAL_PORT = "/dev/ttyACM0"
+BAUD_RATE = 115200
+
+RAD_TO_DEG = 180.0 / math.pi
+
+CALIBRATION_SECONDS = 3.0
+CALIBRATION_STILL_STD_DEG = 0.5
+CALIBRATION_TIMEOUT_S = 15.0
+
+DEFAULT_CALIBRATION_FILE = "imu_side_mounted_calibration.json"
+
+
+def _vector_to_wxyz(vec):
+    if hasattr(vec, "as_floatAt"):
+        return (vec.as_floatAt(0), vec.as_floatAt(1), vec.as_floatAt(2), vec.as_floatAt(3))
+    if hasattr(vec, "as_doubleAt"):
+        return (vec.as_doubleAt(0), vec.as_doubleAt(1), vec.as_doubleAt(2), vec.as_doubleAt(3))
+    if hasattr(vec, "data"):
+        d = vec.data()
+        return (d[0], d[1], d[2], d[3])
+    return (vec[0], vec[1], vec[2], vec[3])
+
+
+def setup_imu():
+    connection = mscl.Connection.Serial(SERIAL_PORT, BAUD_RATE)
+    node = mscl.InertialNode(connection)
+    node.resume()
+    return node
+
+
+def quat_mul(q1, q2):
+    w1, x1, y1, z1 = q1
+    w2, x2, y2, z2 = q2
+    return (
+        w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2,
+        w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+        w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
+        w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
+    )
+
+
+def quat_conj(q):
+    w, x, y, z = q
+    return (w, -x, -y, -z)
+
+
+def read_quat(node):
+    packets = node.getDataPackets(500)
+    qw = qx = qy = qz = None
+
+    QUAT_VECTOR_NAMES = ("estAttitudeQuaternion", "estOrientQuaternion", "estQuaternion")
+    QUAT_SCALAR_NAMES = {
+        "w": ("estQuaternionW", "estAttitudeQuaternionW"),
+        "x": ("estQuaternionX", "estAttitudeQuaternionX"),
+        "y": ("estQuaternionY", "estAttitudeQuaternionY"),
+        "z": ("estQuaternionZ", "estAttitudeQuaternionZ"),
+    }
+
+    for packet in packets:
+        for point in packet.data():
+            name = point.channelName()
+            if name in QUAT_VECTOR_NAMES:
+                try:
+                    q = point.as_Vector()
+                    qw, qx, qy, qz = _vector_to_wxyz(q)
+                except (AttributeError, TypeError):
+                    pass
+            elif name in QUAT_SCALAR_NAMES["w"]:
+                qw = point.as_float()
+            elif name in QUAT_SCALAR_NAMES["x"]:
+                qx = point.as_float()
+            elif name in QUAT_SCALAR_NAMES["y"]:
+                qy = point.as_float()
+            elif name in QUAT_SCALAR_NAMES["z"]:
+                qz = point.as_float()
+
+    if None not in (qw, qx, qy, qz):
+        return (qw, qx, qy, qz)
+    return None
+
+
+def calibrate_reference_quat(node, duration_s):
+    print(f"Calibrating: stand neutral and hold still for {duration_s:.0f}s...")
+    buffer = []
+    start = time.time()
+
+    while True:
+        elapsed = time.time() - start
+        if elapsed > CALIBRATION_TIMEOUT_S:
+            if buffer:
+                print(
+                    f"Warning: never found a still window within {CALIBRATION_TIMEOUT_S:.0f}s. "
+                    f"Using last reading as best-effort reference."
+                )
+                return buffer[-1]
+            print("Warning: no samples received during calibration, using identity reference.")
+            return (1.0, 0.0, 0.0, 0.0)
+
+        quat = read_quat(node)
+        if quat is None:
+            continue
+
+        buffer.append(quat)
+
+        max_len = max(int(duration_s / 0.005), 10)
+        if len(buffer) > max_len:
+            buffer.pop(0)
+
+        if len(buffer) >= max_len:
+            q_last = buffer[-1]
+            max_dev_deg = 0.0
+            for q in buffer:
+                q_rel = quat_mul(quat_conj(q_last), q)
+                w = max(-1.0, min(1.0, q_rel[0]))
+                dev = 2 * math.acos(abs(w)) * RAD_TO_DEG
+                max_dev_deg = max(max_dev_deg, dev)
+
+            if max_dev_deg <= CALIBRATION_STILL_STD_DEG * 3:
+                print(
+                    f"Calibration complete. Reference quaternion = "
+                    f"({q_last[0]:.4f}, {q_last[1]:.4f}, {q_last[2]:.4f}, {q_last[3]:.4f}) "
+                    f"(max deviation in window: {max_dev_deg:.2f} deg)."
+                )
+                return q_last
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Calibrate IMU and save reference quaternion to a file.")
+    parser.add_argument("--out", default=DEFAULT_CALIBRATION_FILE, help=f"Output file (default: {DEFAULT_CALIBRATION_FILE})")
+    args = parser.parse_args()
+
+    node = setup_imu()
+    ref_quat = calibrate_reference_quat(node, CALIBRATION_SECONDS)
+
+    data = {
+        "reference_quaternion": {"w": ref_quat[0], "x": ref_quat[1], "y": ref_quat[2], "z": ref_quat[3]},
+        "calibrated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+    with open(args.out, "w") as f:
+        json.dump(data, f, indent=2)
+
+    print(f"\nSaved calibration to: {os.path.abspath(args.out)}")
+    print("Use this with: python3 micro_strain_front_mount.py --calibration " + args.out)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+## Appendix B: `micro_strain_front_mount.py` (full source)
 
 ```python
 """
@@ -782,7 +1034,7 @@ if __name__ == "__main__":
 
 ---
 
-## Appendix B: `microstrain_matlab_plot.m` (full source)
+## Appendix C: `microstrain_matlab_plot.m` (full source)
 
 ```matlab
 % microstrain_matlab_plot.m
