@@ -36,9 +36,13 @@ The figure below shows the major components and connectors available on the Rasp
 
 <br>
 
-<figure>
-  <img src="ImageFiles/2026-07-22-12-55-20.png" alt="40 GPIO Pins Description of Raspberry Pi 5">
-  <figcaption>Figure 2: 40 GPIO Pins Description of Raspberry Pi 5. <br> <i>Image Source: https://www.hackatronic.com/raspberry-pi-5-pinout-specifications-pricing-a-complete-guide/</i></figcaption>
+<figure style="width:100%;">
+  <img src="ImageFiles\2026-07-24-16-51-26.png"
+       alt="">
+  <figcaption>
+    <strong>Figure 2:</strong> 40 GPIO Pins of the Raspberry Pi 5.<br>
+    <i>Image source: Screenshot captured from the YouTube tutorial "How GPIOs Work - Raspberry Pi 5 Tutorial (#6)" by Robotics Back-End.</i>
+  </figcaption>
 </figure>
 
 ## 1. BCM2712 Processor (CPU)
