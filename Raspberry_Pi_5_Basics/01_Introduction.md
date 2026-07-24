@@ -1,6 +1,7 @@
 # Lesson 1: Introduction to Raspberry Pi 5
 
-@FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026.
+@FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026. <br>
+@Disclaimer: AI has been used in the framing and editing of this document with a human-in-loop.
 
 ## What is Raspberry Pi 5?
 
@@ -29,13 +30,15 @@ The Raspberry Pi 5 can be used for:
 The figure below shows the major components and connectors available on the Raspberry Pi 5. While not every connector is required in every project, understanding their purpose makes it much easier to build hardware systems.
 
 <figure>
-  <img src="ImageFiles/2026-07-22-13-03-30.png" alt="Components of Raspberry Pi 5">
-  <figcaption>Figure: Components of Raspberry Pi 5. <br> <i>Source: https://techtonics.in/product/raspberry-pi-5-model-8gb/</i></figcaption>
+  <img src="ImageFiles/2026-07-22-13-03-30.png" alt="Various Embedded Components of Raspberry Pi 5">
+  <figcaption>Figure 1: Various Embedded Components of Raspberry Pi 5. <br> <i>Image Source: https://techtonics.in/product/raspberry-pi-5-model-8gb/</i></figcaption>
 </figure>
 
+<br>
+
 <figure>
-  <img src="ImageFiles/2026-07-22-12-55-20.png" alt="40 GPIO Pin Description of Raspberry Pi 5">
-  <figcaption>Figure: 40 GPIO Pin Description of Raspberry Pi 5. <br> <i>Source: https://www.hackatronic.com/raspberry-pi-5-pinout-specifications-pricing-a-complete-guide/</i></figcaption>
+  <img src="ImageFiles/2026-07-22-12-55-20.png" alt="40 GPIO Pins Description of Raspberry Pi 5">
+  <figcaption>Figure 2: 40 GPIO Pins Description of Raspberry Pi 5. <br> <i>Image Source: https://www.hackatronic.com/raspberry-pi-5-pinout-specifications-pricing-a-complete-guide/</i></figcaption>
 </figure>
 
 ## 1. BCM2712 Processor (CPU)

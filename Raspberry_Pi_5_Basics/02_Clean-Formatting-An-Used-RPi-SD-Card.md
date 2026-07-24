@@ -1,10 +1,12 @@
 # Lesson 2: Clean Formatting An SD Card Previously Used In A Raspberry Pi
 
 @FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026. <br>
-@Credits: How to Format and Reuse a Raspberry Pi SD Card | Coding With Ashwin YT Channel
+@Credits: How to Format and Reuse a Raspberry Pi SD Card | "Coding With Ashwin" YT Channel | Video Link: https://www.youtube.com/watch?v=otztORT2zxk <br>
+@Disclaimer: AI has been used in the framing and editing of this document with a human-in-loop.
 
-> Skip this lesson if you're using a brand-new microSD card — go straight to Lesson 3
+> 💡 Note: Skip this lesson if you're using a brand-new microSD card — go straight to Lesson 3
 
+<br> <br>
 
 1. Mount the SD Card into your computer/laptop using a SD Card Reader.
 
@@ -26,8 +28,9 @@
 
 1. After all the partition of your SD card's disk are deleted, you will see the space inside the SD card's disk shown as Unallocated (*With Black Ribbon Bar*).
 
-![](ImageFiles/2026-07-22-11-22-09.png)
+    ![](ImageFiles/2026-07-22-11-22-09.png)
 
 <br>
 
-Now the SD Card cleaning is complete. Safely eject it from your system.
+&emsp; &emsp; Now the SD Card cleaning is complete. Safely eject it from your system. <br>
+&emsp; &emsp; **Happy Learning !** 😊

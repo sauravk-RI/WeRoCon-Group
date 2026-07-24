@@ -1,12 +1,11 @@
 # Lesson 5: Changing the Wi-Fi Network of Your Raspberry Pi
 
-@FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026.
+@FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026. <br>
+@Disclaimer: AI has been used in the framing and editing of this document with a human-in-loop.
 
 ## When Will You Need This Tutorial?
 
-Suppose you have already configured your Raspberry Pi and are accessing it remotely using **TigerVNC** or **SSH** over your home Wi-Fi network.
-
-Later, you move your Raspberry Pi to a different location—for example, your office, laboratory, university, or another home—where a different Wi-Fi network is available. Alternatively, you may simply want to connect your Raspberry Pi to your mobile hotspot instead of your home router.
+Suppose you have already configured your Raspberry Pi and are accessing it remotely using **TigerVNC** or **SSH** over your home or phone's Wi-Fi network. Later, you move your Raspberry Pi to a different location—for example, your office, laboratory, university, or another home—where a different Wi-Fi network is available. 
 
 A common question at this point is:
 
@@ -20,11 +19,9 @@ This tutorial explains the recommended methods for changing and managing Wi-Fi c
 
 # Method 1: Using the Raspberry Pi Desktop (Recommended for connecting to Home and Personal WiFi Networks Only)
 
-If you already have access to your Raspberry Pi through **TigerVNC**, changing the Wi-Fi network is the easiest method.
+If you already have access to your Raspberry Pi's GUI through **TigerVNC** do this:
 
-## Connecting to a Home Wi-Fi Network (WPA2-Personal)
-
-1. Click the **Wi-Fi icon** on the Raspberry Pi taskbar.
+1. Click the **Wi-Fi icon** on the GUI's taskbar.
 2. Select the new Wi-Fi network from the list.
 3. Enter the Wi-Fi password.
 4. Click **Connect**.
@@ -51,11 +48,15 @@ Open a terminal and run:
 nmcli device wifi list
 ```
 
-If you cannot see you network, try this command instead:
+![](ImageFiles/2026-07-24-12-59-41.png)
+
+
+If you cannot see you network on the list, try this command instead:
 
 ```bash
 sudo iwlist wlan0 scan | grep ESSID
 ```
+![](ImageFiles/2026-07-24-13-02-02.png)
 
 If your network appears in the output of any of these commands, it is also visible to your RPi5 Board.
 
@@ -69,7 +70,7 @@ Phone_Hotspot
 
 ---
 
-## Connect to a Home Wi-Fi Network (WPA2-Personal)
+## Connect to a Home/Personal Wi-Fi Network (WPA2-Personal Type)
 
 Run:
 
@@ -88,7 +89,7 @@ The Raspberry Pi will automatically reconnect to this network whenever it is ava
 
 ---
 
-## Connecting to a WPA2-Enterprise Wi-Fi Network
+## Connecting to a WPA2-Enterprise Wi-Fi Network (For Office and Organization WiFi Networks)
 
 Unlike a home Wi-Fi network, a WPA2-Enterprise network requires additional authentication details such as a username and password.
 
@@ -96,7 +97,7 @@ Fortunately, `nmcli` fully supports WPA2-Enterprise authentication.
 
 ### Example: 
 
-The your university/lab/office wireless network uses the following settings:
+Lets say your university/lab/office wireless network uses the following settings:
 
 | Setting | Value |
 |---------|-------|
@@ -135,6 +136,10 @@ Replace:
 - `YOUR_INTERNET_ACCESS_ID` with your official Internet Access ID.
 - `YOUR_INTERNET_ACCESS_PASSWORD` with your offical Internet Access password.
 
+<br>
+
+> 💡 **Note:** `YOUR_INTERNET_ACCESS_ID` and `YOUR_INTERNET_ACCESS_PASSWORD` should be within double quotes in the command above. 
+
 ### Step 3: Connect to the Network
 
 ```bash
@@ -145,7 +150,9 @@ If the authentication is successful, NetworkManager saves the connection profile
 
 The Raspberry Pi will reconnect to **WiFi_Name** automatically whenever it is within range.
 
-> **Note:** The option `802-1x.system-ca-certs no` is equivalent to selecting **"Do not validate"** for the CA Certificate in the graphical Wi-Fi configuration window.
+<br>
+
+> 💡 **Note:** The option `802-1x.system-ca-certs no` is equivalent to selecting **"Do not validate"** for the CA Certificate in the graphical Wi-Fi configuration window.
 
 ---
 
@@ -159,12 +166,7 @@ nmcli connection show
 
 Example:
 
-```text
-Home_WiFi
-Office_WiFi
-IITJ_WLAN
-Phone_Hotspot
-```
+![](ImageFiles/2026-07-24-13-12-27.png)
 
 These are all remembered by the Raspberry Pi and can be connected to automatically whenever they are available.
 
@@ -259,3 +261,5 @@ nmcli connection show
 This displays all Wi-Fi profiles currently stored on the Raspberry Pi.
 
 ---
+
+**Happy Learning !** 😊

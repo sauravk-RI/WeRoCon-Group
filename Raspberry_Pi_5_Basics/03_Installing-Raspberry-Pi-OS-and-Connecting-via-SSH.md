@@ -1,9 +1,10 @@
 # Lesson 3: Installing Raspberry Pi OS and Connecting via SSH
 
 @FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026. <br>
-@Credits: Install Raspberry Pi OS without a Monitor (Part 1) - Raspberry Pi 5 Tutorial (#2) | Robotics Backend YT Channel
+@Credits: Install Raspberry Pi OS Without a Monitor (Part 1) - Raspberry Pi 5 Tutorial (#2) | "Robotics Back-End" YT Channel | Video Link: https://www.youtube.com/watch?v=d5AheGVw2yo&list=PLLSegLrePWgIDKJTkdLyyQskh2HDdEL3y&index=3 <br>
+@Disclaimer: AI has been used in the framing and editing of this document with a human-in-loop.
 
-**This tutorial is majorly inspired from the lesson 2 of *Raspberry Pi 5 Tutorials for Beginners* YouTube Series. It is recomended that you watch the video first and then come to this written lesson for following the steps properly.** 
+**This tutorial is heavily inspired from the lesson 2 of *Raspberry Pi 5 Tutorials for Beginners* YouTube Series by Robotics Back-End. It is recomended that you watch the video first and then come to this written lesson for following the steps properly. Check Credits for Video Link.** 
 
 ## Learning Objectives
 
@@ -58,9 +59,9 @@ Before configuring the Raspberry Pi, connect **your computer** to the Wi-Fi netw
 
 This is important because during setup, Raspberry Pi Imager automatically detects your current Wi-Fi network and can configure the Raspberry Pi to connect to it.
 
-> **Important:** Your computer and Raspberry Pi should be connected to the **same Wi-Fi network**. Otherwise, you may not be able to discover the Raspberry Pi on the network later.
+> 💡 **Note:** Your computer and Raspberry Pi should be connected to the **same Wi-Fi network**. Otherwise, you may not be able to discover the Raspberry Pi on the network later.
 
-> 💡 Note: Use the hotspot connection of your phone while setting up the Raspberry Pi for the first time using the Raspberry Pi Imager software. The software, does not have the provision to configure the Raspberry Pi to connect to the institute's WPA2 Enterprise security type WiFi Network. Once the OS installation of the Raspberry Pi is complete, you can set it up to connect to the Institute's Wifi using RPi's Terminal or GUI.
+> 💡 **Note**: Use the hotspot connection of your phone while setting up the Raspberry Pi for the first time using the Raspberry Pi Imager software. The software, does not have the provision to configure the Raspberry Pi to connect to the institute's WPA2 Enterprise security type WiFi Network. Once the OS installation of the Raspberry Pi is complete, you can set it up to connect to the Institute's Wifi using RPi's Terminal or GUI.
 
 ---
 
@@ -145,7 +146,11 @@ Time Zone: Asia/Kolkata  (By Default)
 Keyboard Layout: in (By Default)
 ```
 
+> 💡 **Note**: By default, the keyboard layout will be set to "IN". Change it to English US or English UK to match your computer's or laptop's keyboard layout.
+
+
 Click **Next**.
+
 ---
 
 ## 7.3 Create a Username and Password
@@ -169,7 +174,7 @@ werocon
 
 Choose a secure password that you can remember.
 
-> **Important:** If you accidentally enter the wrong password during setup, you may not be able to log in later and might have to flash the operating system again.
+> 💡 **Note:** If you accidentally enter the wrong password during setup, you may not be able to log in later and might have to flash the operating system again.
 
 Click **Next**.
 
@@ -181,8 +186,9 @@ Enable Wi-Fi configuration.
 
 Enter:
 
-- Wi-Fi Name (SSID) 
-   >  💡 Note: The software automaically detects the WiFi Network that your computer is connected to (Step 2). You are basically configuring your RPi 5 here to connect to the same WiFi Network as soon as it gets booted/powered ON/connected to the power supply.
+- Wi-Fi Name (SSID) <br>
+   >  💡 **Note**: The software automaically detects the WiFi Network that your computer is connected to (Step 2). You are basically configuring your RPi 5 here to connect to the same WiFi Network as soon as it gets booted/powered ON/connected to the power supply.
+
 - Wi-Fi Password
 
 Verify that:
@@ -216,7 +222,7 @@ This is one of the most important settings for a headless Raspberry Pi setup.
 
 Click **Next**.
 
-> 💡 **Note**: You can skip **Enable Raspberry Pi Connect** Step. Just click next. ***Raspberry Pi Connect*** basically allows us to connect to the RPi board using our laptop/computer sitting at anywhere arround the world online. As far as personal projects/lab work is concerned, we can just use SSH to connect with our Pi over the same WiFi network.  
+> 💡 **Note**: You can skip **Enable Raspberry Pi Connect** Step. Just click next. ***Raspberry Pi Connect*** basically allows us to connect to the RPi board using our laptop/computer sitting from anywhere arround the world online. As far as personal projects/lab work is concerned, we can just use SSH to connect with our Pi over the same WiFi network.  
 
 ---
 
@@ -243,7 +249,7 @@ When complete, safely remove the microSD card.
 
 Before inserting the microSD card:
 
-> **Important:** Ensure the Raspberry Pi is **powered OFF**.
+> 💡 **Note:** Ensure the Raspberry Pi is **powered OFF**.
 
 Insert the microSD card into the slot located on the underside of the Raspberry Pi.
 
@@ -251,18 +257,18 @@ Insert the microSD card into the slot located on the underside of the Raspberry 
 
 Push it gently until it clicks into place.
 
-> **Note:** Part of the SD card remains slightly exposed. Avoid pressing against it while handling the board to prevent damaging the card.
+> 💡 **Note:** Part of the SD card remains slightly exposed. Avoid pressing against it while handling the board to prevent damaging the card.
 
 ---
 
 # Step 10: Connect the Cooling Fan (Optional)
 
-If your Raspberry Pi case includes an active cooling fan:
+If you have a Raspberry Pi casing with you and your case includes an active cooling fan:
 
 - Connect the fan cable to the dedicated fan connector on the Raspberry Pi.
 - The connector only fits in one orientation.
 
-If your Raspberry Pi does not include a fan, simply skip this step.
+If you do not have a Raspberry Pi casing available to you, you can simply skip this step. 
 
 ---
 
@@ -277,7 +283,7 @@ For Raspberry Pi 5, the recommended power adapter is:
 
 A power adapter rated at **5V, 3A** is generally sufficient for lighter workloads.
 
-> **Do not** power the Raspberry Pi from your computer's USB port. It usually cannot provide enough current for reliable operation.
+> 💡 **Note:** **Do NOT** power the Raspberry Pi from your computer's USB port. It usually cannot provide enough current for reliable operation.
 
 Once powered:
 
@@ -367,13 +373,11 @@ If your computer cannot discover the Raspberry Pi on the network, you can tempor
 This method is particularly useful when:
 
 - `ping <hostname>.local` does not work.
-- Angry IP Scanner cannot find the Raspberry Pi.
-- Your network blocks device discovery.
-- The Raspberry Pi has obtained a new IP address after connecting to a different Wi-Fi network.
+- The Raspberry Pi has obtained a new IP address after connecting to a different Wi-Fi network and your new network blocks device discovery.
 
 ### Step 1: Connect a Monitor and Keyboard
 
-Temporarily connect:
+Temporarily connect to the Raspberry Pi:
 
 - An HDMI monitor
 - A USB keyboard
@@ -395,8 +399,6 @@ Example output:
 ```
 
 The displayed value is the Raspberry Pi's current IP address.
-
-> **Note:** If multiple IP addresses are displayed, the first one is usually the address assigned to the active Wi-Fi connection.
 
 ### Step 3: Verify Network Connectivity
 
@@ -472,7 +474,7 @@ and press **Enter**.
 
 When prompted, type the password you created during the Raspberry Pi Imager setup.
 
-> **Note:** Nothing will appear on the screen while typing the password. This is normal.
+> 💡 **Note** Nothing will appear on the screen while typing the password. This is normal.
 
 Press **Enter**.
 
@@ -546,3 +548,5 @@ In this lesson, you learned how to:
 - Connect to the Raspberry Pi remotely using SSH.
 
 In the next lesson, we will configure **VNC (Virtual Network Computing)** to remotely access the Raspberry Pi's graphical desktop from our computer.
+
+**Happy Learning !** 😊

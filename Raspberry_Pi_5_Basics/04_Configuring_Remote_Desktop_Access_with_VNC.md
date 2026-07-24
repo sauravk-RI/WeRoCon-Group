@@ -1,7 +1,10 @@
 # Lesson 4: Configuring Remote Desktop Access in Raspberry Pi 5 with VNC
 
 @FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026. <br>
-@Credits: Install Raspberry Pi OS without a Monitor (Part 2) - Raspberry Pi 5 Tutorial (#3) | Robotics Backend YT Channel
+@Credits: Install Raspberry Pi OS Without a Monitor (Part 2) - Raspberry Pi 5 Tutorial (#3) | "Robotics Back-End" YT Channel | Video Link: https://www.youtube.com/watch?v=oqDvhNqPHBo&list=PLLSegLrePWgIDKJTkdLyyQskh2HDdEL3y&index=4&t=934s <br>
+@Disclaimer: AI has been used in the framing and editing of this document with a human-in-loop.
+
+> **This tutorial is heavily inspired from the lesson 3 of *Raspberry Pi 5 Tutorials for Beginners* YouTube Series by Robotics Back-End. It is recomended that you watch the video first and then come to this written lesson for following the steps properly. Check Credits for Video Link.** 
 
 ## Learning Objectives
 
@@ -78,13 +81,13 @@ pi@raspberrypi:~ $
 
 This confirms that you are now executing commands directly on the Raspberry Pi.
 
-> **Tip:** To disconnect from SSH, simply type:
+> 💡 **Note:** To terminate the SSH connection w/ Raspberry Pi, simply type this in your current terminal:
 >
 > ```bash
 > exit
 > ```
 >
-> This only closes the SSH session in your local terminal  — it does **not** shut down the Raspberry Pi.
+> This only closes the SSH session in your terminal  — it does **not** shut down the Raspberry Pi **nor** it closes the working terminal instance.
 
 ---
 
@@ -230,7 +233,7 @@ In the TigerVNC page, click on the **Github Release Page** option. This will ope
 
 ![](ImageFiles/2026-07-23-11-58-41.png)
 
-Inside the Github Releases Page of this Project, you can see trhe latest release version of TigerVNC. Click on the **SourceForge Link** in the project's Readme.   
+Inside the Github Releases Page of this Project, you can see the latest released version of TigerVNC. Click on the **SourceForge Link** in the project's Readme.   
 
 ![](ImageFiles/2026-07-23-12-01-15.png)
 
@@ -247,7 +250,7 @@ During installation:
 - Accept the license agreement.
 - Install using the default options.
 
-> **Windows Note:** Windows Defender may display a security warning. If you downloaded TigerVNC from its official website, it is safe to proceed.
+> 💡 **Note:** Windows Defender may display a security warning. If you downloaded TigerVNC from its official website, it is safe to proceed.
 
 ---
 
@@ -382,7 +385,7 @@ In many cases, this resolves the grey screen issue.
 
 To fix this problem : 
 
-**Click the Raspberry Menu icon** (the raspberry logo in the top-left corner) → **Preferences** → **Control Center** → Select **Keyboard** Tab → **Set Layout** to **English US** or **English UK** → Reboot the Pi Board once using `sudo reboot` command → Reconnect again sing TigerVNC app and try typing something this time, the problem should be fixed now.
+**Click the Raspberry Menu icon** (the raspberry logo in the top-left corner) → **Preferences** → **Control Center** → Select **Keyboard** Tab → **Set Layout** to **English US** or **English UK** → Reboot the Pi Board once using `sudo reboot` command → Reconnect again using TigerVNC app and try typing something this time, the problem should be fixed now.
 
 # Step 9: Explore the Raspberry Pi Desktop
 
@@ -500,4 +503,4 @@ In this lesson, you learned how to:
 
 At this point, your Raspberry Pi is fully configured for remote development. From now on, you can comfortably control it from your computer without needing to connect a monitor, keyboard, or mouse.
 
-**Happy Learning !** 
+**Happy Learning !** 😊
