@@ -1,32 +1,3 @@
-"""
-imu_thigh_angle.py  —  MPU9250 Kalman Filter + CSV Logger for MATLAB
-======================================================================
-Raspberry Pi 5  |  MPU9250 via I2C  |  AK8963 magnetometer
-
-Changes from r0.4:
-  - Calibrated tuning constants pasted from noise_profiler output
-  - DC_OFFSET_PITCH constant added  (from noise_profiler walking trial)
-  - gyro_pitch_dps column added     (gy after offset subtraction — angular velocity)
-  - pitch_centered_deg column added (pitch minus DC_OFFSET_PITCH — zero centered)
-  - R_dynamic column added          (dynamic R per sample — diagnostic)
-  - gyro_pitch_filt column added    (Kalman-filtered angular velocity — replaces EMA)
-  - phase_var column added          (gait phase 0→1 via atan2 with fixed A=20, B=100)
-  - All original equations, logic, and Kalman filter unchanged
-
-Usage:
-    pip install smbus2 numpy --break-system-packages
-    python3 imu_matlab_r0.4.py
-
-Output:
-    imu_data.csv  (same format as r0.3 — MATLAB compatible)
-    Auto-stops after RUN_DURATION seconds.
-    Press Ctrl+C to stop early.
-
-TUNING:
-    Run noise_profiler.py first, then paste the printed values into
-    the TUNING CONSTANTS section below.
-"""
-
 import math, struct, time, signal, sys
 import smbus2
 import numpy as np
