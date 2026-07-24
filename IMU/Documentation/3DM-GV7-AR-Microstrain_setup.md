@@ -308,7 +308,7 @@ overwritten — no silent data loss.
 ## 5. Plotting in MATLAB instead
 
 If you'd rather use MATLAB (e.g. to integrate with existing analysis
-scripts), `analyze_walking_trial.m` reads the same CSV and produces the
+scripts), `microstrain_matlab_plot.m` reads the same CSV and produces the
 same four plots as separate figures:
 
 ```matlab
@@ -782,10 +782,10 @@ if __name__ == "__main__":
 
 ---
 
-## Appendix B: `analyze_walking_trial.m` (full source)
+## Appendix B: `microstrain_matlab_plot.m` (full source)
 
 ```matlab
-% analyze_walking_trial.m
+% microstrain_matlab_plot.m
 %
 % Loads a walking_trial_*.csv (t, roll_deg, pitch_deg, yaw_deg,
 % sensor_ang_vel_deg_s, derived_ang_vel_deg_s, phase_var), zeros the
