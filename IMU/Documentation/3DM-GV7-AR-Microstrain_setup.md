@@ -8,7 +8,22 @@ writes straight to CSV per trial. It is a sibling to a WebSocket/live-dashboard
 version (`imu_dashboard_ws.py`) — same math, different output path. If you
 just want to run a walking trial and get a CSV + plots, this is the one to use.
 
+This README has two parts:
+
+- **[Part 1 — Hardware & SensorConnect](#part-1--hardware--sensorconnect)**:
+  mounting the sensor and getting it configured and streaming the right
+  channels via MicroStrain's official tool. Do this once per sensor/mount.
+- **[Part 2 — Logger Software](#part-2--logger-software)**: installing the
+  Python environment, understanding how `imu_logger_csv_v2.py` works, running
+  it, plotting results, and troubleshooting. Do this per machine / per trial.
+
 ---
+
+# Part 1 — Hardware & SensorConnect
+
+*Do this once per sensor/mount — get the hardware physically set up and
+the right channels streaming from SensorConnect. Section numbers below
+restart at 1 in Part 2, so each part can be followed independently.*
 
 ## 1. What you need
 
@@ -30,7 +45,7 @@ just want to run a walking trial and get a CSV + plots, this is the one to use.
   permanently damage the unit.
 - Default axis convention: **X = direction of travel, Z = down**. Exact
   mounting angle on the thigh doesn't matter for this logger — see
-  Section 6, since it calibrates against whatever pose you're standing in.
+  Part 2, Section 2, since it calibrates against whatever pose you're standing in.
 
 ---
 
@@ -55,11 +70,11 @@ setup won't give you by default:
      (this is the channel `imu_logger_csv_v2.py` actually reads; plain
      roll/pitch/yaw Euler output is not used by this script)
    - **Estimated Angular Rate**, specifically the axis you'll set as
-     `THIGH_AXIS` in the script (default `y` — see Section 6)
+     `THIGH_AXIS` in the script (default `y` — see Part 2, Section 2)
    Set your sample rate (up to 1000 Hz on the GV7-AR; 100 Hz is the
    default this script's loop timing assumes).
 2. **Mounting transform** — not required for this script. Because it
-   works in relative-quaternion space (Section 7), an arbitrary mount
+   works in relative-quaternion space (Part 2, Section 3), an arbitrary mount
    angle is corrected out automatically at calibration time.
 3. **Capture gyro bias** — do this once after mounting, sensor and leg
    completely stationary. Save to non-volatile memory so it survives
@@ -71,7 +86,16 @@ setup won't give you by default:
 
 ---
 
-## 5. Set up the Raspberry Pi (or Linux logging machine)
+---
+
+# Part 2 — Logger Software
+
+*Do this per logging machine (once) and per trial (running the script).
+Assumes Part 1 is already done: sensor is mounted, SensorConnect is
+configured with the quaternion channel enabled, gyro bias is captured, and
+SensorConnect itself is closed so the serial port is free.*
+
+## 1. Set up the Raspberry Pi (or Linux logging machine)
 
 ```bash
 mkdir gv7_project
@@ -113,7 +137,7 @@ If your sensor enumerates as a different port (e.g. `/dev/ttyUSB0` or
 
 ---
 
-## 6. Configuration you may need to change
+## 2. Configuration you may need to change
 
 These live near the top of `imu_logger_csv_v2.py`:
 
@@ -144,12 +168,12 @@ leftover/secondary axes for reference only.
 
 ---
 
-## 7. How the logger actually works
+## 3. How the logger actually works
 
 This is the part that differs most from a "typical" IMU logger, so it's
 worth walking through explicitly.
 
-### 7.1 Why quaternions, and why *relative*
+### 3.1 Why quaternions, and why *relative*
 
 A naive logger reads the sensor's Euler roll/pitch/yaw directly. That's fine
 near level orientations, but it has two problems for a thigh-mounted sensor:
@@ -176,7 +200,7 @@ singularity regardless of how the sensor is actually strapped on — that's
 the "avoids gimbal lock regardless of mount angle" behavior mentioned in
 the script's docstring.
 
-### 7.2 Calibration loop
+### 3.2 Calibration loop
 
 `calibrate_reference_quat()`:
 - Buffers incoming quaternions for `CALIBRATION_SECONDS` worth of samples.
@@ -197,7 +221,7 @@ You can skip live calibration entirely with `--calibration path.json`, which
 loads a previously saved reference quaternion (as written by a separate
 `calibrate_imu.py` helper) instead of prompting you to stand still.
 
-### 7.3 Main logging loop
+### 3.3 Main logging loop
 
 `log_session()` runs a **fixed-cadence** loop (default 100 Hz / 10 ms period):
 - Reads the latest quaternion + this axis's angular rate.
@@ -230,7 +254,7 @@ loads a previously saved reference quaternion (as written by a separate
   file is always flushed and closed in the `finally` block — including on
   Ctrl+C.
 
-### 7.4 Output columns
+### 3.4 Output columns
 
 ```
 t, roll_deg, pitch_deg, yaw_deg, sensor_ang_vel_deg_s, derived_ang_vel_deg_s, phase_var
@@ -247,7 +271,7 @@ t, roll_deg, pitch_deg, yaw_deg, sensor_ang_vel_deg_s, derived_ang_vel_deg_s, ph
 
 ---
 
-## 8. Running it
+## 4. Running it
 
 ```bash
 source sensor_env/bin/activate
@@ -281,7 +305,7 @@ overwritten — no silent data loss.
 
 ---
 
-## 9. Plotting in MATLAB instead
+## 5. Plotting in MATLAB instead
 
 If you'd rather use MATLAB (e.g. to integrate with existing analysis
 scripts), `analyze_walking_trial.m` reads the same CSV and produces the
@@ -299,7 +323,7 @@ script, update the MATLAB script's field references to match.
 
 ---
 
-## 10. Troubleshooting
+## 6. Troubleshooting
 
 | Symptom | Likely cause |
 |---|---|
@@ -307,14 +331,14 @@ script, update the MATLAB script's field references to match.
 | Script hangs at "Calibrating: stand neutral..." | No quaternion data arriving — confirm `Attitude (Quaternion)` is enabled in SensorConnect's Sampling tile, and that SensorConnect itself is disconnected (only one program can hold the serial port) |
 | Calibration warns "never found a still window" | You moved during the 3s calibration window, or `CALIBRATION_STILL_STD_DEG` is too tight — hold genuinely still, or loosen the threshold |
 | `pitch_deg` seems to swing the wrong axis | `THIGH_AXIS` doesn't match how the sensor is actually mounted — re-check against a known movement and swap to `"x"`/`"z"` if needed |
-| `phase_var` looks nothing like a sawtooth | `A_PITCH`/`B_GYRO` are still MPU9250-derived placeholders — recalibrate them against real GV7-AR trial data (Section 6) |
+| `phase_var` looks nothing like a sawtooth | `A_PITCH`/`B_GYRO` are still MPU9250-derived placeholders — recalibrate them against real GV7-AR trial data (Section 2 above) |
 | `sensor_ang_vel_deg_s` and `derived_ang_vel_deg_s` disagree a lot | Expected during initial GV7-AR bring-up — this is exactly why both are logged; compare across a few trials before picking one to trust |
-| CSV has gaps or looks noisy at first | Gyro bias not captured in SensorConnect yet, or sensor still settling — the 3s post-calibration stabilization window helps but isn't a substitute for capturing gyro bias in Section 4 |
+| CSV has gaps or looks noisy at first | Gyro bias not captured in SensorConnect yet, or sensor still settling — the 3s post-calibration stabilization window helps but isn't a substitute for capturing gyro bias in Part 1, Section 4 |
 | Existing file silently missing after re-run | It isn't silent — you're prompted `[y/N]` before overwrite; answering anything but `y` aborts without touching the file |
 
 ---
 
-## 11. Reference links
+## 7. Reference links
 
 - SensorConnect: https://microstrain.com/software/sensorconnect
 - MSCL (archived, `.deb`-based, v68.1.0 final): https://github.com/LORD-MicroStrain/MSCL/releases
