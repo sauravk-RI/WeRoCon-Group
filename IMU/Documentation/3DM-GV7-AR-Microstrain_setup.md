@@ -3,7 +3,7 @@
 Hardware mounting → SensorConnect configuration → Python environment →
 relative-quaternion CSV logger → MATLAB/Python plotting.
 
-This is the **standalone logging** pipeline (`imu_logger_csv_v2.py`), which
+This is the **standalone logging** pipeline (`micro_strain_front_mount.py`), which
 writes straight to CSV per trial. It is a sibling to a WebSocket/live-dashboard
 version (`imu_dashboard_ws.py`) — same math, different output path. If you
 just want to run a walking trial and get a CSV + plots, this is the one to use.
@@ -14,7 +14,7 @@ This README has two parts:
   mounting the sensor and getting it configured and streaming the right
   channels via MicroStrain's official tool. Do this once per sensor/mount.
 - **[Part 2 — Logger Software](#part-2--logger-software)**: installing the
-  Python environment, understanding how `imu_logger_csv_v2.py` works, running
+  Python environment, understanding how `micro_strain_front_mount.py` works, running
   it, plotting results, and troubleshooting. Do this per machine / per trial.
 
 ---
@@ -67,7 +67,7 @@ setup won't give you by default:
 
 1. **Sampling tile** — enable:
    - **Estimation Filter → Attitude (Quaternion)** — `estAttitudeQuaternion`
-     (this is the channel `imu_logger_csv_v2.py` actually reads; plain
+     (this is the channel `micro_strain_front_mount.py` actually reads; plain
      roll/pitch/yaw Euler output is not used by this script)
    - **Estimated Angular Rate**, specifically the axis you'll set as
      `THIGH_AXIS` in the script (default `y` — see Part 2, Section 2)
@@ -118,7 +118,7 @@ ls -l /dev/ttyACM0
 
 If your sensor enumerates as a different port (e.g. `/dev/ttyUSB0` or
 `COM5` on Windows), update `SERIAL_PORT` near the top of
-`imu_logger_csv_v2.py`.
+`micro_strain_front_mount.py`.
 
 > **Note on MSCL install methods.** MicroStrain's official MSCL is
 > archived (last release `v68.1.0`) and traditionally ships as a
@@ -139,7 +139,7 @@ If your sensor enumerates as a different port (e.g. `/dev/ttyUSB0` or
 
 ## 2. Configuration you may need to change
 
-These live near the top of `imu_logger_csv_v2.py`:
+These live near the top of `micro_strain_front_mount.py`:
 
 | Constant | Meaning | Default |
 |---|---|---|
@@ -277,16 +277,16 @@ t, roll_deg, pitch_deg, yaw_deg, sensor_ang_vel_deg_s, derived_ang_vel_deg_s, ph
 source sensor_env/bin/activate
 
 # Default: 10-second trial, auto-named CSV, plots afterward
-python3 imu_logger_csv_v2.py
+python3 micro_strain_front_mount.py
 
 # Custom filename and duration
-python3 imu_logger_csv_v2.py --out walking_trial_1.csv --seconds 15
+python3 micro_strain_front_mount.py --out walking_trial_1.csv --seconds 15
 
 # Skip live calibration, reuse a saved reference pose
-python3 imu_logger_csv_v2.py --calibration ref_pose.json
+python3 micro_strain_front_mount.py --calibration ref_pose.json
 
 # Skip auto-plotting
-python3 imu_logger_csv_v2.py --no-plot
+python3 micro_strain_front_mount.py --no-plot
 ```
 
 What happens, in order:
@@ -348,7 +348,7 @@ script, update the MATLAB script's field references to match.
 
 ---
 
-## Appendix A: `imu_logger_csv_v2.py` (full source)
+## Appendix A: `micro_strain_front_mount.py` (full source)
 
 ```python
 """
@@ -365,9 +365,9 @@ Sensor Connect setup:
     Enable the Estimation Filter "Attitude (Quaternion)" channel.
 
 Usage:
-    python3 imu_logger_csv_v2.py
-    python3 imu_logger_csv_v2.py --out walking_trial_1.csv
-    python3 imu_logger_csv_v2.py --seconds 15
+    python3 micro_strain_front_mount.py
+    python3 micro_strain_front_mount.py --out walking_trial_1.csv
+    python3 micro_strain_front_mount.py --seconds 15
 
 Calibration:
     Stand neutral and hold still when prompted. Re-run the script for a
