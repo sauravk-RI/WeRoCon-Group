@@ -1,5 +1,3 @@
-<img width="1672" height="941" alt="image" src="https://github.com/user-attachments/assets/6d7d5c97-089a-492f-a518-47f2c5d2becc" /># Phase Variable: Basics and Necessary Conditions
-
 ## What is a phase variable?
 
 - A normalized 0-to-1 representation of the gait cycle, where 0 = start of stride, 1 = end of stride.
@@ -8,7 +6,7 @@
   - Slower walking -> shallower slope
 - Used instead of elapsed time because gait cadence is not constant, and a prosthetic leg needs a cadence-independent way to know where it is in the cycle.
   Phase variable should idealy look like as shown below
-  <img width="1672" height="941" alt="image" src="https://github.com/user-attachments/assets/65b511b5-bade-409a-8255-d344659241f5" />
+  <img width="1672" height="800" alt="image" src="https://github.com/user-attachments/assets/65b511b5-bade-409a-8255-d344659241f5" />
 
 
 
