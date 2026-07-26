@@ -531,7 +531,7 @@ fprintf('  If range is small → A or B needs adjustment (signal not reaching li
 
 ## 3. Result
 
-![Phase variable and pitch plots](phase_variable_result.png)
+<img width="697" height="377" alt="image" src="https://github.com/user-attachments/assets/13c8be74-04f6-4324-88fa-3bc336bd8725" />
 
 **Top panel (φ vs time):** sawtooth pattern from 0→1 per gait cycle, with a brief startup glitch near t=0 (rapid clamped jumps before the IMU signal settles).
 
