@@ -57,7 +57,7 @@ Then θ̃ = θ/A, θ̃̇ = θ̇/B — both should now oscillate between roughly 
 
 **Without this**, you get an ellipse instead of a circle — phase moves fast in one part of the cycle and slow in another, so the 0-to-1 output is nonuniform.
 
-<img width="1254" height="800" alt="image" src="https://github.com/user-attachments/assets/40055f7c-e53d-4222-86a0-13c21b647714" />
+<img width="800" height="800" alt="image" src="https://github.com/user-attachments/assets/40055f7c-e53d-4222-86a0-13c21b647714" />
 
 
 
