@@ -6,10 +6,8 @@
   - Slower walking -> shallower slope
 - Used instead of elapsed time because gait cadence is not constant, and a prosthetic leg needs a cadence-independent way to know where it is in the cycle.
 
-
   Phase variable should idealy look like as shown below
   <img width="1672" height="800" alt="image" src="https://github.com/user-attachments/assets/65b511b5-bade-409a-8255-d344659241f5" />
-
 
 
 ## Where it comes from
@@ -58,6 +56,10 @@ Define:
 Then θ̃ = θ/A, θ̃̇ = θ̇/B — both should now oscillate between roughly -1 and +1.
 
 **Without this**, you get an ellipse instead of a circle — phase moves fast in one part of the cycle and slow in another, so the 0-to-1 output is nonuniform.
+
+<img width="1254" height="800" alt="image" src="https://github.com/user-attachments/assets/40055f7c-e53d-4222-86a0-13c21b647714" />
+
+
 
 **5. Signal must be smooth enough for the portrait to be a closed orbit**
 
