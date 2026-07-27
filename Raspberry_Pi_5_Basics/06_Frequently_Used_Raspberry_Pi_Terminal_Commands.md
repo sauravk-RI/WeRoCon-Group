@@ -3,6 +3,8 @@
 @FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026. <br>
 @Disclaimer: This tutorial was written and reviewed by the author. AI-assisted tools were used to support drafting, editing, and language refinement, with all technical content verified by the author.
 
+[← Back to Contents](00_Contents.md)
+
 ---
 
 # Why Learn Terminal Commands?
@@ -547,12 +549,6 @@ rm -rf Project
 ```
 
 The `-f` option forces deletion without asking for confirmation.
-
-> ⚠️ **Extreme Caution:** Never run commands such as:
->```bash
-> sudo rm -rf /
-> ```
-> Doing so will destroy your operating system.
 
 ---
 
@@ -1921,3 +1917,5 @@ You are now familiar with many of the Linux terminal commands that Raspberry Pi 
 ---
 
 **Happy Learning!** 😊
+
+[← Back to Contents](00_Contents.md)

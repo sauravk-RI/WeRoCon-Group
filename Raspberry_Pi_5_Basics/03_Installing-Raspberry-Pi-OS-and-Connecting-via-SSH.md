@@ -4,6 +4,8 @@
 @Credits: Install Raspberry Pi OS Without a Monitor (Part 1) - Raspberry Pi 5 Tutorial (#2) | "Robotics Back-End" YT Channel | Video Link: https://www.youtube.com/watch?v=d5AheGVw2yo&list=PLLSegLrePWgIDKJTkdLyyQskh2HDdEL3y&index=3 <br>
 @Disclaimer: This tutorial was written and reviewed by the author. AI-assisted tools were used to support drafting, editing, and language refinement, with all technical content verified by the author.
 
+[← Back to Contents](00_Contents.md)
+
 **This tutorial is heavily inspired from the lesson 2 of *Raspberry Pi 5 Tutorials for Beginners* YouTube Series by Robotics Back-End. It is recommended that you watch the video first and then come to this written lesson for following the steps properly. Check Credits for Video Link.** 
 
 ## Learning Objectives
@@ -169,7 +171,7 @@ pi
 Example
 
 ```
-werocon
+loremipsum
 ```
 
 Choose a secure password that you can remember.
@@ -373,7 +375,7 @@ If your computer cannot discover the Raspberry Pi on the network, you can tempor
 This method is particularly useful when:
 
 - `ping <hostname>.local` does not work.
-- The Raspberry Pi has obtained a new IP address after connecting to a different Wi-Fi network and your new network blocks device discovery.
+- The Raspberry Pi has obtained a new IP address after connecting to a different Wi-Fi network and although your laptop/computer is a;so connected to that same wifi network as well but this new network blocks discovery of other devices connected to it.
 
 ### Step 1: Connect a Monitor and Keyboard
 
@@ -498,8 +500,6 @@ Check the following:
 
 - The Raspberry Pi has finished booting.
 - The power supply is connected properly.
-- The Wi-Fi network name (SSID) is correct.
-- The Wi-Fi password is correct.
 - Your computer is connected to the same Wi-Fi network.
 
 ---
@@ -510,29 +510,24 @@ Possible causes include:
 
 - SSH was not enabled during installation.
 - The Raspberry Pi has not finished booting.
-- The IP address is incorrect.
+- The IP address is incorrect. Raspberry Pi is connected to a different WiFi Network.
 
-If SSH was not enabled, you will need to reflash the operating system with SSH enabled.
+If SSH was not enabled during installation by mistake, connect a monitor and keyboard to the Raspberry Pi, log into Raspberry Pi OS, and use:
 
----
+```
+sudo raspi-config
+```
+Then:
 
-## Incorrect Password
+**Interface Options → SSH → Yes**
 
-Verify:
+Afterward, determine the Pi's IP address using:
 
-- The password is typed correctly.
-- Caps Lock is disabled.
-- The keyboard layout matches the one selected during setup.
+```
+hostname -I
+```
 
-If you cannot remember the password or entered it incorrectly during installation, the easiest solution is to flash the operating system again.
-
----
-
-## Host Key Error
-
-If SSH reports a **known_hosts** error, delete the corresponding entry from your computer's SSH `known_hosts` file and reconnect.
-
-This usually occurs when the Raspberry Pi has been reflashed but retains the same IP address.
+It's better to enable SSH before the first boot. In Raspberry Pi Imager, enable SSH in the OS customization settings and configure authentication there.
 
 ---
 
@@ -550,3 +545,5 @@ In this lesson, you learned how to:
 In the next lesson, we will configure **VNC (Virtual Network Computing)** to remotely access the Raspberry Pi's graphical desktop from our computer.
 
 **Happy Learning !** 😊
+
+[← Back to Contents](00_Contents.md)

@@ -3,6 +3,8 @@
 @FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026. <br>
 @Disclaimer: This tutorial was written and reviewed by the author. AI-assisted tools were used to support drafting, editing, and language refinement, with all technical content verified by the author.
 
+[← Back to Contents](00_Contents.md)
+
 ## When Will You Need This Tutorial?
 
 Suppose you have already configured your Raspberry Pi and are accessing it remotely using **TigerVNC** or **SSH** over your home or phone's Wi-Fi network. Later, you move your Raspberry Pi to a different location—for example, your office, laboratory, university, or another home—where a different Wi-Fi network is available. 
@@ -79,11 +81,35 @@ sudo nmcli device wifi connect "Office_WiFi" password "YourPassword"
 ```
 
 Replace:
-
 - `Office_WiFi` with your Wi-Fi network name (SSID).
 - `YourPassword` with the corresponding Wi-Fi password.
 
-If the connection is successful, NetworkManager automatically saves the network profile.
+<br>
+
+> ⚠️ **Security Note:** The Wi-Fi password entered directly in the command above may be saved in the terminal's command history. On a Raspberry Pi shared by multiple users, another user may therefore be able to view the previously entered command—and the password contained in it—using the `history` command.
+>
+> After successfully connecting to the Wi-Fi network, it is recommended that you check your command history:
+>
+> ```bash
+> history
+> ```
+>
+> Locate the history entry containing your Wi-Fi password and note its entry number. For example, if the sensitive command is entry `502`, remove it using:
+>
+> ```bash
+> history -d 502
+> ```
+>
+> Then write the updated command history to the history file:
+>
+> ```bash
+> history -w
+> ```
+>
+> Replace `502` with the actual history entry number shown on your Raspberry Pi. This removes the sensitive command from your shell history so that the Wi-Fi password is not exposed through that history entry.
+
+
+If the connection is successful, NetworkManager  automatically saves the network profile.
 
 The Raspberry Pi will automatically reconnect to this network whenever it is available.
 
@@ -112,35 +138,51 @@ Lets say your university/lab/office wireless network uses the following settings
 ### Step 1: Create the Wi-Fi Profile
 
 ```bash
-sudo nmcli connection add \
-    type wifi \
-    con-name WiFi_Name \
-    ifname wlan0 \
-    ssid WiFi_Name
+sudo nmcli connection add type wifi con-name WiFi_Name ifname wlan0 ssid WiFi_Name
 ```
 
 ### Step 2: Configure Enterprise Authentication
 
 ```bash
-sudo nmcli connection modify WiFi_Name \
-    wifi-sec.key-mgmt wpa-eap \
-    802-1x.eap peap \
-    802-1x.identity "YOUR_INTERNET_ACCESS_ID" \
-    802-1x.password "YOUR_INTERNET_ACCESS_PASSWORD" \
-    802-1x.phase2-auth mschapv2 \
-    802-1x.system-ca-certs no
+sudo nmcli connection modify WiFi_Name wifi-sec.key-mgmt wpa-eap 802-1x.eap peap 802-1x.identity "YOUR_INTERNET_ACCESS_ID" 802-1x.password "YOUR_INTERNET_ACCESS_PASSWORD" 802-1x.phase2-auth mschapv2 802-1x.system-ca-certs no
 ```
 
 Replace:
 
 - `YOUR_INTERNET_ACCESS_ID` with your official Internet Access ID.
 - `YOUR_INTERNET_ACCESS_PASSWORD` with your official Internet Access password.
-
 <br>
 
-> 💡 **Note:** `YOUR_INTERNET_ACCESS_ID` and `YOUR_INTERNET_ACCESS_PASSWORD` should be within double quotes in the command above. 
+> 💡 **Note:** `YOUR_INTERNET_ACCESS_ID` and `YOUR_INTERNET_ACCESS_PASSWORD` should be within double quotes ("_") in the command above. 
+
+> ⚠️ **Security Note:** The command above contains your Internet Access ID and password directly as command-line arguments. These credentials may be saved as part of the command in the terminal's command history. On a shared Raspberry Pi, another user may therefore be able to view them later using the `history` command.
+>
+> After successfully configuring the network, it is recommended that you check your command history:
+>
+> ```bash
+> history
+> ```
+>
+> Locate the entry containing your Internet Access ID and password. For example, if the sensitive command is entry `615`, remove it using:
+>
+> ```bash
+> history -d 615
+> ```
+>
+> Then write the updated command history to the history file:
+>
+> ```bash
+> history -w
+> ```
+>
+> Replace `615` with the actual history entry number shown on your Raspberry Pi.
+>
+> **Do not clear the entire command history unnecessarily.** Delete only the entry containing your credentials.
+
 
 ### Step 3: Connect to the Network
+
+Run the following command:
 
 ```bash
 sudo nmcli connection up WiFi_Name
@@ -263,3 +305,5 @@ This displays all Wi-Fi profiles currently stored on the Raspberry Pi.
 ---
 
 **Happy Learning !** 😊
+
+[← Back to Contents](00_Contents.md)

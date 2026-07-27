@@ -3,6 +3,8 @@
 @FirstAuthor: Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, July 2026. <br>
 @Disclaimer: This tutorial was written and reviewed by the author. AI-assisted tools were used to support drafting, editing, and language refinement, with all technical content verified by the author.
 
+[← Back to Contents](00_Contents.md)
+
 ## What is Raspberry Pi 5?
 
 The **Raspberry Pi 5** is a small, affordable single-board computer (SBC) developed by the Raspberry Pi Foundation. Despite its compact size, it is a fully functional computer capable of running Linux-based operating systems, connecting to the internet, and interfacing with a wide range of electronic hardware.
@@ -30,18 +32,46 @@ The Raspberry Pi 5 can be used for:
 The figure below shows the major components and connectors available on the Raspberry Pi 5. While not every connector is required in every project, understanding their purpose makes it much easier to build hardware systems.
 
 <figure>
-  <img src="ImageFiles/2026-07-22-13-03-30.png" alt="Various Embedded Components of Raspberry Pi 5">
-  <figcaption>Figure 1: Various Embedded Components of Raspberry Pi 5. <br> <i>Image Source: https://techtonics.in/product/raspberry-pi-5-model-8gb/</i></figcaption>
+  <img src="ImageFiles/2026-07-22-13-03-30.png" 
+       alt="Major components and interfaces of the Raspberry Pi 5">
+
+  <figcaption>
+    Figure 1: Major components and interfaces of the Raspberry Pi 5.
+    <br>
+    <i>
+      Source: Adapted and annotated from a photograph by 
+      <a href="https://commons.wikimedia.org/wiki/File:Raspberry_Pi_5.jpg">SimonWaldherr, via Wikimedia Commons</a>,
+      licensed under
+      <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+      Annotations and modifications by the author.
+    </i>
+  </figcaption>
 </figure>
 
 <br>
 
-<figure style="width:100%;">
-  <img src="ImageFiles\2026-07-24-16-51-26.png"
-       alt="">
+<figure>
+  <img src="ImageFiles/2026-07-24-16-51-26.png"
+       alt="GPIO pin reference for the Raspberry Pi 2 Model B">
+
   <figcaption>
-    <strong>Figure 2:</strong> 40 GPIO Pins of the Raspberry Pi 5.<br>
-    <i>Image source: Screenshot captured from the YouTube tutorial "How GPIOs Work - Raspberry Pi 5 Tutorial (#6)" by Robotics Back-End.</i>
+    Figure 2: GPIO pin reference for the Raspberry Pi 2 Model B.
+    <br>
+    <i>
+      Source:
+      <a href="https://commons.wikimedia.org/wiki/File:Cjam-raspberry-pi-2-model-b-gpio-pins.png">
+        Andy Oakley, via Wikimedia Commons
+      </a>.
+      <a href="https://creativecommons.org/publicdomain/zero/1.0/">
+        CC0 1.0 Universal (Public Domain Dedication)
+      </a>.
+    </i>
+    <br>
+    <b>Note:</b>
+    <i>
+      The physical 40-pin GPIO header layout is identical across
+      Raspberry Pi 2, 3, 4, and 5 models.
+    </i>
   </figcaption>
 </figure>
 
@@ -301,3 +331,5 @@ Allows the Raspberry Pi 5 to be powered on or shut down safely without unpluggin
 ## Summary
 
 The Raspberry Pi 5 combines the functionality of a desktop computer with dedicated hardware interfaces for electronics projects. In most robotics and embedded applications, you will primarily use the **USB-C port for power**, **HDMI for display**, **GPIO header for sensors and motor drivers**, **MIPI connector for cameras**, **USB ports for peripherals**, and **Ethernet or Wi-Fi for communication**. Understanding these connectors is the first step toward building reliable Raspberry Pi-based systems.
+
+[← Back to Contents](00_Contents.md)
