@@ -6,7 +6,7 @@
 
 [← Back to Contents](00_Contents.md)
 
-> **This tutorial is heavily inspired from the lesson 3 of *Raspberry Pi 5 Tutorials for Beginners* YouTube Series by Robotics Back-End. It is recomMended that you watch the video first and then come to this written lesson for following the steps properly. Check Credits for Video Link.** 
+> **This tutorial is heavily inspired from the lesson 3 of *Raspberry Pi 5 Tutorials for Beginners* YouTube Series by Robotics Back-End. It is recommended that you watch the video first and then come to this written lesson for following the steps properly. Check Credits for Video Link.** 
 
 ## Learning Objectives
 
@@ -64,7 +64,7 @@ On Windows:
 Connect using:
 
 ```bash
-ssh pi@<RaspberryPi_IP_Address>
+ssh <YourRaspberryPiUsername>@<RaspberryPi_IP_Address>
 ```
 
 Example:
@@ -72,6 +72,8 @@ Example:
 ```bash
 ssh pi@192.168.1.150
 ```
+
+> Replace pi with whatever username you set during OS flashing. And replace 192.168.1.150 with your RPi's IP address.
 
 Enter the password you created while flashing Raspberry Pi OS.
 
@@ -331,6 +333,8 @@ If this happens:
 
 There is no need to reinstall Raspberry Pi OS.
 
+> 💡 **Note:** This flag is Windows-specific (ping on Windows supports -4/-6 to force IP version). On macOS/Linux, ping doesn't use -4.
+
 ---
 
 # Troubleshooting
@@ -442,7 +446,7 @@ Examples include:
 
 ---
 
-# Step 13: Network and Bluetooth
+# Step 12: Network and Bluetooth
 
 On the taskbar, you can access:
 

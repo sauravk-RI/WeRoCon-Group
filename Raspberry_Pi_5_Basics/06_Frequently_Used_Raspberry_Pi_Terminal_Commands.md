@@ -1398,7 +1398,7 @@ PID TTY          TIME CMD
 Command:
 
 ```bash
-ps -aux
+ps aux
 ```
 
 This displays all processes currently running on the Raspberry Pi.

@@ -85,6 +85,7 @@ This is the **main processor** of the Raspberry Pi 5. It performs all computatio
 
 ## 2. RAM (1GB / 2GB / 4GB / 8GB)
 
+Technically it's full name is LPDDR4X-4267 SDRAM.
 The RAM stores data that is currently being used by the operating system and running applications.
 
 More RAM allows the Raspberry Pi to run larger and multiple programs simultaneously.
@@ -98,6 +99,8 @@ This connector supplies power to the Raspberry Pi.
 **Connect here:**
 
 - USB-C power adapter (recommended 5V, 5A for Raspberry Pi 5)
+
+> 💡 **Note:** 5V/3A Power adapter also works for Raspberry Pi 5. However, 5V/3A supply will undercharge/underpower it in high-load scenarios 
 
 ---
 
@@ -226,6 +229,8 @@ Provides a high-speed expansion interface.
 
 Mostly used in advanced projects.
 
+> 💡 **Note:** Worth noting it's a single-lane PCIe 2.0 (x1) interface, and it requires a separate M.2 HAT or other adapter to actually use — there's no physical PCIe slot exposed directly on the board itself.
+
 ---
 
 ## 12. Ethernet Transceiver
@@ -282,7 +287,7 @@ Typically used for:
 
 ---
 
-## 17. PoE HAT Connector
+## 17. PoE+ HAT Connector
 
 Used with a Power over Ethernet (PoE) HAT.
 

@@ -4,9 +4,11 @@
 @Credits: How to Format and Reuse a Raspberry Pi SD Card | "Coding With Ashwin" YT Channel | Video Link: https://www.youtube.com/watch?v=otztORT2zxk <br>
 @Disclaimer: This tutorial was written and reviewed by the author. AI-assisted tools were used to support drafting, editing, and language refinement, with all technical content verified by the author.
 
-[← Back to Contents](00_Contents.md)
+> 💡 Note: 
+> - Skip this lesson if you're using a brand-new microSD card — go straight to Lesson 3
+> - This tutorial is made only for the **Windows Users**.
 
-> 💡 Note: Skip this lesson if you're using a brand-new microSD card — go straight to Lesson 3
+[← Back to Contents](00_Contents.md)
 
 <br> 
 
@@ -20,9 +22,9 @@
 
     ![](ImageFiles/2026-07-22-11-13-37.png)
 
-1. At the bottom of the *Disk Manangement* Window, you can see the list of all the disks/drives that are currently connected to your computer/laptop's Motherboard. Locate the Removable SD Card's disk in that list. (*Hint: Its name will start with "Removable".*)
+1. At the bottom of the *Disk Management* Window, you can see the list of all the disks/drives that are currently connected to your computer/laptop's Motherboard. Locate the Removable SD Card's disk in that list. (*Hint: Its name will start with "Removable".*)
 
-1. Righ-Click on each of the partitions that you can see inside the Removable SD Card's disk panel (only the ones with Blue Ribbon Bars) and select the **Delete Volume**.
+1. Right-Click on each of the partitions that you can see inside the Removable SD Card's disk panel (only the ones with Blue Ribbon Bars) and select the **Delete Volume**.
 
     ![](ImageFiles/2026-07-22-11-19-35.png)
 

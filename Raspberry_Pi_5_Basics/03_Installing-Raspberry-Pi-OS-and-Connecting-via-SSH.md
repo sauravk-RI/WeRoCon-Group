@@ -287,6 +287,8 @@ A power adapter rated at **5V, 3A** is generally sufficient for lighter workload
 
 > 💡 **Note:** **Do NOT** power the Raspberry Pi from your computer's USB port. It usually cannot provide enough current for reliable operation.
 
+> 💡 **Note:** If you use a lower-rated supply (e.g., 5V/3A), the Raspberry Pi 5 will automatically restrict total USB port current to prevent instability, and you may see a lightning-bolt icon indicating undervoltage. This is fine for light use but can affect performance of USB-powered peripherals like SSDs.
+
 Once powered:
 
 - The red power LED should turn on.
@@ -375,7 +377,7 @@ If your computer cannot discover the Raspberry Pi on the network, you can tempor
 This method is particularly useful when:
 
 - `ping <hostname>.local` does not work.
-- The Raspberry Pi has obtained a new IP address after connecting to a different Wi-Fi network and although your laptop/computer is a;so connected to that same wifi network as well but this new network blocks discovery of other devices connected to it.
+- The Raspberry Pi has obtained a new IP address after connecting to a different Wi-Fi network and although your laptop/computer is also connected to that same wifi network as well but this new network blocks discovery of other devices connected to it.
 
 ### Step 1: Connect a Monitor and Keyboard
 
@@ -493,16 +495,6 @@ Congratulations! You are now connected to your Raspberry Pi through SSH.
 ---
 
 # Troubleshooting
-
-## Raspberry Pi Does Not Appear on the Network
-
-Check the following:
-
-- The Raspberry Pi has finished booting.
-- The power supply is connected properly.
-- Your computer is connected to the same Wi-Fi network.
-
----
 
 ## SSH Connection Refused
 
