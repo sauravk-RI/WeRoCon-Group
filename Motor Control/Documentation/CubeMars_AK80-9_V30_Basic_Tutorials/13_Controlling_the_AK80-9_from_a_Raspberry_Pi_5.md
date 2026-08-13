@@ -34,10 +34,10 @@ Before touching any hardware, let's see the whole chain we are about to build. R
 │  RASPBERRY PI 5                                               │
 │                                                               │
 │   your Python script  (e.g. first_motion.py — §5)             │
-│        │  set_position(0.5 rad, Kp=5, Kd=0.5)                 │
+│        │  set_velocity(1.0 rad/s)                             │
 │        ▼                                                      │
-│   EPICally Powerful  (packs the MIT frame for you — §4)       │
-│        │  8 data bytes, extended ID = (8 << 8) | CAN_ID       │
+│   EPICally Powerful  (packs the CAN frame for you — §4)       │
+│        │  4 data bytes, extended ID = (3 << 8) | CAN_ID       │
 │        ▼                                                      │
 │   python-can  →  SocketCAN ("can0" network interface — §3)    │
 │        │                                                      │
@@ -53,7 +53,7 @@ Before touching any hardware, let's see the whole chain we are about to build. R
                     ▼
 ┌───────────────────────────────────────────────────────────────┐
 │  AK80-9 V3.0  (powered separately: 18–52 V DC, 48 V nominal)  │
-│   driver board → MIT sum → iq_ref → FOC → windings (Ch 11 §1) │
+│   driver board → velocity PI → iq_ref → FOC → windings (Ch 8) │
 │   …and every ~5 ms it *replies*: position, speed, current,    │
 │   temperature, error code (the upload frame, Ch 3 §6)         │
 └───────────────────────────────────────────────────────────────┘
@@ -67,7 +67,7 @@ Three observations that make everything below make sense.
 
 **Third: two power worlds, one data bridge.** The Pi runs on its own 5 V USB-C supply. The motor runs on its own 18–52 V supply (Chapter 1 §5). These two power systems stay completely separate — the only thing that crosses between them is the CAN data pair. Keep this picture in mind while wiring: *signal wires meet; power wires never do.*
 
-One naming note before we start. This series has always written commands from the motor's point of view — Control Mode IDs, ERPM, the MIT frame. Nothing about that changes. The Pi is simply a new *speaker* of the same language. Whenever you wonder "what is EP actually sending right now?", the answer is always in Chapter 11 §13 (MIT frames) and Chapter 4 §1 (the mode-ID map).
+One naming note before we start. This series has always written commands from the motor's point of view — Control Mode IDs, ERPM, the MIT frame. Nothing about that changes. The Pi is simply a new *speaker* of the same language. Whenever you wonder "what is EP actually sending right now?", the answer is always in Chapter 4 §1's mode-ID map and the protocol chapters behind it — Chapters 5–10 for the Servo frames this chapter uses, Chapter 11 §13 for the MIT frame.
 
 ## 2. Step 1 — Hardware: Wiring Pi ↔ CAN HAT ↔ Motor
 
@@ -363,7 +363,13 @@ From the next boot onward, `can0` is simply *there*, up and configured.
 
 ## 4. Step 3 — Installing EPICally Powerful, Our Motor-Control API
 
-We *could* now drive the motor with raw `cansend` commands — Chapter 11 §13 taught you the byte layout. But heya ! hello ! nobody does research that way! What we want is a library where "move to 0.5 rad with stiffness 5" is one line of Python, and the byte-packing, unit scaling, telemetry parsing, and safety bookkeeping happen underneath. That library is **EPICally Powerful (EP)**.
+Before installing anything, let's be clear about *why* a library like this exists at all — because the answer explains half of modern robotics research.
+
+Open any motor or sensor datasheet — ours included — and you will find that the hardware's native language is **bytes**: frames like `FF FF FF FF FF FF FF FC`, fields packed bit by bit, IDs shifted and OR-ed together. Hardware does not speak "move at 1 rad/s"; it speaks `04 0C 05 78`. For decades, the standard way to produce those bytes was **embedded C or C++ running on a microcontroller** — which meant that before a researcher could test a single gait-control idea, they first had to become a competent embedded programmer. That was the real entry barrier to robotics research: not the robotics, the *plumbing*.
+
+Two things dismantled that barrier. The first you built in §3: a Linux single-board computer with **SocketCAN**, which lets a normal program on a normal OS put frames on a CAN bus — no microcontroller, no firmware flashing. The second is the subject of this section: a **Python API that acts as a translator** between you and the hardware. You speak to it in the language of your research — radians, rad/s, newton-metres, `set_velocity(...)` — and it speaks to the motor in the motor's own byte dialect, in both directions: your commands are packed into frames going out, and the telemetry bytes coming back are unpacked into clean floating-point numbers. A middleman that is fluent on both sides of the conversation, so you never have to be fluent on the hardware's side. **EPICally Powerful (EP)** is exactly such a translator, purpose-built for our stack — and it has siblings built on the same philosophy, like the Open Source Leg project's API for prosthetics research, which our lab also uses.
+
+One caution so the magic stays honest: a translator is *convenient*, not *mystical*. Chapter 11 §13 proved you can pack these bytes yourself with a pencil; EP simply does that packing correctly, two hundred times a second, with unit conversion and safety bookkeeping thrown in — and when the translator itself has a gap (§5 will show you a real one we found), knowing the underlying byte language is what lets you fix it. That is why this series taught you the bytes *first*.
 
 ### 4.1 What EP Is, and Why It Is a Perfect Fit for This Series
 
@@ -371,7 +377,7 @@ We *could* now drive the motor with raw `cansend` commands — Chapter 11 §13 t
 
 Three facts connect EP straight back to what you already know:
 
-- **EP's CubeMars V3 driver speaks precisely the protocol of Chapter 11 §13.** Reading its source, `set_control()` packs the five MIT values — Kp (12 bits), Kd (12 bits), position (16 bits), velocity (12 bits), torque (12 bits) — into an 8-byte **extended frame with ID `(8 << 8) | CAN_ID`**: Control Mode ID 8, the Force Control frame, byte for byte. `zero_encoder()` sends the empty frame under Control Mode ID **5** — Chapter 4 §1's Set Origin helper. There is no new protocol to learn; EP is an automation of Part III.
+- **EP's CubeMars V3 driver speaks precisely the protocol language of the motor.** Reading its source, `set_control()` packs the five MIT values — Kp (12 bits), Kd (12 bits), position (16 bits), velocity (12 bits), torque (12 bits) — into an 8-byte **extended frame with ID `(8 << 8) | CAN_ID`**: Control Mode ID 8, the Force Control frame, byte for byte. `zero_encoder()` sends the empty frame under Control Mode ID **5** — Chapter 4 §1's Set Origin helper. There is no new protocol to learn; EP is an automation of Part III.
 - **EP's built-in AK80-9-V3 limits are Chapter 11 §10's table.** The library clamps every outgoing command to position ±12.56 rad, velocity ±65 rad/s, torque ±18 N·m, Kp 0–500, Kd 0–5 — the exact ranges we read out of the manual — and it separately *monitors* your running RMS torque against the **rated** ±9 N·m (Chapter 1 §2), warning you (configurable: warn / throttle / saturate / disable) when a command pattern would cook the motor. The "encodable is not operable" caution of Chapter 2 §9 is literally programmed in.
 - **EP knows the ÷189.** Telemetry velocity arrives from the motor in ERPM (Chapter 3); EP divides by pole-pairs × gear-ratio = 21 × 9 = 189 and hands you clean **rad/s at the output shaft**. Positions are output-shaft **radians**, torque commands are output-shaft **newton-metres**. All the unit discipline of Chapter 3, handled.
 
@@ -458,6 +464,8 @@ Four behaviours worth knowing rather than discovering: **(a)** on Ctrl+C or norm
 Everything is in place. This section is this chapter's **demo**: one complete, commented script that opens the bus, wakes the motor, then streams a **sinusoidal velocity command** at 100 Hz for 15 seconds — the shaft rocks back and forth like a slow pendulum — reading telemetry the whole time, then brings the motor to a controlled stop and releases it. A miniature of exactly what a research controller does, with gait phase replaced by a sine.
 
 One part of the script deserves its backstory, because no document will tell you this — our bench did. The V3.0 firmware expects a **power-on code** — an 8-byte frame `FF FF FF FF FF FF FF FC` sent to the motor's *plain* CAN ID — before it will *sustain* operation, and a matching `FF…FD` power-off when you are done. Without the power-on, the motor obeys commands for roughly half a second and then shuts itself down mid-motion: green LED off, telemetry gone, shaft coasting (§6 has the full fingerprint). EP's Servo dialect does not send these codes, so the demo's small `lifecycle()` function does it manually. The frames are reproduced byte-for-byte from the proven **TMotorCANControl** library — the CAN stack beneath the Open Source Leg project's TMotor drivers — whose `power_on()`/`power_off()` do exactly this. A worthwhile lesson rides along: *libraries are code you can read*, and when a datasheet is silent, a battle-tested sibling library is a primary source.
+
+> 📌 **The rule from here on:** until this is fixed upstream in EP, treat the lifecycle frames as **mandatory boilerplate in every CubeMars Servo-dialect script you write** — copy the `lifecycle()` helper into each script, call `lifecycle(0xFC)` immediately after `ActuatorGroup.from_dict(...)` and *before* your first control command, and call `lifecycle(0xFD)` in the cleanup at the very end (inside a `finally:` block, so it runs even when the script crashes or you press Ctrl+C). Forget the first call and your motor will die half a second into every run; skip the last and it is merely impolite.
 
 **Starting condition:** motor bench-mounted, calibrated per Ch 4, output shaft **unloaded** (a tape flag is nice for visibility), 48 V supply with a conservative current limit, E-stop within reach; `can0` up (§3.4 or §3.7); `(epenv)` active (§4.3); §4.4's smoke test already passed today. All of Ch 4 §6's ground rules in force.
 
@@ -653,7 +661,7 @@ python first_motion.py
 
 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
   <figure style="text-align: center; margin: 0;">
-      <video src="videos\video15.mp4" width="640" height="360" controls></video>
+      <video src="videos/video15.mp4" width="640" height="360" controls></video>
       <p style="width: 640px; text-align: center; margin-top: 4px;">
       <i>Video 13.1: Motor shaft action upon running the above code.</i>
       </p>
@@ -677,7 +685,7 @@ The great advantage of §1's chain picture is that every failure lives in exactl
 | `dmesg` shows `Cannot initialize MCP2515` or no `can0` in `ip link` | HAT not fully seated on the header; typo in the `dtoverlay` line; edited the wrong `config.txt`; forgot the reboot | reseat the HAT firmly; re-open `/boot/firmware/config.txt` and compare character-by-character with §3.2; `sudo reboot`; re-check `dmesg` |
 | `can0` exists but `RTNETLINK answers: Network is down` / "Cannot find device" when sending | forgot §3.4's every-session bring-up (it does not survive reboots) | `sudo ip link set can0 up type can bitrate 1000000` — then consider installing §3.7's service so this row retires forever |
 | Loopback test (§3.5) fails | problem is purely Pi-side: overlay, crystal value, or a damaged HAT | re-verify the crystal marking vs the `oscillator=` value; try the other oscillator line; if loopback still fails, test the HAT on another Pi/SD card |
-| Loopback passes, but `candump` hears nothing from the powered motor | **H/L swapped** (the #1 cause); loose screw terminal; motor in query-reply mode (silence is then *normal* until commanded, §3.6); CAN feedback not configured (§4.2); wrong bit rate on either end | swap the white/blue wires at the terminal and re-test; tug-test the terminals; run §4.4's smoke test (it *commands*, so even query-reply motors must answer); confirm 1 Mbps + feedback rate in CubeMarsTool; as a last resort add the common-ground wire from §2.3 |
+| Loopback passes, but `candump` hears nothing from the powered motor | **H/L swapped** (the #1 cause); loose screw terminal; motor in query-reply mode (silence is then *normal* until commanded, §3.6); CAN feedback not configured (§4.2); wrong bit rate on either end | swap the white/blue wires at the terminal and re-test; tug-test the terminals; run §4.4's smoke test (it *commands*, so even query-reply motors must answer); confirm 1 Mbps + feedback rate in CubeMarsTool; as a last resort, run a temporary wire from the motor supply's **negative** terminal to any Pi **GND** pin so both CAN transceivers share a ground reference (grounds only — never a positive rail) |
 | `ep-stream-actuator` runs but the table stays all zeros / "not responding" | wrong `--actuator-id` (must equal §4.2's CAN ID); wrong type string — `'AK80-9'` speaks the obsolete V1/V2 protocol, and a dialect↔mode mismatch (`'AK80-9-V3'` MIT frames at a Servo-mode motor, or vice versa) is *silently discarded*: telemetry healthy, green LED on, shaft frozen, current at the noise floor, **no error code**; feedback rate = 0 | use **`'AK80-9-V3-servo'`** for a Servo-mode motor; set feedback to ~200 Hz periodic in CubeMarsTool; watch `candump can0` in a second terminal while the tool runs — for CAN ID 100 you should see command frames going out (extended IDs `00000164`/`00000364` — Current/Velocity Loop) *and* reply frames (`00002964`) coming back, which tells you instantly which direction is broken |
 | Demo tracks beautifully for ~half a second, then the green LED goes off, the shaft coasts to a stop, the printed telemetry freezes into identical repeating lines while the script keeps running — and afterwards even `candump` is silent | the firmware's **power-on code was never sent**: the motor wakes transiently on the first commands, then shuts itself down — and its periodic telemetry stops with it, which is why the whole bus *seems* dead (§5) | confirm the demo's `lifecycle(0xFC)` call runs right after `from_dict`; power-cycle the motor and rerun. The frame on the wire is `cansend can0 00000064#FFFFFFFFFFFFFFFC` — note the *plain* CAN ID (`0x64` = 100), not a mode-prefixed one |
 | `ModuleNotFoundError: No module named 'epicallypowerful'` | virtual environment not active in this terminal | `source ~/ak80-9/epenv/bin/activate` (look for the `(epenv)` prompt), then rerun |
@@ -705,7 +713,7 @@ This chapter closes the loop the series opened on page one: Chapter 1's "robot's
 - OS setup splits cleanly into **one-time** (the `dtoverlay=mcp2515-can0,…` line — with `oscillator=` matching *your* board's 12 MHz or 8 MHz crystal — plus one reboot and a `dmesg` check) and **every-session** (`ip link set can0 up type can bitrate 1000000` + txqueuelen; automatable with a small systemd unit) (§3).
 - **EPICally Powerful** is Parts II–III as a library, in two dialects that must match the motor's operating mode: `'AK80-9-V3-servo'` (this chapter) speaks Servo — `set_velocity` is Ch 8's Velocity Loop, `set_torque` is Ch 6's Current Loop **in amperes** (× 0.5701 N·m/A for torque, Ch 2 §6), `set_position` is Ch 9's max-speed Position Loop, `zero_encoder` is a flash-permanent Set Origin — while dropping `-servo` (motor in MIT mode) makes the same names Ch 11's MIT controls plus the full master equation. Telemetry getters decode Ch 3 §6's upload frame with the ÷189 built in (§4).
 - The demo's loop — *target → one command frame → read telemetry → repeat on a metronome* — is the canonical shape of every research controller this lab writes; the sine wave is just its training wheels (§5).
-- Debug along the chain: loopback proves the Pi alone; candump proves the wire; the smoke test proves the motor config; and the type string is a silent-failure trap twice over — `'AK80-9'` speaks the obsolete V1/V2 protocol, and the dialect (`-servo` or not) must match the motor's operating mode. One more bench-earned rule: the firmware wants its power-on code (§5) before it will *stay* awake (§6).
+- Debug along the chain: loopback proves the Pi alone; candump proves the wire; the smoke test proves the motor config; and the type string is a silent-failure trap twice over — `'AK80-9'` speaks the obsolete V1/V2 protocol, and the dialect (`-servo` or not) must match the motor's operating mode. One more bench-earned rule: the firmware wants its power-on code before it will *stay* awake, so §5's `lifecycle()` helper is mandatory boilerplate — `lifecycle(0xFC)` after `from_dict`, `lifecycle(0xFD)` in the final cleanup — in every CubeMars Servo script this lab writes (§5, §6).
 
 ## Safety Notes
 
