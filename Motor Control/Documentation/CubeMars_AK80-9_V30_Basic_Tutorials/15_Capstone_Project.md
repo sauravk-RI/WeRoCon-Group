@@ -834,6 +834,8 @@ See the above code in action (Video Below):
       <p>Video 15.2: Knee and Ankle joint motors executing the time-based reference gait trajectory for 3 continuous gait cycles.</p></figure>
 </div>
 
+<br>
+
 ### 3.8 The New Discovered Problem
 
 Below are the knee and ankle joint motor's reference v/s actual trajectory comparison graphs for 1 gait cycle execution.
@@ -843,8 +845,10 @@ Below are the knee and ankle joint motor's reference v/s actual trajectory compa
         alt="Knee and Ankle joint motor's reference v/s actual trajectory comparison graphs for 1 gait cycle execution.">
     <figcaption>
       Figure 15.1: Knee and Ankle joint motor's reference v/s actual trajectory comparison graphs for 1 gait cycle execution.
-    *</figcaption>
+    </figcaption>
 </figure>
+
+<br>
 
 Now looking at this graph you can notice a very easy visible problem: observe the jitters in both the knee and ankle's actual trajectory lines (red) - very prominent in the ankle motor. What this means is that the rotors of both the motors (more in ankle motor) are although trying to follow the given trajectory but they are not doing this very smoothly i.e. they are executing some sort of vibratory wiggly motion arround the desired postions (from reference trajectory) most of the time. If a real person wears this prosthetic, he will continuosly experience prothesis vibrating. And our next challenge is to solve this problem.
 
