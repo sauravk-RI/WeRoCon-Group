@@ -17,3 +17,6 @@ A step-by-step tutorial series on understanding and controlling the CubeMars AK8
 13. [Chapter 13 — From Bench to Robot: Controlling the AK80-9 from a Raspberry Pi 5 using Python](13_Controlling_the_AK80-9_from_a_Raspberry_Pi_5.md)
 14. [Chapter 14 — The Complete Phrasebook: Every Control Mode from Python](14_Different_Control_Modes_Using_Python___EpicallyPowerFullAPI.md)
 15. [Chapter 15 — Capstone Project: Dual-Motor Control Using a Time-Based Knee–Ankle Trajectory Position Controller for a Powered Prosthetic Leg](15_Capstone_Project.md)
+
+
+> **Note :** All the codes of these tutorials can be found at Motor Control/Codes/ak80-9_Tutorials folder of this repository. 
