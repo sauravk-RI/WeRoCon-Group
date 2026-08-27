@@ -1,5 +1,7 @@
 # Chapter 11 — MIT (Force) Control Mode
 
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 12 — Choosing the Right Control Mode →](12_Choosing_the_Right_Control_Mode.md)
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -406,3 +408,7 @@ Skip it when delegation is simply the better deal. If one well-regulated quantit
 
 1. **CubeMars AK Series Module Product Manual, Ver. 3.0.1 (2025.03.14)** — specifically: §4.2 "Force Control Mode (MIT) Communication Protocol" (p. 37–41: single Control Mode ID 8 shared by the three MIT patterns; extended-frame ID layout; the Data Transmission Definition table, p. 38, including the DATA[6] label misprint noted in §13; the simplified Force Control diagram, p. 38, showing the $K_p$/$K_d$/$T_{\mathrm{ref}}$ sum feeding `iq_ref` through torque-limit protection with `id_ref = 0`; the p. 38 "Position/Velocity/Current Loop Mode" naming recorded in this chapter's terminology note; the Parameter Ranges table, p. 39, AK80-9 column: ±12.56 rad, ±65 rad/s, ±18 N·m, $K_p$ 0–500, $K_d$ 0–5 — verified against the printed table image; the Force Control Mode Send Code Example, p. 39–41: `SERVO_Can_Send_Msg`, `pack_cmd` — including the clamping error documented in §13 — and `float_to_uint`); §3.3.2 "Force Control Mode (Mit Control)" (p. 28–29: GUI operation of Force Control Position / Velocity / Torque Mode); §4.3.1 "CAN Upload Message Protocol" (p. 42: the timed telemetry upload cited for §13's feedback note); §4.4.1 "CAN Port Control Command Examples" (p. 52–53: the MIT Velocity / Position / Torque example payloads analyzed in §13).
 2. **CubeMars AK80-9 V3.0 KV100 product specifications**, cubemars.com (accessed August 2026) — rated/peak torque 9 / 22 N·m, rated/peak current 12 / 28 A, no-load speed 570 rpm, and the torque constants 0.095 N·m/A (motor side) / 0.5701 N·m/A (output side) used for this chapter's current estimates, via the series reference table (Ch 1 §2) and their definitive treatment in Ch 2 §6 and §9.
+
+---
+
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 12 — Choosing the Right Control Mode →](12_Choosing_the_Right_Control_Mode.md)

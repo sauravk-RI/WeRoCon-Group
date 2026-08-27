@@ -1,5 +1,7 @@
 # Chapter 6 — Current Loop Mode: Controlling Torque
 
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 7 — Current Brake Mode →](07_Current_Brake_Mode.md)
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -431,3 +433,7 @@ This chapter's mental model carries a lot of weight in the rest of the series:
 
 1. **CubeMars AK Series Module Product Manual, Ver. 3.0.1 (2025.03.14)** — specifically: §4.1 "Servo Mode Control Modes and Description" (p. 31: Current Loop Mode defined as "a specified Iq current is given to the motor… output torque = iq·KT… can be used as a torque loop"; the seven Servo Control Mode IDs 0–6; extended-frame ID layout); §4.1.2 "Current Loop Mode" (p. 33: data-transmission definition — int32 payload = current × 1000, −60,000…+60,000 ↔ ±60 A; the `comm_can_set_current` example routine; `CAN_PACKET_SET_CURRENT` in the packet enum, p. 32); §3.3.1.5 "Current Loop Mode" (p. 26: GUI operation — "enter the desired current I, and the motor will operate at the desired current"); §3.3.1.3 "Braking Mode" (p. 25: the `T` field — "enter the desired torque T, and the motor will brake with the desired torque"); §4.1.3 "Current Brake Mode" (p. 33–34: brake-current magnitude 0–60 A, cited for §8's pointer); §4.2 / Parameter Ranges (p. 37–39: MIT Control ID 8 and the AK80-9 ±18 N·m torque range, cited for §8's disambiguation).
 2. **CubeMars AK80-9 V3.0 KV100 product specifications**, cubemars.com (accessed August 2026) — torque constants 0.095 N·m/A (motor side) and 0.5701 N·m/A (output side), rated/peak currents 12 A / 28 A, and no-load speed context, via this series' reference table (Ch 1 §2) and their definitive treatment in Ch 2 §6 and §9.
+
+---
+
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 7 — Current Brake Mode →](07_Current_Brake_Mode.md)

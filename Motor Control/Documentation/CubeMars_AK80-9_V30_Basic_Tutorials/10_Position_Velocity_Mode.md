@@ -1,5 +1,7 @@
 # Chapter 10 — Position–Velocity Loop Mode: Multi-Turn and Single-Turn
 
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 11 — MIT (Force) Control Mode →](11_MIT_Force_Control_Mode.md)
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -243,3 +245,7 @@ Skip it in a few cases. If you do not need a profile and maximum speed is accept
 1. **CubeMars AK Series Module Product Manual, Ver. 3.0.1 (2025.03.14)** — specifically: §3.3.1.1 "Multi-Position-Velocity Loop Mode" (p. 24: Multi Mode GUI operation; position ±100 turns = −36,000°–36,000°; "the motor will move at the desired speed until it reaches the desired position"); §3.3.1.2 "Single-Position-Velocity-Loop Mode" (p. 25: Single Mode GUI operation; position one turn, 0°–359°); §4.1 "Servo Mode Control Modes and Description" (p. 31: "Position-Velocity Loop Mode: A specified position, speed, and acceleration are given to the motor"; Control Mode ID 6 among the seven mode IDs; extended-frame ID layout); the CAN packet enum (p. 32: `CAN_PACKET_SET_POS_SPD`); §4.1.7 "Position-Velocity Loop Mode" (p. 37: Simplified Diagram for the Position-Speed Loop; data-transmission definition — position int32 ±360,000,000 ↔ ±36,000°, speed int16 −32,768…32,767 ↔ −327,680…327,680 ERPM, acceleration int16 0…32,767 ↔ 0…327,670 with 1 unit = 10 ERPM/s²; the `comm_can_set_pos_spd` example routine); §4.3.2 "Serial Port Message Protocol" (p. 43: `COMM_SET_POS_MULTI = 61` / `COMM_SET_POS_SINGLE = 62` and their apparently swapped comments, cited in §7).
 2. **CubeMars AK80-9 V3.0 KV100 product specifications**, cubemars.com (accessed August 2026) — 21 pole pairs, 9:1 reduction, and the 12 A / 28 A current and 9 N·m / 22 N·m torque ratings, cited via this series' reference table (Ch 1 §2) and the ÷189 conversion (Ch 3 §2).
 3. **CubeMarsTool upper-computer software** — Trap Control panel shown in Figures 10.1–10.2; © CubeMars / Nanchang Kude Intelligent Technology Co., Ltd.
+
+---
+
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 11 — MIT (Force) Control Mode →](11_MIT_Force_Control_Mode.md)

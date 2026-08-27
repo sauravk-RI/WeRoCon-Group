@@ -1,5 +1,7 @@
 # Chapter 9 — Position Loop Mode
 
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 10 — Position–Velocity Loop Mode →](10_Position_Velocity_Mode.md)
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -276,3 +278,7 @@ Skip it when its boundaries bite. If the *motion itself* matters — speed limit
 1. **CubeMars AK Series Module Product Manual, Ver. 3.0.1 (2025.03.14)** — specifically: §3.3.1.4 "Position Loop Mode" (p. 26: GUI operation — "enter the desired position P, and the motor will reach the desired position with maximum speed and acceleration"); §4.1 "Servo Mode Control Modes and Description" (p. 31: "Position Mode: A specified position is given to the motor, and the motor will move to the specified position (speed and acceleration are default to the maximum value)"; Control Mode ID 4 among the seven mode IDs; extended-frame ID layout); the CAN packet enum (p. 32: `CAN_PACKET_SET_POS`, `CAN_PACKET_SET_ORIGIN_HERE`); §4.1.5 "Position Loop Mode" (p. 35–36: the Simplified Control Diagram for Position Loop — position-loop Kp plus a differentiator-fed Kd, summed through torque-limit protection into `iq_ref` and the FOC current loop with `id_ref = 0`; the data-transmission definition — int32 payload, −360,000,000 … +360,000,000 representing −36,000° … +36,000°; the `comm_can_set_pos` example routine with its ×10,000.0 scaling); §4.1.6 "Setting Origin Mode" (p. 36: temporary vs permanent origin, `comm_can_set_origin` routine), cited for §2's origin discussion.
 2. **CubeMars AK80-9 V3.0 KV100 product specifications**, cubemars.com (accessed August 2026) — the 9 N·m rated / 22 N·m peak torque and 12 A / 28 A ratings cited in §5–§6 and the safety notes, and the 0.5701 N·m/A output torque coefficient used in §5's current estimate, via this series' reference table (Ch 1 §2) and Ch 2 §6.
 3. **CubeMarsTool upper-computer software** — Servo Control P field and Real-time Data plots shown in Figure 9.1; © CubeMars / Nanchang Kude Intelligent Technology Co., Ltd.
+
+---
+
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 10 — Position–Velocity Loop Mode →](10_Position_Velocity_Mode.md)

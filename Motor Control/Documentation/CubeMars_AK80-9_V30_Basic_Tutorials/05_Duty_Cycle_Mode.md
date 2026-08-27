@@ -1,5 +1,7 @@
 # Chapter 5 — Duty Cycle Mode
 
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 6 — Current Loop Mode →](06_Current_Loop_Mode.md)
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -569,3 +571,7 @@ Duty Cycle Mode is the reference point that the rest of Part II is measured agai
 1. **CubeMars AK Series Module Product Manual, Ver. 3.0.1 (2025.03.14)** — specifically: §4.1 "Servo Mode Control Modes and Description" (p. 31: Duty Cycle Mode defined as "a specified duty cycle voltage… similar to square wave drive form"; Control Mode ID 0; extended-frame ID layout); §3.3.1.8 "Duty Cycle Mode" (p. 28: GUI operation and the default 0.005–0.95 duty range); §4.1.1 "Duty Cycle Mode" (p. 32–33: data-transmission definition — 4-byte payload, duty bits 1–32; the `comm_can_set_duty` example routine with int32 = duty × 100,000 scaling; `CAN_PACKET_SET_DUTY = 0` in the CAN packet enum).
 2. **CubeMars AK80-9 V3.0 KV100 product specifications**, cubemars.com (accessed August 2026) — KV100, 9:1 reduction, and ratings used for the demo speed estimates and safety limits, via this series' reference table (Ch 1 §2) and unit conversions (Ch 3 §2).
 3. **CubeMarsTool upper-computer software** — Servo Control duty field and Real-time Data plots shown in Figure 5.1; © CubeMars / Nanchang Kude Intelligent Technology Co., Ltd.
+
+---
+
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 6 — Current Loop Mode →](06_Current_Loop_Mode.md)

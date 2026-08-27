@@ -1,5 +1,7 @@
 # Chapter 1 — Meet the AK80-9: What It Is and What Its Ratings Mean
 
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 2 — Currents, Torque, and FOC →](02_Currents_Torque_and_FOC.md)
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -221,3 +223,7 @@ There is deliberately no hands-on demo here. This chapter comes before the first
 
 1. **CubeMars AK Series Module Product Manual, Ver. 3.0.1 (2025.03.14)** — specifically §1.1/§1.2 "Driver Appearance Introduction & Product Specifications" (p. 7–8: rated working voltage 48 V, **allowable working voltage 18–52 V**, standby consumption ≤ 50 mA, CAN bit rate 1 Mbps, connector/port identification).
 2. **CubeMars AK80-9 V3.0 KV100 product specifications**, cubemars.com (accessed August 2026) — rated voltage 48 V; rated/peak torque 9 / 22 N·m; rated/peak current 12 / 28 A; rated/no-load speed 390 / 570 rpm; reduction ratio 9:1; KV 100 rpm/V; KT 0.095 N·m/A; output torque–current coefficient 0.5701 N·m/A; 36 slots, 21 pole pairs; dimensions Ф98 × 38.5 mm; weight 490 g; XT30 2+2 power+CAN and CJT 3-pin serial interfaces.
+
+---
+
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 2 — Currents, Torque, and FOC →](02_Currents_Torque_and_FOC.md)

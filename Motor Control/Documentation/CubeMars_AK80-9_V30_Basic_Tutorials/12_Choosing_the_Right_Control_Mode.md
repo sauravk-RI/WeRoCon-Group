@@ -1,5 +1,7 @@
 # Chapter 12 — Choosing the Right Control Mode
 
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 13 — Controlling the AK80-9 from a Raspberry Pi 5 →](13_Controlling_the_AK80-9_from_a_Raspberry_Pi_5.md)
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -188,3 +190,7 @@ Walking is really a stiffness-and-damping problem, not just a position or speed 
 5. **C. Nesler, G. Thomas, N. Divekar, E. J. Rouse, and R. D. Gregg, "Enhancing Voluntary Motion With Modular, Backdrivable, Powered Hip and Knee Orthoses"** (M-BLUE), *IEEE Robotics and Automation Letters*, 2022 — a partial-assist lower-limb exoskeleton built on the same AK80-9 actuator, cited in §6.1.
 6. **S. Yu et al., "Quasi-Direct Drive Actuation for a Lightweight Hip Exoskeleton With High Backdrivability and High Bandwidth,"** *IEEE/ASME Transactions on Mechatronics*, 2020 — the QDD approach for wearable robots, cited in §6.1.
 7. **Wearable Robotics & Control (WeRoCon) Laboratory, IIT Jodhpur** — laboratory research context for §6: home.iitj.ac.in/~sauravk (accessed August 2026).
+
+---
+
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 13 — Controlling the AK80-9 from a Raspberry Pi 5 →](13_Controlling_the_AK80-9_from_a_Raspberry_Pi_5.md)

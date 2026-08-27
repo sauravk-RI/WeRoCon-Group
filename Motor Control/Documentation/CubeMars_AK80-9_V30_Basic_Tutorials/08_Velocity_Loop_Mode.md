@@ -1,5 +1,7 @@
 # Chapter 8 — Velocity Loop Mode
 
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 9 — Position Loop Mode →](09_Position_Loop_Mode.md)
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -333,3 +335,7 @@ Skip it when one of its limits gets in the way. If the job is really a *torque* 
 1. **CubeMars AK Series Module Product Manual, Ver. 3.0.1 (2025.03.14)** — specifically: §4.1 "Servo Mode Control Modes and Description" (p. 31: "Velocity Mode: A specified operating speed is given to the motor (acceleration is default to the maximum value)"; Servo Control Mode ID 3 among the seven mode IDs; extended-frame ID layout); §4.1.4 "Velocity Loop Mode" (p. 35: the Simplified Control Diagram for Velocity Loop — PI speed regulator with torque-limit protection feeding `iq_ref` into the FOC current loop, `id_ref = 0`, speed feedback from differentiated position; data-transmission definition — int32 payload, −100,000 … +100,000 representing −100,000 … +100,000 electrical RPM; the `comm_can_set_rpm` example routine); the CAN packet enum (p. 32: `CAN_PACKET_SET_RPM`); §3.3.1.6 "Velocity Loop Mode" (p. 27: GUI operation — "enter the desired speed S (±50000 ERPM), and the motor will operate at the desired speed (with the default maximum acceleration)"); §4.1.2 "Current Loop Mode" (p. 33: cited for §5's contrast, via Ch 6).
 2. **CubeMars AK80-9 V3.0 KV100 product specifications**, cubemars.com (accessed August 2026) — 21 pole pairs and the 9:1 reduction behind the ÷189 ERPM conversion (via Ch 3 §2), the 570 rpm no-load speed used in §1/§6, and the 12 A / 28 A ratings cited in the safety notes, via this series' reference table (Ch 1 §2).
 3. **CubeMarsTool upper-computer software** — Servo Control S field and Real-time Data plots shown in Figure 8.1; © CubeMars / Nanchang Kude Intelligent Technology Co., Ltd.
+
+---
+
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 9 — Position Loop Mode →](09_Position_Loop_Mode.md)

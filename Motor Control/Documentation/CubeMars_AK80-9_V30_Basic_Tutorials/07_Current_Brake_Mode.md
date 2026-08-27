@@ -1,5 +1,7 @@
 # Chapter 7 — Current Brake Mode
 
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 8 — Velocity Loop Mode →](08_Velocity_Loop_Mode.md)
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -352,3 +354,7 @@ Avoid it when any of its four limits gets in your way: if the hold must survive 
 
 1. **CubeMars AK Series Module Product Manual, Ver. 3.0.1 (2025.03.14)** — specifically: §4.1 "Servo Mode Control Modes and Description" (p. 31: Current Brake Mode defined as "a specified braking current is given to the motor to hold it in the current position (pay attention to motor temperature when using)"; Servo Control Mode ID 2 among the seven mode IDs; extended-frame ID layout); §4.1.3 "Current Brake Mode" (p. 33–34: data-transmission definition — int32 payload = current × 1000, values 0…60,000 ↔ 0…60 A; the `comm_can_set_cb` example routine); the CAN packet enum (p. 32: `CAN_PACKET_SET_CURRENT_BRAKE`); §3.3.1.7 "Braking Loop Mode" (p. 27: GUI operation — "enter the desired braking current B, and the motor will brake with the desired current"); §3.3.1.3 "Braking Mode" (p. 25: the separate GUI `T` braking-by-torque field, cited for disambiguation via Ch 6 §8); §4.1.2 "Current Loop Mode" (p. 33: the signed −60…+60 A range, cited for §1/§3's contrast).
 2. **CubeMars AK80-9 V3.0 KV100 product specifications**, cubemars.com (accessed August 2026) — rated/peak currents 12 A / 28 A and the torque constants 0.095 N·m/A (motor side) / 0.5701 N·m/A (output side) used for this chapter's torque estimates, via this series' reference table (Ch 1 §2) and their definitive treatment in Ch 2 §6 and §9.
+
+---
+
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 8 — Velocity Loop Mode →](08_Velocity_Loop_Mode.md)

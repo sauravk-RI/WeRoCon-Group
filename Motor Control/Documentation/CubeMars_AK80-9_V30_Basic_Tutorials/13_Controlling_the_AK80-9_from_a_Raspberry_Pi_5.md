@@ -1,5 +1,7 @@
 # Chapter 13 — From Bench to Robot: Controlling the AK80-9 from a Raspberry Pi 5 using Python
 
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 14 — The Complete Phrasebook →](14_Different_Control_Modes_Using_Python___EpicallyPowerFullAPI.md)
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -735,3 +737,7 @@ This chapter closes the loop the series opened on page one: Chapter 1's "robot's
 7. **Linux kernel SocketCAN documentation**, kernel.org/doc/Documentation/networking/can.txt (accessed August 2026) — the CAN-as-network-interface model, `ip link` administration, and loopback mode behind §3.1 and §3.5.
 8. **TMotorCANControl — source code**, pypi.org/project/TMotorCANControl (v1.2.6, accessed August 2026), the CAN driver stack beneath the Open Source Leg project's TMotor support — `servo_can.py`: `power_on()`/`power_off()` transmit the Servo-mode power-on/power-off codes (8-byte `FF…FC` / `FF…FD` frames on the motor's *plain* extended CAN ID), which §5's `lifecycle()` reproduces byte-for-byte; validated on this lab's bench with the same motor, Pi, and HAT before adoption (§5, §6).
 9. **This tutorial series, Chapters 1–12** — principally: Ch 1 §1 (the two-level control picture completed here; the XT30 (2+2) port), §5 (18–52 V rules); Ch 2 §6 (0.5701 N·m/A, used live in §5); Ch 3 §2, §6 (ERPM ÷ 189; the telemetry scalings EP decodes); Ch 4 §1 (Control Mode IDs 5 and 8), §3–§4 (CubeMarsTool procedure and LED table reused in §4.2/§2.5), §6 (the ground rules governing every demo); Ch 11 §§1–13 (the MIT master equation, gains, parameter ranges, and frame layout that EP transmits); Ch 12 §7 (the lab context this chapter operationalises).
+
+---
+
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 14 — The Complete Phrasebook →](14_Different_Control_Modes_Using_Python___EpicallyPowerFullAPI.md)

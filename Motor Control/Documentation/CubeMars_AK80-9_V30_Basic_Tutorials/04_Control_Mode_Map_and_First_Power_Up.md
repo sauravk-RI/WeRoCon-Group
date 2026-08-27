@@ -1,5 +1,7 @@
 # Chapter 4 — The Control-Mode Map, CubeMarsTool, and First Power-Up
 
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 5 — Duty Cycle Mode →](05_Duty_Cycle_Mode.md)
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -255,3 +257,7 @@ This chapter ends Part I. Everything after it assumes a connected, calibrated, h
 1. **CubeMars AK Series Module Product Manual, Ver. 3.0.1 (2025.03.14)** — specifically: §1.3 (p. 10: driver indicator-light definitions and the normal power-on behavior); §3.1.1–3.1.7 (p. 14–23: the upper-computer interface — Configuration Basic/Advanced settings and their warnings, Real-time Status, Real-time Data fields, the Control areas including Trap Control Multi ±36,000° / Single 0–359° and the run-to-zero maximum-speed caution, Unit Settings, Connection, Stop); §3.2/§3.2.1 (p. 23–24: when recalibration is needed, calibration Steps 0–4, and the no-load and heating warnings); §3.3.1–3.3.2 (p. 24–29: per-mode GUI operation — duty default 0.005–0.95, velocity S ±50,000 ERPM, Position Mode's maximum speed/acceleration, MIT position/velocity/torque operation); §4.1 (p. 31: the six Servo modes, their definitions, the extended-frame ID layout, Control Mode IDs 0–6); §4.2 (p. 37–38: Force Control shares Control Mode ID 8; the manual's "Position/Velocity/Current Loop" names for MIT's three uses).
 2. **CubeMars AK80-9 V3.0 KV100 product specifications**, cubemars.com (accessed August 2026) — used through this series' reference table (Ch 1 §2) and unit conversions (Ch 3).
 3. **CubeMarsTool upper-computer software** — all GUI descriptions and the CubeMarsTool screenshots shown in Figures 4.3–4.5; © CubeMars / Nanchang Kude Intelligent Technology Co., Ltd.
+
+---
+
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 5 — Duty Cycle Mode →](05_Duty_Cycle_Mode.md)

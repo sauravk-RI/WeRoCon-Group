@@ -1,5 +1,7 @@
 # Chapter 15 — Capstone Project: Dual-Motor Control Using a Time-Based Knee–Ankle Trajectory Position Controller for a Powered Prosthetic Leg
 
+[← Back to Contents](00_Contents.md) | *(End of Series)*
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -4247,3 +4249,7 @@ Nothing else in the impedance law, gain values, or loop structure changes betwee
 5. **SciPy documentation**, `scipy.interpolate.CubicSpline` — the spline-and-analytic-derivative technique used in §3.3 to generate a smooth, self-consistent $P_d(t)$/$V_d(t)$ pair from the dataset's discrete samples.
 6. **The Open-Source Leg (OSL) project, opensourceleg.readthedocs.io** — the reference knee/ankle position and impedance control examples this chapter's joint-limit constants and gear-ratio callout (§3.4) are checked against.
 4. **SciPy documentation**, `scipy.interpolate.CubicSpline` and `scipy.io.loadmat` — the spline-and-analytic-derivative technique used in §3.3 to generate a smooth, self-consistent $P_d(t)$/$V_d(t)$ pair, and the segmentation-file reader used in §3.2's cycle-boundary detection.
+
+---
+
+[← Back to Contents](00_Contents.md) | *(End of Series)*

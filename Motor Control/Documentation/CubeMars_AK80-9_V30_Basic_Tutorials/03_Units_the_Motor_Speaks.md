@@ -1,5 +1,7 @@
 # Chapter 3 — The Units the Motor Speaks: Degrees, ERPM, rad/s, and N·m
 
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 4 — The Control-Mode Map and First Power-Up →](04_Control_Mode_Map_and_First_Power_Up.md)
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -180,3 +182,7 @@ This chapter is pure reference; here is where each unit system gets put to work:
 1. **CubeMars AK Series Module Product Manual, Ver. 3.0.1 (2025.03.14)** — specifically: §3.3.1.1–3.3.1.8 (p. 24–28: GUI command fields and ranges — multi-turn ±100 turns / ±36,000°, single-turn 0–359°, velocity S ±50,000 ERPM, duty default 0.005–0.95, T/P/I/B fields); §4.1.1–4.1.7 (p. 33–37: Servo CAN scalings — duty × 100,000; current int32 ±60,000 ↔ ±60 A; brake 0–60,000 ↔ 0–60 A; velocity int32 ±100,000 ERPM; position int32 ±360,000,000 ↔ ±36,000°; Position–Velocity frame speed int16 1 LSB = 10 ERPM and acceleration int16 1 LSB = 10 ERPM/s², 0–327,670); §4.2 and the Parameter Ranges table (p. 38–39: MIT AK80-9 position ±12.56 rad, velocity ±65 rad/s, torque ±18 N·m, Kp 0–500, Kd 0–5); §4.3.1 (p. 42: telemetry — position int16 0.1°/LSB ±3,200°, speed int16 10 ERPM/LSB ±320,000 ERPM, current int16 0.01 A/LSB ±60 A, temperature int8 −20…127 °C, error codes 0–7, upload 1–500 Hz).
 2. **CubeMars AK80-9 V3.0 KV100 product specifications**, cubemars.com (accessed August 2026) — 21 pole pairs, 9:1 reduction, KV100, 570 rpm no-load speed, 9 N·m rated / 22 N·m peak torque; summarized in this series' reference table (Ch 1 §2).
 3. **CubeMarsTool upper-computer software** — Servo Control panel shown in Figure 3.1; © CubeMars / Nanchang Kude Intelligent Technology Co., Ltd.
+
+---
+
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 4 — The Control-Mode Map and First Power-Up →](04_Control_Mode_Map_and_First_Power_Up.md)

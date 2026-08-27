@@ -1,5 +1,7 @@
 # Chapter 2 — Currents, Torque, and FOC Inside the AK80-9
 
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 3 — The Units the Motor Speaks →](03_Units_the_Motor_Speaks.md)
+
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -567,3 +569,7 @@ This chapter is a hub. Here is where each of its threads continues in the series
 1. **CubeMars AK Series Module Product Manual, Ver. 3.0.1 (2025.03.14)** — specifically: §4.1 "Servo Mode Control Modes and Description" (p. 31: mode definitions; Current Loop defined as a specified $I_q$ current with output torque = $i_q \cdot K_T$; Current Brake defined as a specified braking current with temperature warning); §4.1.2 "Current Loop Mode" (p. 33: int32 encoding, −60 000…60 000 ↔ −60…60 A); §4.1.3 "Current Brake Mode" (p. 33–34: int32 encoding, 0…60 000 ↔ 0…60 A); §4.3.1 "CAN Upload Message Protocol" (p. 42: telemetry current int16, ±6 000 ↔ ±60 A, 0.01 A/LSB); §3.3.1.5 "Current Loop Mode" and §3.3.1.7 "Braking Loop Mode" (p. 26–27: GUI I and B command fields); §4.2 (p. 37–38: MIT mode command contents) and the MIT parameter-range table (p. 39: AK80-9 torque range ±18 N·m); §1.1/§1.2 driver product specifications (p. 7–8: 48 V rated / 18–52 V allowable working voltage, ≤ 50 mA standby consumption).
 2. **CubeMars AK80-9 V3.0 KV100 product specifications**, cubemars.com (accessed August 2026) — rated/peak current (12 A / 28 A), torque constant $K_T$ = 0.095 N·m/A, output torque coefficient 0.5701 N·m/A, 9:1 reduction; summarized in this series' reference table (Ch 1 §2).
 3. **CubeMarsTool upper-computer software** — Real-time Data panel shown in Figure 2.1; © CubeMars / Nanchang Kude Intelligent Technology Co., Ltd.
+
+---
+
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 3 — The Units the Motor Speaks →](03_Units_the_Motor_Speaks.md)
