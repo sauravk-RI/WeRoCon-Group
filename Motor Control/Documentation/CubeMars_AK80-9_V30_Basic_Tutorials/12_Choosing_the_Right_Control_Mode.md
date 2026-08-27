@@ -2,235 +2,189 @@
 
 ---
 
-**FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026.
+**FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
 **Disclaimer:** This tutorial was written and reviewed by the author. AI-assisted tools were used to support drafting, editing, and language refinement, with all technical content verified by the author.
 
 ---
 
-Welcome to the final chapter! Eleven chapters ago, the AK80-9 was just a sealed metal cylinder with three connectors. Today, for you, it is ten different tools: seven Servo commands and three MIT patterns. You have tried each one on the bench, and you know what each one promises. Only one question is left — and it is the question every real project begins with:
+You now know ten ways to control the AK80-9: seven Servo commands and three MIT patterns. This chapter helps you pick the right one for a real job. Nothing here is new — every fact was already explained in Chapters 1–11. This chapter just puts everything side by side so you can compare and choose.
 
 > **Which mode should I use?**
 
-This chapter answers that question. And here is some good news: there is nothing new to learn here. Every fact below was already explained somewhere in Chs 1–11. What this chapter adds is the *arrangement* — all the modes on one page, side by side, so you can compare them and choose. In the mode chapters, we always kept comparisons short and said "the full comparison is in Ch 12." Well, you have arrived. In order, we cover:
+Here is what this chapter covers:
 
-- the one-page master table: every mode, what you command, what the controller does for you (§1);
-- a decision flowchart: *what do you actually need to control?* (§2);
-- six worked examples that go from a real application to the right mode, with the reasoning shown (§3);
-- Servo vs MIT: two different philosophies, and when to prefer each one (§4);
-- nine short "head-to-head" boxes — one for each pair of modes that people often confuse (§5);
-- the five cautions that follow you into *every* mode (§6);
-- and finally, the section this whole series was built for: how these modes are used in **our own lab's research on powered prosthetic legs and lower-limb exoskeletons**, and why we chose this particular motor for it (§7).
+- a one-page table of every mode, plus common mix-ups (§1);
+- six short worked examples (§2);
+- Servo vs MIT, and how to choose (§3);
+- nine short comparisons between modes people often mix up (§4);
+- five cautions that apply to every mode (§5);
+- how our own lab uses these modes for prosthetic legs and exoskeletons (§6).
 
-There is no demo in this chapter. Every behavior mentioned here was already established in its home chapter — on the bench or in its telemetry discussion — and the pointers will take you straight back to the evidence.
+There is no hands-on demo here — every point links back to its home chapter.
 
 ## 1. The Master Table
 
-Before the table, one simple idea that makes the whole table easy to read. Think of the modes as a **ladder**:
 
-```text
-        (top)   Position–Velocity  ← controller does the most for you
-                Position
-                Velocity
-                Current (torque)
-        (bottom) Duty Cycle        ← controller does the least for you
-```
-
-On the bottom step, Duty Cycle Mode, you hand the driver a raw electrical effort and the controller regulates nothing. Each step up, the controller takes over one more job: first it holds the current for you, then the speed, then the position, then even the shape of the trip. This is the "cascade" idea from Ch 9 §4 — each loop is built on top of the loop below it. MIT mode then steps *sideways* off the ladder: instead of picking one step, it hands you the whole control law — target, gains, and extra torque — in every single command (Ch 11 §1).
-
-Now the table. Read it top to bottom as "you do more work → the controller does more work," with the three MIT patterns at the end as the flexible alternative:
-
-| Mode (CAN ID) | You command | The controller regulates | Typical use | Main limitation | Be careful about |
+| Mode (CAN ID) | You send | It controls | Good for | Watch out for | Type |
 |---|---|---|---|---|---|
-| **Duty Cycle** (0, Ch 5) | a signed voltage effort, ±0.95 | nothing — open loop | first spins, testing, running your own external controller | speed and torque drift when the load changes, and nothing corrects them (Ch 5 §6) | current is *highest at low speed* — at starts and stalls (Ch 5 §4) |
-| **Current Loop** (1, Ch 6) | a signed current $I_q$ in amps → torque ≈ 0.5701 × $I_q$ N·m (Ch 2 §6) | only the current | grippers with a force limit, tensioning, a torque input for your own outer loop | no speed or position target at all — motion just "happens" (Ch 6 §4) | a small current still reaches a high speed when unloaded; a stall makes heat (Ch 6 §5) |
-| **Current Brake** (2, Ch 7) | an unsigned braking effort in amps | opposition to any motion | commanded stops, park-and-hold, slowing a load that wants to run away | no target and no memory: if pushed away, it stays away (Ch 7 §6) | holding = continuous $I^2R$ heat at zero speed (Ch 7 §5) |
-| **Velocity Loop** (3, Ch 8) | a target speed in ERPM (÷189 = shaft rpm, Ch 3 §2) | the speed, using an internal PI loop (Ch 8 §1) | conveyors, wheels, fans — any "keep this rpm" job | acceleration is always the maximum; it never stops by itself | a jammed shaft or an impossible target = full effort forever (Ch 8 §6) |
-| **Position Loop** (4, Ch 9) | one absolute angle in degrees, ±36,000° | the position, and the hold after arrival | joints, valves, pointers — when only "where" matters | **every trip is at maximum speed and acceleration** (Ch 9 §1) | check where the shaft is *before* commanding — the trip is the distance, not the number |
-| **Set Origin** (5, Ch 4/9) | — (a utility: "this position = 0°") | — | setting the zero point that all position commands measure from (Ch 9 §2) | not a control mode | a temporary origin is lost when power is lost |
-| **Position–Velocity** (6, Ch 10) | position + speed + acceleration | the position, moved along a smooth trapezoid profile | index tables, dispensers, lead screws (Multi), dials (Single) | still no choice of stiffness or damping per move | a smooth profile is not automatically a safe one; too big a load = full effort (Ch 10 §6) |
-| **MIT Position** (8, Ch 11 §7) | $P_d$, $K_p$, $K_d$ in rad (with $V_d = 0$) | a spring–damper law: $\tau = K_p e_P - K_d V$ | compliant joints, where *you* choose stiffness and damping per command | range is only ±12.56 rad ≈ ±2 turns (Ch 11 §10) | a loaded hold sags by $\tau_L/K_p$; with $K_d = 0$ it oscillates (Ch 11 Demo 3) |
-| **MIT Velocity** (8, Ch 11 §8) | $V_d$ and $K_d$ in rad/s (with $K_p = 0$) | speed, through $\tau = K_d(V_d - V)$ | speed control inside a streamed MIT scheme | runs slightly slow under load (error $\tau_L/K_d$) — no integral term | $K_d$ is *your* choice every command; Servo Velocity has no such offset |
-| **MIT Torque** (8, Ch 11 §9) | a signed torque $\tau_{\mathrm{ff}}$ in N·m, ±18 | only the torque (the driver converts N·m to current for you) | direct torque in robotics units; gravity compensation | does not control speed — same story as Ch 6 §4, new units | ±18 N·m is what the *message* can say, not what the motor can safely do |
+| **Duty Cycle** (0, Ch 5) | a voltage fraction, −0.95 to +0.95 | nothing — open loop | quick tests | current is highest at start-up and stalls later, not at speed (Ch 5 §4) | SISO |
+| **Current Loop** (1, Ch 6) | a current in amps (torque ≈ 0.57 × current, Ch 2 §6) | only the current, which sets the torque | grippers with a force limit, tensioning — <span style="background-color:#ffe58a;">also the way to control torque from the Raspberry Pi, since Servo has no separate torque mode</span> (§3.1) | no speed or position limit — an unloaded shaft can spin fast (Ch 6 §4) | SISO |
+| **Current Brake** (2, Ch 7) | a braking amount in amps (always positive) | pushes back against motion, whichever way the shaft is moving | quick stops, or holding a shaft still for a short time | no memory of where it started — pushed to a new spot, it just holds the new spot; holding makes heat (Ch 7 §5) | SISO |
+| **Velocity Loop** (3, Ch 8) | a target speed in ERPM (÷189 = shaft rpm, Ch 3 §2) | speed, using a built-in PI controller | conveyors, wheels, fans — anything that should spin at a steady rpm | never stops by itself (Ch 8 §6) | SISO |
+| **Position Loop** (4, Ch 9) | one target angle, in degrees | position, and holds it after arrival | joints, valves, pointers — when only the end position matters | every move happens at full speed and full acceleration (Ch 9 §1) — check where the shaft is before sending a new target | SISO |
+| **Set Origin** (5, Ch 4/9) | nothing to control — marks "this position = 0°" | — | setting the zero point that position commands measure from (Ch 9 §2) | not a control mode; a temporary origin is lost on power loss | — |
+| **Position–Velocity** (6, Ch 10) | position + speed + acceleration, together | goes to commanded position with the selected velocity and accelaration (Ch 10 §1) | index tables, dispensers — anywhere a gentler, controlled move matters | you still can't choose how firm or soft the hold feels | MISO |
+| **MIT Position** (8, Ch 11 §7) | target position $P_d$, stiffness $K_p$, damping $K_d$ | a spring-like hold: torque $= K_p \times$ position error $- K_d \times$ velocity | joints that need an adjustable, springy feel | under load it settles a little short of target unless you add feedforward torque; <span style="background-color:#ffe58a;">you can raise the $K_p$ to a high value like 80-100 to hold the shaft in the desired position against some external torque - but only once the shaft has arrived — a high $K_p$ sent from far away causes a sudden, violent move</span> (§3.1, Ch 11 Demo 3) | MISO |
+| **MIT Velocity** (8, Ch 11 §8) | target speed $V_d$ and damping $K_d$ | speed: torque $= K_d \times$ (target speed − speed) | speed control | runs a little slow under load, with no automatic correction (Ch 11 §8) | MISO |
+| **MIT Torque** (8, Ch 11 §9) | a signed torque directly, in N·m, up to ±18 | only the torque — the motor converts it to current for you | robotics code that already thinks in torque; gravity compensation | doesn't control speed at all — an unloaded shaft will accelerate (Ch 6 §4) | MISO |
 
-Two notes for reading the table. First, every mode above ends in the same place: an `iq_ref` handed to the same FOC current loop from Ch 2 §5. The modes only differ in *who computes that current, and from what* (Ch 9 §4 asked exactly this question with its own table). Second, every number range in this table is a message-encoding range, not a promise about the motor — that is the rule from Ch 2 §9, and it returns in §6.
+A few notes on the table:
 
+- Every mode ends the same way: it sends a current to the same core control loop inside the motor (Ch 2 §5). The modes only differ in who computes that current, and from what.
+- Every range shown here (like ±60 A or ±18 N·m) is what the *message* allows, not what the motor can safely handle — see §5.
+- **SISO** means you send one number and control one thing. **MISO** means several numbers work together to control one thing. Position–Velocity and MIT are MISO. <span style="background-color:#ffe58a;">In MIT, you can send position alone, speed alone, torque alone, or mix them — if you mix position and speed, keep the damping gain ($K_d$) smaller than the stiffness gain ($K_p$), or the shaft will fight itself instead of settling smoothly near the target.</span>
 
-## 2. The Decision Flowchart
+A few common mix-ups, explained simply:
 
-When choosing a mode, do not ask "what should the motor do?" That question is too vague. Ask instead: **which quantity does my application actually specify?** Look at your requirement and find the number in it — is it a force? a speed? an angle? Then follow the chart:
+- **Brake vs Velocity:** Velocity Mode pushes to *keep* the shaft moving. Brake Mode pushes to *stop* it. They react to a load in opposite ways.
+- **Brake vs a Position hold:** Brake just resists movement — pushed away, it stays at the new spot. A Position hold remembers the target and pulls back to it. Scenario (d) below shows how to pick.
+- **Brake vs a high-stiffness MIT hold:** <span style="background-color:#ffe58a;">A MIT hold with a high $K_p$ resists a push almost like Brake does, but it also remembers its target, like a Position hold</span> (§3.1).
+- **Servo vs MIT:** this choice is really about how much control you want over the motor's *feel* — that's §3.
 
-```text
-What do you actually need to control?
-│
-├─ A FORCE or a TORQUE (speed and position are free to float)
-│   ├─ you think in amps, commanded from a Servo-style host ..... CURRENT LOOP (Ch 6)
-│   ├─ you think in N·m, or you stream MIT frames ............... MIT TORQUE (Ch 11 §9)
-│   └─ the real goal is "resist motion / stay put" .............. CURRENT BRAKE (Ch 7)
-│
-├─ A SPEED, held steady even when the load changes
-│   ├─ one number, set-and-forget, no offset under load ......... VELOCITY LOOP (Ch 8)
-│   └─ you want to choose the aggressiveness per command ........ MIT VELOCITY (Ch 11 §8)
-│
-├─ A POSITION, reached and then held
-│   ├─ the journey does not matter (unloaded, robust setup) ..... POSITION LOOP (Ch 9)
-│   ├─ the journey matters: you must set speed & acceleration ... POSITION–VELOCITY (Ch 10)
-│   │     └─ turns add up? → Multi ·· only the facing matters? → Single (Ch 10 §§2–3)
-│   └─ the stiffness/damping of the hold must be yours .......... MIT POSITION (Ch 11 §7)
-│
-├─ COMPLIANCE — the *feel* of the joint is part of the job
-│   └─ spring–damper behavior, trajectories + feedforward ....... MIT, all five fields (Ch 11 §12)
-│
-└─ NOTHING — you want raw, unregulated drive
-    └─ testing, characterization, your own control loop ......... DUTY CYCLE (Ch 5)
-```
+## 2. Six Worked Examples
 
-Three small forks that the chart squeezes together, spelled out. **Brake vs Velocity:** both involve motion, but they want opposite things. Velocity Mode *defends* motion — if the load slows the shaft, the controller pushes harder. Brake Mode *opposes* motion — any movement, in any direction, gets a counter-torque (Ch 7 §10, Ch 8 §8). **Brake vs Position for holding:** Brake asks *"is it moving?"*; Position asks *"is it where it should be?"* Scenario (d) below shows how to choose. **Servo vs MIT:** this fork appears at every level of the chart, because the real question there is not the quantity but the *philosophy* — that is §4.
+**(a) A robot-arm joint fighting gravity → MIT.** Servo Position can reach the angle, but always at full speed, with a firmness you can't change. MIT lets you set the stiffness ($K_p$), the damping ($K_d$), and add a steady push (feedforward torque) to cancel gravity, so the arm doesn't dip under its own weight. Keep $K_p$ low while the arm is still moving, and only raise it once it has arrived — otherwise the move becomes sudden and jerky (§3.1). A robotic knee works the same way: soft while swinging, firm while carrying weight (§6).
 
-## 3. Six Worked Examples
+**(b) A conveyor belt or drive wheel → Velocity Loop.** A conveyor needs a steady rpm no matter the load. Velocity Loop's built-in controller keeps adjusting the current to hold that speed, and removes any leftover speed error over time — something MIT Velocity's simpler rule can't fully do (Ch 11 §8). Send 189 × the rpm you want.
 
-Rules choose modes badly; real requirements choose them well. Here are six applications. For each, we start from the requirement and reason our way to the mode. (You will notice several of them sound close to what we do in our own lab — §7 makes that connection complete.)
+**(c) Tensioning, or a gripper with a force limit → Current Loop.** Here you want a fixed force and don't care about speed or position — the current *is* the force limit (torque ≈ 0.57 × current). MIT Torque works too, if your code already speaks torque and MIT frames.
 
-**(a) A robot-arm joint fighting gravity → MIT ($K_p$, $K_d$, $\tau_{\mathrm{ff}}$).** The requirement here is not just "reach this angle." The joint must reach the angle *gently*, carry its own weight, and be safe to touch. Servo Position can reach the angle, but it sprints there at full effort (Ch 9 §1) and holds with fixed gains you cannot see or change. Position–Velocity fixes the trip but not the hold. MIT Position gives you the stiffness and damping as numbers in your command — and $\tau_{\mathrm{ff}}$ pays the gravity bill directly, so the pose has no sag. Ch 11 §7 works exactly this situation in miniature: a $K_p = 20$ hold against a 1 N·m load droops by ~2.9° — until a 1 N·m feedforward arrives and the droop disappears. For a *moving* arm, stream all five fields: the trajectory as $P_d(t)$ and $V_d(t)$, the predicted dynamics as $\tau_{\mathrm{ff}}(t)$, and the gains set to the "feel" you want (Ch 11 §12). This is also how a powered knee behaves during walking — hold that thought for §7.
+**(d) Park-and-hold against a load → Current Brake, or a Position hold.** Brake holds against a push but doesn't return to a target afterward — good for "just stay still, wherever that is." A Position hold remembers and returns to the exact spot — better when the joint must stay at one exact angle. A MIT hold with a high $K_p$ can do the same job as a Position hold, with the option to soften later (§3.1). None of these survive a power cut — use a mechanical brake if a falling load is a real risk.
 
-**(b) A conveyor belt or a drive wheel → Velocity Loop.** The requirement contains an rpm and the words "no matter the load." That is exactly the contract of Ch 8. Remember why nothing simpler works: Ch 6 §4.3 showed that a fixed current can *produce* a steady belt speed — but nobody is controlling that speed, so the first heavy box slows the belt permanently. Velocity Loop's internal PI controller rewrites the current the moment the load changes (Ch 8 §4 — the dip-and-recover story), and its integral action means there is no leftover speed error under load — something MIT Velocity's simpler law cannot promise (Ch 11 §8). One signed number, converted first: 189 × the shaft rpm you want (Ch 3 §2).
+**(e) An indexing table that needs smooth moves → Position–Velocity.** Plain Position Mode always moves at full speed — not good if something fragile is attached. Position–Velocity lets you set the speed and acceleration of the move, so it's smoother. Use Multi Mode if turns add up (a lead screw); use Single Mode if only the final angle matters (a dial).
 
-**(c) Tensioning, or a gripper with a force limit → Current Loop.** Here the requirement is a *force*, and the speed is explicitly allowed to float: film pays out at whatever rate the process pulls it; gripper jaws stop wherever the object is. Command $I_q = \tau^*/0.5701$ (Ch 6 §2), and the current limit *is* the force limit — at any position, at any speed, including zero. The "stalled gripper" state is Ch 6 §5's behavior working as a feature, as long as you respect the heat. Choose MIT Torque instead only if your controller already speaks N·m or streams MIT frames (§5, Box 8) — the physics is identical either way.
+**(f) Characterizing a motor, or open-loop testing → Duty Cycle.** To see the motor's raw behavior, use Duty Cycle — no internal loop changes what you're measuring. For most other custom control loops, Current Loop is easier, because it handles the electrical side for you.
 
-**(d) Park-and-hold against a load → Current Brake — or a Position hold. Here is the boundary.** Both can keep a loaded shaft still, and both pay the same $I^2R$ heating bill while doing it (Ch 7 §5). The deciding question is: *what should happen after a disturbance?* If the answer is "resist it, and wherever the shaft ends up is fine" — a winch pausing, a robot held on a ramp, "wait here while the rest of the machine works" — then Brake Mode does the job with one unsigned number and nothing to configure (Ch 7 §9). If the answer is "come back to the exact pose" — an indexed fixture, a joint that must stay *at* its angle — then you need target memory, and only a position hold has it. Put Ch 9's spring-back next to Ch 7's push-and-stay: that pair of behaviors is the whole difference (Ch 7 §6, Ch 9 §5). And remember: neither hold survives a power cut. A load that must never fall needs a mechanical brake.
+## 3. Servo vs MIT: Two Ways of Working
 
-**(e) An indexing table that needs smooth moves → Position–Velocity.** The requirement is an angle *plus* rules about the journey — because the mechanism on the shaft does not like being sprinted, and in practice almost nothing attached to a shaft does (Ch 10's rule of thumb). Plain Position Mode is ruled out by its own definition: maximum speed and acceleration, always (Ch 9 §1). Position–Velocity keeps the same "go to this absolute angle" meaning but lets you write the cruise speed and the ramps into every command (Ch 10 §1 — watch the speed plot on a long and a short trip, trapezoid then triangle, and you will see your profile really is yours). Multi Mode if the table's turns add up; Single Mode if only the facing matters (Ch 10 §4). MIT could also do this, but it costs five fields per move for flexibility this job does not need.
+**Servo control is simple.** You give one target — a duty, a current, a speed, an angle — and the motor's own controller does the rest, with fixed settings you can't see or change. This is enough when only one thing matters, and you don't care about *how* the motor gets there: the conveyor of (b), the index table of (e), the gripper of (c).
 
-**(f) Characterizing a motor, or open-loop testing → Duty Cycle.** This time the requirement is the *absence* of control: you are measuring how the motor and mechanism respond, and any internal loop would reshape the very response you are trying to measure (Ch 5's "when to use," case 4). Step through a few duty values, log the current, speed, and bus voltage, and the back-EMF story writes itself in the telemetry (Ch 5 §4 and its demo). The same logic makes duty a natural output for a controller you build yourself — although for most external loops, commanding current is easier and safer, because the inner loop then handles the electrical dynamics for you (Ch 5's case 3, Ch 6's case 3).
+**MIT control asks more of you, but gives more back.** You also choose *how* the motor should respond: how stiff, how damped, how much extra push. You need a computer sending five values, often many times a second — this is the least forgiving mode in the series, since a typing mistake in a gain can make the motor sprint or shake (Ch 11's Safety Notes). In return, you can change the joint's feel from one command to the next.
 
-## 4. Servo vs MIT: Two Philosophies
+A simple way to choose: if your requirement includes words like stiffness, damping, or springiness, use MIT — nothing else can do that. If one well-behaved quantity is the whole job, and there's no computer streaming commands, use a Servo mode — it's simpler.
 
-Every MIT comparison in §5 comes down to one distinction, so let us make it clear once. Ch 11 §14 named the two philosophies; here is how to *choose* between them.
+**Rigid or springy — the feel of the hold.** Every Servo hold — Position, Position–Velocity — is firm: once the shaft arrives, it won't budge, and the motor uses as much torque as it needs to keep it exactly there (Ch 9 §5). MIT is springy by default: it gives a little under a push and returns, like a real leg joint. But <span style="background-color:#ffe58a;">you can make a MIT hold feel just as firm as Servo Position — raise $K_p$ to something high, like 80–100</span> (Box 6 has more detail). <span style="background-color:#ffe58a;">The important rule: only raise $K_p$ once the shaft has already arrived and needs to hold against a push. If you send a high $K_p$ while the shaft is still far from the target, it will snap toward the target violently instead of moving there smoothly.</span>
 
-**Servo control is delegation.** You name one target — a duty, a current, a speed, an angle — and the firmware's own controllers, with their own hidden gains, decide how hard to chase it. The interface is one to three numbers. You can *set it and forget it*, because the regulation keeps running by itself between your commands. This is the right philosophy when one well-regulated quantity is the whole job and you do not care about the *style* of the pursuit: the conveyor of scenario (b), the index table of (e), the gripper of (c).
+**Which joint needs which feel.** Different joints on the same machine can need opposite answers. <span style="background-color:#ffe58a;">A joint that must not buckle under load — an exoskeleton hip holding the leg upright — wants Servo Position's firm hold, or MIT with $K_p$ set high. A joint that must give and rebound — a prosthetic or exoskeleton knee, swinging and absorbing small shocks — wants the springy, adjustable feel that only MIT gives</span>, with a moderate $K_p$ that changes through the walking cycle. §6.2 shows this in our own lab's work.
 
-**MIT control is specification.** Every frame states not only *where* and *how fast*, but also *how stiff*, *how damped*, and *how much extra torque* — the response itself becomes part of the command (Ch 11 §1). The price is that MIT expects an intelligent master: a computer composing five coupled fields, ideally streaming them quickly, and it is the least forgiving interface in this series — one typo in a gain field is a command to sprint or to oscillate (Ch 11's Safety Notes). The reward is that the joint's *mechanical personality* is yours, per command: a stiff servo in one frame, a soft compliant spring in the next, the same hardware throughout (Ch 11 §12). No Servo setting can offer that at any price.
+### 3.1 A Practical Note: MIT Mode vs. Impedance Control on the Pi
 
-A practical selector, in two questions. *Does the response matter?* If words like stiffness, damping, compliance, or "model-based feedforward" appear in your requirement, choose MIT — nothing else can express them. *Is there a master?* MIT assumes a computer streaming frames; Servo modes assume a target that can stand alone. A conveyor run from a PLC wants Servo Velocity; a walking robot's leg run from a 1 kHz controller wants MIT. In between, pick the simplest interface that can state your requirement — delegation is cheaper than specification whenever delegation is enough.
+Two things worth knowing before writing control code for this motor on a Raspberry Pi (Chapters 13–14).
 
-## 5. Nine Head-to-Head Boxes
+**First:** <span style="background-color:#ffe58a;">the Servo command set has no separate "torque mode." Current Loop *is* how you control torque</span>, because torque ≈ 0.57 × current (Ch 2 §6). Whenever this chapter, or your own code, needs torque control through the Servo commands, Current Loop (ID 1) is the answer.
 
-Each box below settles one classic confusion between two modes. Each is short on purpose; the pointers carry the depth.
+**Second:** <span style="background-color:#ffe58a;">in our own testing, we found bugs in the motor's own MIT mode (Control ID 8) when driving it directly from the Raspberry Pi</span> — sending $P_d$, $V_d$, $K_p$, $K_d$, $\tau_{\mathrm{ff}}$ and letting the motor's firmware compute the torque itself (Ch 14 §1.1). <span style="background-color:#ffe58a;">So instead, our own code computes the same spring-damper equation in Python, on the Pi, and sends the result as an ordinary Current Loop command</span>:
 
-> **Box 1 — Duty Cycle ↔ Current Loop** *(Ch 5 ↔ Ch 6)*
-> Same physics, opposite fixed point. Duty **pins the voltage**: as speed rises, back-EMF eats the voltage headroom, so the current — and the torque — get squeezed down, and the controller does nothing about it (Ch 5 §4). Current Loop **pins the current**: the loop notices $I_q$ sagging and spends *more* voltage to defend it, until the 48 V bus has nothing left to give (Ch 6 §4.2).
-> A one-line memory aid: *duty lets physics set the torque; current loop pins it.*
-> The low-speed consequence: in Duty mode, current at standstill is an uncontrolled inrush — the highest current the mode ever draws (Ch 5 §4 Stage 5). In Current Loop, a stalled shaft carries exactly the current you commanded — safe by design, but thermally expensive if you forget about it (Ch 6 §5).
-> Choose Duty to *observe* the electrical chain, or to drive it from your own controller. Choose Current Loop to *use* torque as a controlled quantity.
+$$\tau = \tau_{\mathrm{ff}} + K_p(P_d - P) + K_d(V_d - V)$$
 
-> **Box 2 — Current Loop ↔ Current Brake** *(Ch 6 ↔ Ch 7)*
-> The command ranges tell the whole story: signed −60…+60 A versus unsigned 0…60 A. Current Loop says *"I want this torque"* — you choose the size **and the direction**, and the motor will accelerate, brake, or reverse exactly as your sign says (Ch 6 §3). Current Brake says *"oppose motion, this hard"* — you choose only the effort; the firmware reads the encoder, sees which way the shaft moves, and pushes against it, every time (Ch 7 §3).
-> A useful habit for any motor driver you meet: when a command range is one-sided, the controller is telling you it has kept the direction decision for itself (Ch 7 §3).
-> Also: Brake stops the story at zero speed and switches to holding. Current Loop's signed command pushes *through* zero into reversal (Ch 6 Demo 2 vs Ch 7 §2).
-> Small caution: the brake command is not documented as $I_q$, so torque estimates via 0.5701 N·m/A are estimates, not promises (Ch 7 §1).
+This is computed fresh every control cycle from the motor's own telemetry, converted to current (current = torque ÷ 0.57), and sent as a normal Current Loop frame (ID 1). Chapter 14 §4.2 shows the working code; Chapter 15's knee–ankle controller is built the same way.
 
-> **Box 3 — Current Loop ↔ Velocity Loop** *(Ch 6 ↔ Ch 8)*
-> Two different questions: *"how much torque?"* versus *"how fast?"* In Current Loop, you write the current command by hand, and the speed is whatever the load equation produces — steady only if the torques happen to balance, and defended by nobody (Ch 6 §4.3). Velocity Loop is the same machine **with a supervisor**: a PI controller measures the speed, computes the error, and continuously rewrites the very current command you used to write yourself (Ch 8 §1).
-> The visible difference is one friction pad. Under Current Loop, the shaft slows and *stays* slow — the loop defends the current perfectly and the speed not at all. Under Velocity Loop, the shaft dips and *recovers*, with the current rising by itself to pay for your friction. Ch 6 §4.3 and Ch 8 §4 tell the two halves of that story.
-> And remember: a small command is not a slow command in Current Loop (0.5 A → hundreds of rpm unloaded, Ch 6 §4.2). In Velocity Loop, a low target genuinely means a low speed.
+Is this the same as "MIT mode"? <span style="background-color:#ffe58a;">Almost — it's the same equation, just running in a different place.</span> This equation is called *impedance control* in general — a well-known idea from control theory (Hogan, 1985): instead of a fixed target, you command a spring-damper relationship, centered on a moving target. "MIT mode" is one specific version of it — the same equation, running inside the motor's own firmware, using the five-value frame the MIT Biomimetic Robotics Lab designed for their Mini Cheetah project (Ch 11 §1). So wherever this chapter says "MIT Position" or "MIT/impedance control" about our own hardware, it means this Pi-side version, not literally Control ID 8.
 
-> **Box 4 — Velocity Loop ↔ Position Loop** *(Ch 8 ↔ Ch 9)*
-> *"How fast should I move?"* versus *"where should I stop?"* Velocity Mode has no destination: unless you send a new command, it spins at the target forever — stopping is simply not in its contract. Position Mode's whole job *is* stopping at the answer: the shrinking position error brakes the landing onto the target, and arrival begins a hold that rejects disturbances indefinitely (Ch 9 §3, §5).
-> Structurally, Position wraps Velocity, which wraps Current — the completed cascade (Ch 9 §4). Nothing from Ch 8 is thrown away; a velocity toward the target is created *internally* on the way to every angle.
-> Boundary cases: motion that never ends (conveying, spinning) is Velocity, even if you happen to have a position sensor. Motion that must end *somewhere specific* is Position, even if it spends most of its time moving.
+## 4. Nine Head-to-Head Comparisons
 
-> **Box 5 — Position Loop ↔ Position–Velocity** *(Ch 9 ↔ Ch 10)*
-> Same destinations — absolute targets in the same ±36,000° coordinate, same hold after arrival — but opposite journeys. In Position Mode, the controller chooses the motion, and its choice is always **maximum speed and maximum acceleration** (Ch 9 §1's warning box). In Position–Velocity, the journey is part of the command: target + cruise speed + acceleration, shaped into a trapezoid (or a triangle, when the trip is too short to reach cruise speed; Ch 10 §1).
-> Under the surface, Ch 10 adds exactly one block: a profile generator that feeds the Ch 9 cascade a slowly moving setpoint instead of the final target all at once (Ch 10 §1).
-> The selection rule from Ch 10: the moment a real mechanism is attached to the shaft, Position–Velocity should be your *default* position mode. Plain Position Mode — one field instead of three — is for unloaded bench work and mechanisms that can truly take full effort. Ch 9's demo and Ch 10's Demo 1 run the very same 90° target so you can see the contrast: sprint versus glide.
+> **1 — Duty Cycle vs Current Loop** *(Ch 5 vs Ch 6)*
+> Duty Cycle fixes the voltage. As the motor speeds up, back-EMF eats into that voltage, so current — and torque — drop, and nothing corrects this. Current Loop fixes the current instead: if it starts to drop, the controller raises the voltage to hold it steady.
+> Simple way to remember: Duty lets physics decide the torque; Current Loop holds the torque steady.
+> Use Duty to see the motor's raw behavior, or to run your own outer control loop. Use Current Loop when you want torque as a controlled value.
 
-> **Box 6 — Servo Position ↔ MIT Position** *(Ch 9 ↔ Ch 11 §7)*
-> The manual's own diagrams give away the secret: Servo Position Mode is *already* a PD controller writing `iq_ref` — with its gains locked inside the firmware (Ch 9 §4). MIT Position is the same law, $\tau = K_p e_P - K_d V$, but with $K_p$ and $K_d$ shipped **inside every command**. Stiffness and damping stop being the firmware's business and become yours, per move (Ch 11 §7).
-> What you gain: the same actuator, holding the same target, feels like a rubber band at $K_p = 5$ and like a rigid stop at $K_p = 100$ (Ch 11 Demo 3) — compliance as a command.
-> What you trade: MIT position covers only ±12.56 rad ≈ ±2 turns, against Servo's ±100 turns (Ch 11 §10); a pure-spring hold sags by $\tau_L/K_p$ under load, fixable with $\tau_{\mathrm{ff}}$ (Ch 11 §7); and the tuning is now your responsibility — including always sending a nonzero $K_d$, or the step response rings (Ch 11 Demo 3).
-> This is §4's philosophy at the position level: a simpler interface versus per-command authority.
+> **2 — Current Loop vs Current Brake** *(Ch 6 vs Ch 7)*
+> Current Loop takes a signed value (−60 to +60 A) — you choose the size and the direction. Current Brake takes only a positive value (0 to 60 A) — you choose how hard to resist, and the motor figures out which direction to push against.
+> Current Loop can push the shaft through zero and reverse it. Brake stops at zero speed and holds there.
+> Note: Brake's number is not officially documented as current, so torque estimates from it are rough guesses only (Ch 7 §1).
 
-> **Box 7 — Servo Velocity ↔ MIT Velocity** *(Ch 8 ↔ Ch 11 §8)*
-> Both hold a speed by turning velocity error into torque. The difference is *whose law it is*. Servo Velocity: an internal **PI** controller — you send only the target, the firmware owns the gains, and the integral term slowly removes any leftover speed error, even under load (Ch 8 §1).
-> MIT Velocity: the law is out in the open, and it is proportional only — $\tau = K_d(V_d - V)$ — with $K_d$ as *your* dial, per command, setting how aggressively error becomes torque (Ch 11 Demo 2).
-> The cost of the simpler law: under a load $\tau_L$, the shaft settles slightly *below* target, with a standing error of $\tau_L/K_d$, because the error must stay nonzero to keep producing torque. You can cancel a known load with $\tau_{\mathrm{ff}}$, or accept the offset (Ch 11 §8).
-> Rule of thumb: set-and-forget speed under changing load → Servo Velocity. Speed control *inside* a streamed MIT scheme, with per-command aggressiveness → MIT Velocity.
+> **3 — Current Loop vs Velocity Loop** *(Ch 6 vs Ch 8)*
+> Current Loop controls force, not speed — the shaft's speed just settles wherever the load allows. Velocity Loop adds a controller on top: it watches the speed and keeps adjusting the current to hold a target speed steady, even if the load changes.
+> Remember: a small current in Current Loop can still mean a fast, unloaded shaft — don't assume a small number means slow motion.
 
-> **Box 8 — Current Loop ↔ MIT Torque** *(Ch 6 ↔ Ch 11 §9)*
-> The same physical act — commanding the motor's torque — in two different units, over two different protocols. Current Loop: you command **amps** (Servo ID 1) and do the conversion yourself: $I_q^* = \tau^*/0.5701$, so a 2 N·m request becomes a 3.51 A command (Ch 6 §2). MIT Torque: you command **newton-metres** directly (ID 8 with $K_p = K_d = 0$, range ±18 N·m) — the only place this actuator accepts N·m over the wire — and the driver does the conversion for you, through the same FOC machinery and the same constants (Ch 11 §9, Ch 2 §11).
-> Downstream, the behavior is identical, because the physics is: torque causes acceleration, never a particular speed — Ch 6 §4's story carries over word for word, with $\tau_{\mathrm{ff}}$ in place of $0.5701\,I_q$.
-> Choose by ecosystem: a Servo-speaking host that thinks in amps → Current Loop. Robotics units, or torque as one term of a fuller MIT command → MIT Torque. And neither one is the GUI's `T` field — that is a braking shortcut over Brake Mode (Ch 6 §8).
+> **4 — Velocity Loop vs Position Loop** *(Ch 8 vs Ch 9)*
+> Velocity Loop never stops by itself — it just keeps spinning at the target speed. Position Loop is built to stop exactly at a target angle, and holds there afterward.
+> Use Velocity for motion that doesn't end (a wheel, a fan). Use Position for motion that must end at a specific spot.
 
-> **Box 9 — Current Brake ↔ MIT (Torque)** *(Ch 7 ↔ Ch 11)*
-> The classic beginner question: *"why not just use MIT Torque to brake?"* Answer: **who signs the torque.** MIT Torque is manual direction control — you specify $\tau_{\mathrm{ff}}$ *including its sign*. To brake a moving shaft you must know its direction, oppose it yourself, and remove the command at standstill — otherwise the shaft reverses (Ch 11 §9, and Ch 6 §3's brake-then-reverse story). Brake Mode is automatic: one unsigned number, the firmware reads the measured velocity, opposes it, and stops the story at zero speed, smoothly switching to holding (Ch 7 §§2–4).
-> MIT *can* also hold — as a spring–damper via $K_p$/$K_d$, with target memory and a stiffness you choose (Ch 11 §7). That is richer than Brake's hold-wherever-it-stops, but it costs the full MIT interface and its ±2-turn window.
-> Rule: "stop it / keep it still, simply" → Brake. "Push with this signed torque," or a hold whose *feel* is part of the job → MIT.
+> **5 — Position Loop vs Position–Velocity** *(Ch 9 vs Ch 10)*
+> Both move to an absolute angle and hold there afterward. Position Loop always moves at full speed and full acceleration — you can't change that. Position–Velocity lets you set the speed and acceleration of the move.
+> Rule of thumb: if something real (not just a bare shaft) is attached, use Position–Velocity by default.
 
-## 6. Five Cautions That Follow You Everywhere
+> **6 — Servo Position vs MIT Position** *(Ch 9 vs Ch 11 §7)*
+> Both work the same way inside: a position error, plus some damping, produces torque. Servo Position uses fixed values you can't see. MIT Position lets you set the stiffness ($K_p$) and damping ($K_d$) yourself, every time.
+> At a low $K_p$ (around 5), MIT feels like a soft spring. At a high $K_p$ (around 100), it feels just as firm as Servo Position.
+> Trade-off: MIT only covers about ±2 turns (Servo covers ±100 turns), and a loaded hold settles a little short of the target unless you add feedforward torque. You must also set the damping ($K_d$) yourself — without it, the shaft overshoots and swings back and forth around the target.
+> Because you can dial the stiffness up or down, MIT Position can act like Servo Position — but Servo Position cannot act like a soft MIT hold.
 
-Whichever mode you choose, these five rules — plus two documentation traps — come with you. Each one was fully explained once, in its home chapter; here they are as a pre-flight checklist.
+> **7 — Servo Velocity vs MIT Velocity** *(Ch 8 vs Ch 11 §8)*
+> Servo Velocity uses a built-in PI controller — it slowly removes any leftover speed error, even under load. MIT Velocity uses a simpler rule you control yourself (just the $K_d$ gain) — under load, it settles a little below target and stays there.
+> Use Servo Velocity for steady speed control on its own. Use MIT Velocity when you're already streaming MIT commands and want to set how strongly it reacts yourself.
 
-1. **A protocol range is not a motor rating.** ±60 A, ±100,000 ERPM, ±327,680 ERPM, ±65 rad/s, ±18 N·m — these are what the *messages* can express. The motor's real limits are Ch 1 §2's table: 12 A continuous / 28 A peak, 9 / 22 N·m, 570 rpm no-load. Stated once for the series in Ch 2 §9; the MIT version — "range ≠ recommendation," so $K_p \le 500$ does not mean start at 500 — is Ch 11 §10.
-2. **Holding makes heat.** Zero speed ≠ zero current ≠ zero heat: a motor holding a load dissipates $I^2R$ continuously, with no motion to carry the heat away — and the heat grows with the *square* of the current. Every mode that holds — Brake, Position, Position–Velocity, MIT — pays this bill in exactly the same way. Ch 7 §5 owns the physics; watch the temperature telemetry during any hold and you will see it for yourself.
-3. **Divide ERPM by 189.** Every Servo speed and acceleration you type is *electrical*: divide by 189 (21 pole pairs × 9:1 gearbox) to get shaft rpm, and convert *before* commanding. 1,000 ERPM is a ~5.3 rpm crawl — and "fixing" a slow demo by typing a huge number toward an encoding limit is how shafts jump to hundreds of rpm. Ch 3 §2 owns the conversion.
-4. **Plain Position Mode always moves at maximum speed and acceleration.** It is the mode's definition, not a setting you can soften (Ch 9 §1's warning box). Nearby targets, unloaded first contact, and check the current position before every command. Wanting a gentler trip means wanting Ch 10 or Ch 11 — not a different number in the same field.
-5. **An active hold is not a lock.** Brake, Position, and MIT holds are electronics: power off = hold off, holding strength is finite, and a load stronger than the motor wins the tug-of-war at full current. Never let an electronic hold be the only thing between a load and the floor (Ch 7 §6, Ch 9 §5).
-6. *Documentation trap 1:* the manual's MIT `pack_cmd` example clamps the number 0 instead of the variables `p_des`/`v_des` — as printed, it always transmits $P_d = V_d = 0$. Fix both lines before implementing the MIT protocol (Ch 11 §13).
-7. *Documentation trap 2:* the manual's serial-port enum comments for `COMM_SET_POS_MULTI` (61) and `COMM_SET_POS_SINGLE` (62) appear to be swapped — trust the identifier names, and verify on the bench before trusting firmware to them (Ch 10 §7).
+> **8 — Current Loop vs MIT Torque** *(Ch 6 vs Ch 11 §9)*
+> Both control torque, just in different units. Current Loop: you send amps and convert to torque yourself (torque ≈ 0.57 × current). MIT Torque: you send newton-metres directly, and the motor converts it to current for you.
+> The behavior is the same either way — torque changes speed, but does not set a specific speed.
+> On this lab's Raspberry Pi code, MIT-style torque commands are actually sent as Current Loop values, computed on the Pi (§3.1).
 
-## 7. The AK80-9 in Our Lab: Prosthetic Legs and Exoskeletons
+> **9 — Current Brake vs MIT (Torque)** *(Ch 7 vs Ch 11)*
+> MIT Torque needs you to set the direction yourself — you must know which way the shaft is moving, push against it, and turn the command off once it stops, or it will push the shaft the other way. Current Brake does this automatically: it reads the direction from the encoder and always resists it, then holds once the shaft stops.
+> MIT can also hold like Brake, but with a stiffness you choose and a memory of the target — a high-$K_p$ MIT hold behaves a lot like Brake, but remembers where it should be (§3.1).
 
-This series was written at the **Wearable Robotics & Control (WeRoCon) Laboratory, IIT Jodhpur**, where we design and build intelligent lower-limb prostheses and powered exoskeletons for people with mobility impairments — work carried out together with clinical partners such as AIIMS Jodhpur. So the honest final question of this series is not "which mode for a conveyor?" but: *why is this exact motor sitting on our bench, and which of its modes will our own research actually use?* Everything you have learned in Chs 1–11 comes together in the answer.
+## 5. Five Cautions That Follow You Everywhere
 
-### 7.1 Why this motor? The quasi-direct-drive idea
+1. **A protocol range is not a motor rating.** The message may allow ±60 A, ±18 N·m, and so on — but the motor's real limits are 12 A continuous / 28 A peak, 9 / 22 N·m, 570 rpm no-load (Ch 1 §2, Ch 2 §9). Same for MIT's gain ranges (Ch 11 §10).
+2. **Holding still still uses current, and current makes heat.** Brake, Position, Position–Velocity, and MIT all pay this cost while holding — even at zero speed (Ch 7 §5).
+3. **Divide ERPM by 189 to get shaft rpm** (21 pole pairs × 9:1 gearbox, Ch 3 §2). 1,000 ERPM is only about 5 rpm — a common mistake is typing a huge number to "fix" a slow demo.
+4. **Plain Position Mode always moves at full speed and acceleration.** This can't be changed — it's the mode's definition (Ch 9 §1). Use Position–Velocity or MIT for a gentler move.
+5. **A hold is not a mechanical lock.** It stops working the instant power is lost, and it can only push so hard before a strong enough load overpowers it (Ch 7 §6, Ch 9 §5).
+6. *Documentation trap:* the manual's example MIT code (`pack_cmd`) has a bug — it always sends position and speed as zero. Fix this before using it (Ch 11 §13).
+7. *Documentation trap:* the manual's names for `COMM_SET_POS_MULTI` (61) and `COMM_SET_POS_SINGLE` (62) look swapped. Trust the ID names, and test on the bench first (Ch 10 §7).
 
-A wearable robot has a hard set of demands that most industrial actuators fail. It must be **light**, because every gram is carried on a human leg. It must be **strong in torque**, because human joints work in newton-metres, not in rpm. It must be **backdrivable** — meaning a person can move the joint by hand, against only a small resistance — because the wearer's own leg must never feel trapped inside the machine. And it must offer **accurate, fast torque control**, because assistance is delivered as carefully timed torque, in step with the wearer's gait.
+## 6. The AK80-9 in Our Lab: Prosthetic Legs and Exoskeletons
 
-The AK80-9 belongs to a family of actuators built exactly for these demands, called **quasi-direct-drive (QDD)** actuators: a torque-dense, "pancake"-shaped motor combined with a deliberately *small* gear ratio — here, just 9:1 (Ch 1 §6). Compare that with a conventional robot joint, which may use a 100:1 or larger gearbox. That big gearbox multiplies torque, yes — but it also multiplies friction and reflected inertia, so the joint becomes stiff, noisy, and nearly impossible to backdrive by hand. The QDD approach accepts a smaller torque multiplication in exchange for a joint that stays *transparent*: the AK80-9 can be turned by hand with well under a newton-metre of static resistance, and published exoskeleton studies report only a few newton-metres of resistance even during fast, walking-like motion. A small gear ratio also means the motor "feels" the outside world clearly, so output torque can be estimated well from the motor current alone — $\tau_{\mathrm{out}} \approx 0.5701\,I_q$, Ch 2 §6 — without adding a heavy, expensive torque sensor at the joint. This is why the current-based torque control you practiced in Ch 6, and the MIT control of Ch 11, are not just conveniences: for wearable robots, they *replace hardware*.
+This series was written at the **Wearable Robotics & Control (WeRoCon) Laboratory, IIT Jodhpur**, where we build powered lower-limb prostheses and exoskeletons, with clinical partners including AIIMS Jodhpur. Here's why this motor, and which of its modes our own research actually uses.
 
-You do not have to take our word for this choice. The AK80-9 is one of the most widely used actuators in lower-limb wearable-robotics research worldwide: the modular backdrivable hip, knee, and ankle exoskeleton M-BLUE (University of Michigan) is built around this exact actuator, and a recent AI-driven lower-limb exoskeleton from Georgia Tech, published in *Science Advances*, is fully powered by AK80-9 units. The same *actuation philosophy* — a high-torque motor with a low-ratio transmission — is behind leading powered knee–ankle prosthesis designs, which report benefits our own prototypes care about deeply: a knee that swings freely, compliance with the ground at foot contact, quiet operation, and even energy regeneration during the braking phases of gait. The manufacturer itself markets this actuator "especially" for exoskeletons and robot leg joints. In short: for a lab building prosthetic legs and lower-limb exoskeletons, the AK80-9 is close to the community's default choice — light (490 g), integrated (motor + gearbox + encoder + driver in one module, Ch 1 §1), torque-honest, backdrivable, and speaking both Servo and MIT protocols over a simple CAN bus.
+### 6.1 Why this motor?
 
-### 7.2 Which modes for which lab tasks?
+A wearable robot needs to be light, strong in torque, easy to move by hand (backdrivable), and able to control torque accurately and quickly.
 
-Now map our own workflow onto this chapter's decision framework. Notice how every stage of building a wearable robot lands on a mode you already know:
+The AK80-9 is a **quasi-direct-drive (QDD)** actuator: a motor that produces high torque for its size, combined with a small gear ratio (9:1, Ch 1 §6) instead of a large one like 100:1. A small gear ratio means less friction, so the joint stays easy to move by hand, and it lets us estimate output torque directly from motor current (torque ≈ 0.57 × current, Ch 2 §6) — no separate torque sensor needed.
 
-| Lab task | Mode | Why (in this chapter's language) |
+This actuator is widely used in this field: it powers exoskeletons like M-BLUE (University of Michigan) and a lower-limb exoskeleton from Georgia Tech, and the same approach — high torque, low gear ratio — is behind several powered prosthetic knee designs. It is light (490 g), has the motor, gearbox, encoder, and driver built into one unit, and speaks both Servo and MIT protocols over CAN.
+
+### 6.2 Which modes for which lab tasks?
+
+| Lab task | Mode | Why |
 |---|---|---|
-| First checks of a new actuator; friction and inertia characterization | **Duty Cycle** (Ch 5), then **Current Loop** (Ch 6) | scenario (f): you want *no* internal loop shaping the response you are measuring |
-| "Transparent" / zero-torque mode — the exoskeleton follows the wearer without helping or resisting | **MIT Torque** with $\tau_{\mathrm{ff}} \approx 0$ (or small compensation), or **Current Loop** near 0 A | the joint must be a pure, tiny torque source; the QDD's low friction is what makes ≈0 commanded torque feel like ≈0 resisted torque |
-| Gait assistance: a torque profile delivered in time with the gait cycle (e.g., help at push-off) | **MIT Torque**, streamed — $\tau_{\mathrm{ff}}(t)$ follows the gait phase | the requirement is a *torque versus time*, not a position; Box 8's "torque in robotics units," commanded at high rate |
-| A prosthetic knee during walking: stiff in stance (it must carry body weight), soft in swing (it must swing like a pendulum) | **MIT Position** with gait-phase-dependent $K_p$, $K_d$ | this is impedance control — scenario (a) at a human joint; the knee's stiffness and damping are re-commanded every gait phase, which only MIT can express (Ch 11 §7, §12) |
-| Holding a joint still during donning/doffing, fitting, or between trials on the bench | **Current Brake** (Ch 7) — with caution 5 in mind | scenario (d): "stay put, wherever you are," one number, automatic engagement — but never as the only thing supporting a limb or a load |
-| Bench rigs: repeatable joint sweeps for testing, sensor calibration, data collection | **Position–Velocity** (Ch 10) | smooth, repeatable trapezoid moves at speeds *you* chose — scenario (e) on a test stand |
-| Treadmill-like or dynamometer-style test fixtures | **Velocity Loop** (Ch 8) | scenario (b): hold an rpm while the load (the leg being tested) varies |
+| First checks on a new motor | Duty Cycle, then Current Loop | no internal loop changes what you're measuring — scenario (f) |
+| Gait assistance — a torque profile timed to the walking cycle | MIT Torque, streamed — in practice, Current Loop computed on the Pi (§3.1) | the requirement is torque over time, not a position |
+| Exoskeleton hip during standing — must not buckle under body weight | Servo Position, or MIT with a high $K_p$ | the joint should hold firmly, like scenario (a) |
+| Knee during walking — firm in stance, springy in swing | MIT Position with changing $K_p$/$K_d$ — run as Pi-side impedance control over Current Loop (§3.1) | the stiffness needs to change through the walking cycle |
+| Holding a joint still for fitting, or between bench tests | Current Brake Mode / <span style="background-color:#ffe58a;">Impedance Control Mode (High $K_p$)</span> | simple "stay put" — never the only thing holding a load, though |
+| Bench tests: repeated, smooth moves | Position–Velocity | smooth, repeatable moves at a speed you set |
+| Test rigs needing a steady rpm | Velocity Loop | holds speed steady even as the load changes |
 
-Read the middle rows again, because they contain the reason this series ends with MIT mode as its flagship. Human walking is not a position problem or a speed problem — it is an **impedance** problem: at every moment, the joint must present the right *stiffness*, the right *damping*, and the right *bias torque*, and all three change with the phase of gait. That is, word for word, the MIT command frame: $\{P_d, V_d, K_p, K_d, \tau_{\mathrm{ff}}\}$, re-sent at high rate (Ch 11 §12). A gait controller in our lab is, at its lowest level, a program that tracks which point of the gait cycle the wearer is in and streams the matching five numbers to this motor. Every chapter of this series — the torque constants of Ch 2, the units of Ch 3, the heat rules of Ch 7, the cascade of Chs 6–9, and the master equation of Ch 11 — was preparing you to write, tune, and debug exactly that program.
-
-### 7.3 One extra safety layer: there is a person in the loop
-
-Everything in Ch 4 §6 and this chapter's §6 applies double when the actuator is attached to a human body. Three lab rules to carry forward. First, **all mode experiments happen on the bench first** — a control idea meets a wearer only after it has been fully proven on a fixture, and human trials in this lab happen only under the supervisor's approval and the applicable ethics protocols. Second, **know the power-loss behavior of every mode you use** (caution 5): a wearable joint must be mechanically safe — able to move or be moved — when the electronics stop, which is one more reason the backdrivable QDD design was chosen. Third, **respect the thermal budget** (caution 2): stance-phase support and long holds are exactly the "zero speed, real current" condition of Ch 7 §5, and a warm actuator strapped to a leg is both a comfort problem and a safety problem — watch the temperature telemetry in every wearable experiment.
+Walking is really a stiffness-and-damping problem, not just a position or speed problem — the joint's stiffness needs to change through the gait cycle. That's exactly what MIT/impedance control gives us, run through the Pi as explained in §3.1.
 
 ## Key Takeaways
 
-- The modes form a **ladder of delegation** — duty → current → velocity → position → profiled position — where each step up hands one more job to an internal loop; MIT steps sideways and hands you the whole control law in every frame (§1).
-- Choose a mode by asking **which quantity your requirement actually specifies**: a force → Current Loop or MIT Torque; a maintained speed → Velocity Loop or MIT Velocity; an angle → Position, Position–Velocity, or MIT Position; "oppose motion" → Brake; a *feel* (compliance) → MIT with all five fields; nothing → Duty (§2).
-- The recurring boundary questions have concrete answers: brake-hold vs position-hold depends on whether a disturbance should be *resisted* or *reversed* (scenario d); plain vs profiled position depends on whether anything fragile is attached (Box 5); Servo vs MIT depends on whether the response is part of the spec, and whether a master is streaming commands (§4).
-- All ten tools drive the same machine: every mode ends by writing an `iq_ref` for the same FOC current loop, converted through the same two torque constants, obeying the same physics — torque causes acceleration, back-EMF caps speed, holding costs heat (Chs 2, 5–7).
-- For our lab's research, the AK80-9's quasi-direct-drive design — light, torque-dense, backdrivable, torque-honest through its current — is why it sits at the joints of our prosthetic-leg and exoskeleton prototypes, and MIT impedance control is the mode our gait controllers ultimately speak (§7).
-- The five cautions of §6 — encodings are not ratings, holding heats, ÷189, Position Mode sprints, holds are not locks — travel with you into every mode, every bench, and every prototype.
-
-## Safety Notes
-
-- This chapter adds no new hands-on procedures. If its comparisons send you back to the bench, re-enter each mode through its own chapter's demos, starting conditions, and safety notes — and Ch 4 §6's ground rules apply to every powered minute, in every mode.
-- Mode *transitions* deserve care: command zero (0 A, S = 0, B = 0, or Stop) and let the shaft settle before switching modes. A leftover command from the old mode plus a first command in the new one is how surprises happen.
-- When selecting a mode for a real application, check §6's cautions before any argument about elegance: worst-case load versus the *ratings* (not the encodings), the thermal cost of holding, and what happens at power loss.
-- For wearable applications specifically: bench-prove everything first; know each mode's power-loss behavior before any human is attached; monitor temperature throughout; and involve the wearer and supervisor per §7.3 and the lab's protocols.
+- Servo modes (Duty, Current, Brake, Velocity, Position) each take one number and control one thing (SISO). Position–Velocity and MIT take several numbers together (MISO) — MIT is the most flexible, letting you mix position, speed, and torque in one command (§1).
+- Pick a mode by asking what your application actually needs.
+- Servo Position always holds firmly. MIT holds springily by default, but a high $K_p$ — set only once the shaft has arrived, never during a move — makes it just as firm. This is why a rigid hip and a springy knee can both run on this same motor's MIT interface (§3).
+- The Servo command set has no separate torque mode — Current Loop is torque control. On this lab's own hardware, MIT-style control also runs through Current Loop, computed on the Raspberry Pi, because of firmware issues found in the motor's own MIT mode (§3.1).
+- All ten modes end up sending a current to the same core control loop inside the motor (Ch 2 §5) — they only differ in who computes that current, and how.
+- The AK80-9's light weight, ease of moving by hand, and torque-from-current design are why it fits prosthetic legs and exoskeletons, and MIT/impedance control is the mode our gait controllers ultimately use (§6).
 
 ## Sources / References
 
-1. **This tutorial series, Chapters 1–11** — this capstone is a synthesis: every mode behavior, demo result, equation, and caution above is established in its home chapter, principally: Ch 1 §§1–2, §6 (the integrated actuator, ratings table, 9:1 gearbox); Ch 2 §§5–6, §§9–11 (FOC, the two torque constants, encodings vs ratings, the full chain); Ch 3 §§2–6 (units and the ÷189 conversion); Ch 4 §§1–2, §6 (mode map, CAN Control Mode IDs, ground rules); Ch 5 §§1–7 (Duty); Ch 6 §§1–9 (Current Loop); Ch 7 §§1–10 (Brake, holding, heat); Ch 8 §§1–8 (Velocity); Ch 9 §§1–7 (Position and the cascade); Ch 10 §§1–8 (Position–Velocity); Ch 11 §§1–14 (MIT).
-2. **CubeMars AK Series Module Product Manual, Ver. 3.0.1 (2025.03.14)** — the mode-overview sections behind §1's table and §2's flowchart: §4.1 "Servo Mode Control Modes and Description" (p. 31: one-line definitions of all Servo modes, Control Mode IDs 0–6, and the maximum-speed/maximum-acceleration and motor-temperature notes quoted via Chs 5–10); §4.2 "Force Control Mode (MIT) Communication Protocol" (p. 37–39: single Control ID 8, the three MIT patterns, the master-equation diagram, and the AK80-9 parameter-range row); §3.3.1–3.3.2 (p. 24–29: per-mode GUI operation and ranges, cited via the mode chapters).
-3. **CubeMars AK80-9 V3.0 KV100 product specifications and applications**, cubemars.com (accessed August 2026) — ratings cited in §1 and §6 via the series reference table (Ch 1 §2); manufacturer application guidance naming exoskeletons, legged robots, and robot limb joints, and the note on the Georgia Tech AI-driven lower-limb exoskeleton (published in *Science Advances*) powered by AK80-9 actuators, cited in §7.1.
-4. **T. Elery, S. Rezazadeh, C. Nesler, and R. D. Gregg, "Design and Validation of a Powered Knee–Ankle Prosthesis With High-Torque, Low-Impedance Actuators,"** *IEEE Transactions on Robotics*, 2020 — the high-torque, low-reduction (quasi-direct-drive) actuation philosophy for powered prosthetic legs: backdrivability from small torques, free-swinging knee motion, ground compliance, low reflected inertia, quiet operation, energy regeneration, and accurate impedance/torque control without joint torque sensors; cited in §7.1.
-5. **C. Nesler, G. Thomas, N. Divekar, E. J. Rouse, and R. D. Gregg, "Enhancing Voluntary Motion With Modular, Backdrivable, Powered Hip and Knee Orthoses"** (M-BLUE), *IEEE Robotics and Automation Letters*, 2022, and the follow-up modular backdrivable ankle exoskeleton work by the same group — partial-assist lower-limb exoskeleton modules built directly on the T-Motor AK80-9 quasi-direct-drive actuator, reporting sub-newton-metre static backdrive torque and low dynamic backdrive torque during walking-like motion; cited in §7.1.
-6. **S. Yu et al., "Quasi-Direct Drive Actuation for a Lightweight Hip Exoskeleton With High Backdrivability and High Bandwidth,"** *IEEE/ASME Transactions on Mechatronics*, 2020 — the QDD paradigm for wearable robots (high-torque-density motor + low gear ratio) benchmarked against conventional and series-elastic actuation for torque capability, control bandwidth, backdrivability, and torque-tracking accuracy; cited in §7.1.
-7. **Wearable Robotics & Control (WeRoCon) Laboratory, IIT Jodhpur** — laboratory research context for §7 (intelligent lower-limb prostheses, powered exoskeletons, and rehabilitation robotics, in collaboration with clinical partners including AIIMS Jodhpur): home.iitj.ac.in/~sauravk (accessed August 2026).
+1. **This tutorial series, Chapters 1–11** — this chapter is a synthesis: every mode behavior, demo result, equation, and caution above is established in its home chapter, principally: Ch 1 §§1–2, §6 (the integrated actuator, ratings table, 9:1 gearbox); Ch 2 §§5–6, §§9–11 (FOC, the two torque constants, encodings vs ratings); Ch 3 §§2–6 (units and the ÷189 conversion); Ch 4 §§1–2, §6 (mode map, CAN Control Mode IDs, ground rules); Ch 5 §§1–7 (Duty); Ch 6 §§1–9 (Current Loop); Ch 7 §§1–10 (Brake, holding, heat); Ch 8 §§1–8 (Velocity); Ch 9 §§1–7 (Position); Ch 10 §§1–8 (Position–Velocity); Ch 11 §§1–14 (MIT).
+2. **CubeMars AK Series Module Product Manual, Ver. 3.0.1 (2025.03.14)** — the mode-overview sections behind §1's table: §4.1 "Servo Mode Control Modes and Description" (p. 31); §4.2 "Force Control Mode (MIT) Communication Protocol" (p. 37–39); §3.3.1–3.3.2 (p. 24–29, per-mode GUI operation and ranges).
+3. **CubeMars AK80-9 V3.0 KV100 product specifications and applications**, cubemars.com (accessed August 2026) — ratings cited in §1 and §5; manufacturer application guidance naming exoskeletons, legged robots, and robot limb joints, and the Georgia Tech AI-driven lower-limb exoskeleton (published in *Science Advances*) powered by AK80-9 actuators, cited in §6.1.
+4. **T. Elery, S. Rezazadeh, C. Nesler, and R. D. Gregg, "Design and Validation of a Powered Knee–Ankle Prosthesis With High-Torque, Low-Impedance Actuators,"** *IEEE Transactions on Robotics*, 2020 — the high-torque, low-reduction actuation approach for powered prosthetic legs, cited in §6.1.
+5. **C. Nesler, G. Thomas, N. Divekar, E. J. Rouse, and R. D. Gregg, "Enhancing Voluntary Motion With Modular, Backdrivable, Powered Hip and Knee Orthoses"** (M-BLUE), *IEEE Robotics and Automation Letters*, 2022 — a partial-assist lower-limb exoskeleton built on the same AK80-9 actuator, cited in §6.1.
+6. **S. Yu et al., "Quasi-Direct Drive Actuation for a Lightweight Hip Exoskeleton With High Backdrivability and High Bandwidth,"** *IEEE/ASME Transactions on Mechatronics*, 2020 — the QDD approach for wearable robots, cited in §6.1.
+7. **Wearable Robotics & Control (WeRoCon) Laboratory, IIT Jodhpur** — laboratory research context for §6: home.iitj.ac.in/~sauravk (accessed August 2026).
