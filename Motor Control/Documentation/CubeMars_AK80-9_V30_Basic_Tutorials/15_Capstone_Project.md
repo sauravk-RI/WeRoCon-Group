@@ -374,7 +374,7 @@ with $\tau_{ff}=0$ for both joints (the bare shaft's own inertia is small enough
 
 ### Keeping Each Joint Inside Its Limits
 
-A trajectory-tracking controller has no idea, on its own, that a real leg's knee and ankle can only move so far. Nothing in the impedance law above checks that $P_d(t)$ stays inside the joint's real mechanical range — it will happily ask a joint to go wherever the spline says, even past a hardstop, if the reference data or a sign mistake ever pointed it there. This chapter adds two checks, both built around the same pair of numbers per joint — `KNEE_LIMIT_MIN_DEG`/`KNEE_LIMIT_MAX_DEG` and `ANKLE_LIMIT_MIN_DEG`/`ANKLE_LIMIT_MAX_DEG` in the script's USER SETTINGS, matching the OSL's own convention (0° = full knee extension, 120° = maximum knee flexion) and the ankle range implied by the OSL's own example impedance state machine (−20° push-off plantarflexion to +25° swing dorsiflexion, given a little headroom below):
+A trajectory-tracking controller has no idea, on its own, that a real leg's knee and ankle can only move so far. Nothing in the impedance law above checks that $P_d(t)$ stays inside the joint's real mechanical range — it will happily ask a joint to go wherever the spline says, even past a hardstop, if the reference data or a sign mistake ever pointed it there. This chapter adds two checks, both built around the same pair of numbers per joint — `KNEE_LIMIT_MIN_DEG`/`KNEE_LIMIT_MAX_DEG` and `ANKLE_LIMIT_MIN_DEG`/`ANKLE_LIMIT_MAX_DEG` in the script's USER SETTINGS, matching the OSL v2's own mechanical design specification: 0° = full knee extension, 120° = maximum knee flexion, and ±30° for the ankle (+30° full dorsiflexion at swing to −30° full plantarflexion at push-off). These are the leg's actual hardstop limits, not headroom inferred around an example setpoint range:
 
 1. **Pre-flight check, before any motor is even powered.** The moment the trajectory splines exist, the script works out the full absolute angle range they will command over one gait cycle (dataset start angle plus the spline's own excursion) and compares it against the hardware limits. If the trajectory would ever ask for an angle outside the joint's real range, the script either aborts (see below) or corrects it — before the CAN bus is opened, before any current is ever sent.
 2. **Runtime check, every control tick.** The pre-flight check only proves the *intended* trajectory is safe; it says nothing about what the motor is *actually* doing. So the control loop also checks each joint's real, measured absolute position against the same two limits, every tick, and aborts the run the same way the tracking-error guard does (§3.9 below) if either joint would cross its limit — independent of whether tracking error looks fine.
@@ -504,12 +504,13 @@ logged) are still produced.
 # ===========================================================================
 
 # --- Paths to the Scherpereel et al. (2023) trial files --------------------
-# Both files come from the SAME trial folder, "normal_walk_1_1-2" (the
-# Walk / 1.2 m/s condition -- Ch 15 §3.1). Verified against the real
-# download: this trial's left leg completes one gait cycle (heel-strike to
+# Both files come from the SAME trial folder AB01 > "normal_walk_1_1-2" (the
+# Walk / 1.2 m/s condition -- Ch 15 §3.1).
+# This trial's left leg completes one gait cycle (heel-strike to
 # heel-strike) in 1.085 s at a 200 Hz sample rate, cadence ~110 steps/min.
-ANGLE_CSV_PATH = "AB01_normal_walk_1_1-2_angle.csv"
-GRF_CSV_PATH   = "AB01_normal_walk_1_1-2_grf.csv"
+# USE YOUR OWN PATHS: the ones below are only valid on the author's Pi, not yours.
+ANGLE_CSV_PATH = "/home/pi/ak80-9_tutorials/AB01_normal_walk_1_1-2_angle.csv"
+GRF_CSV_PATH   = "/home/pi/ak80-9_tutorials/AB01_normal_walk_1_1-2_grf.csv"
 
 # How many CONSECUTIVE strides, starting from the trial's very first
 # heel-strike, to send to the motors as one continuous trajectory. There
@@ -569,15 +570,18 @@ KNEE_SIGN  = +1.0
 ANKLE_SIGN = +1.0
 
 # --- Joint hardware limits (OSL v2 mechanical range), degrees --------------
-# Matches the OSL's own convention : 0 deg = full extension, 120 deg = max
-# flexion for the knee and +30 deg = full dorsiflexion to -30 deg = full plantarflexion. If your own leg's real
+# Matches the OSL v2's own mechanical design specification: 0 deg = full
+# extension, 120 deg = maximum flexion for the knee; +30 deg = full
+# dorsiflexion (swing) to -30 deg = full plantarflexion (push-off) for the
+# ankle. These are the leg's actual hardstop limits, not merely inferred
+# headroom around an example setpoint range. If your own leg's real
 # hardstops differ, update these to match -- these bound BOTH the
 # pre-flight trajectory check below AND the runtime limit guard inside the
 # control loop.
 KNEE_LIMIT_MIN_DEG  = 0.0
-KNEE_LIMIT_MAX_DEG  = 115.0
-ANKLE_LIMIT_MIN_DEG = -25.0
-ANKLE_LIMIT_MAX_DEG = 25.0
+KNEE_LIMIT_MAX_DEG  = 120.0
+ANKLE_LIMIT_MIN_DEG = -30.0
+ANKLE_LIMIT_MAX_DEG = 30.0
 
 # --- Dataset start angle -------------------------------------------------
 # No manual constant here: this used to be a pair of hardcoded literals
@@ -614,7 +618,7 @@ HOME_LOOP_HZ       = 50
 HOME_SPEED_ERPM    = 1500    # cruise speed while homing, wire units (Ch 10 §5)
 HOME_ACCEL_ERPM_S  = 3000    # ramp rate while homing
 HOME_TOLERANCE_DEG = 1.0     # "close enough" -- stop polling once within this
-HOME_TIMEOUT_S     = 8.0     # SECONDS (not milliseconds). If a joint has not
+HOME_TIMEOUT_S     = 15.0     # SECONDS (not milliseconds). If a joint has not
                               # reached its start angle within this many
                               # seconds, home_joint() raises RuntimeError and
                               # the script aborts before the control loop
@@ -626,24 +630,6 @@ TIME_SCALE = 2.0   # stretches the whole trajectory by this factor (2.0 =
                    # half of real walking speed). Use a bigger number for
                    # your very first run; approach 1.0 (real gait speed)
                    # only once you trust your gains and your bench setup.
-
-# --- Startup torque ramp --------------------------------------------------
-# The gait cycle begins mid-motion, so Vd(0) is NOT zero. The shaft,
-# however, IS stationary at t=0, so on the very first tick the damper term
-# alone asks for Kd*Vd(0) of torque -- a real, audible bang on a bench with
-# two motors if left uneased.
-#
-# STARTUP_RAMP_S is a DURATION in seconds, NOT a slope. It is how long the
-# ease-in period lasts: the commanded torque is scaled by a factor that
-# rises from 0 -> 1 over exactly this many seconds, then stays at 1 for
-# the rest of the run. The shape of that rise is a smoothstep S-curve
-# (3u^2 - 2u^3, u = t/STARTUP_RAMP_S going from 0 to 1) -- NOT a straight
-# ramp. A straight line has a slope corner at the moment it hits 1.0, and
-# that corner is itself a small impulse that rings the joint's resonance;
-# the smoothstep arrives at 1.0 with zero slope, so there is no corner to
-# ring. Set to 0.0 to disable the ease-in entirely (and hear what it was
-# doing).
-STARTUP_RAMP_S = 0.25
 
 # --- Runaway guards --------------------------------------------------------
 # These guards abort the run
@@ -941,13 +927,12 @@ MOTORS = {j.id: MOTOR_TYPE for j in JOINTS}
 # Vd(0) is NOT zero -- the gait cycle begins mid-motion. The shaft, however,
 # IS stationary at t=0, so the damper term contributes Kd*Vd(0) of torque
 # on the very first tick. It is small at these gains, but it is real, and
-# it is worth knowing about before it surprises you (see STARTUP_RAMP_S).
+# it is worth knowing about before it surprises you.
 for joint in JOINTS:
     vd0 = float(joint.vel_spline(0.0))
     print(f"  {joint.label:5s}: Vd(0) = {vd0:+.3f} rad/s -> "
           f"startup damper torque {joint.kd * vd0:+.3f} N*m "
-          f"({joint.kd * vd0 / KT:+.2f} A) before the "
-          f"{STARTUP_RAMP_S:.2f} s ease-in ramp")
+          f"({joint.kd * vd0 / KT:+.2f} A)")
 
 
 # ---------------------------------------------------------------------------
@@ -1162,17 +1147,6 @@ try:
             break
         t_traj = t_wall   # position along the whole (non-repeating) trajectory
 
-        # Ease-in factor: 0 -> 1 over STARTUP_RAMP_S, then constant at 1.
-        # Smoothstep (3u^2 - 2u^3) rather than a straight line, so the ramp
-        # arrives at 1.0 with zero slope and does not kick the resonance on
-        # its way out. Applied identically to both joints so they stay
-        # synchronized.
-        if STARTUP_RAMP_S > 0.0 and t_wall < STARTUP_RAMP_S:
-            u = t_wall / STARTUP_RAMP_S
-            ramp = u * u * (3.0 - 2.0 * u)
-        else:
-            ramp = 1.0
-
         for joint in JOINTS:
             pd = float(joint.pos_spline(t_traj))
             vd = float(joint.vel_spline(t_traj))
@@ -1203,7 +1177,7 @@ try:
             # Section 3.9 diagnoses exactly what this costs.
             tau_position = joint.kp * (pd - p)
             tau_velocity = joint.kd * (vd - v_raw)
-            tau = (tau_position + tau_velocity) * ramp
+            tau = tau_position + tau_velocity
             current = tau / KT   # see MAX_CURRENT_A in USER SETTINGS
             if abs(current) > MAX_CURRENT_A:
                 current = math.copysign(MAX_CURRENT_A, current)
@@ -1758,7 +1732,7 @@ Do the ankle last — it is the more delicate joint, and it is the one you most 
 
 #### Part 8: The Complete, Filtered Controller
 
-This is the full `knee_ankle_trajectory_controller_blpf_filter.py` -- everything from `knee_ankle_trajectory_controller_nofilter.py` (§3.6) unchanged, plus the order-1 Butterworth filter this section just derived. Diff the two files and there are exactly two kinds of difference: the `_check_cutoff()` / `design_butterworth_1st_order()` / `RealtimeButterworthLPF` block (new), and the single line inside the control loop where `v_filt = joint.filt.update(v_raw)` replaces the raw reading in the `Kd` term -- everything else, including the dataset loader, the sign correction, the joint-limit check, homing, the startup ramp, and the wrap-glitch guard, is byte-for-byte the same script you already read in §3.6. Save this as `knee_ankle_trajectory_controller_blpf_filter.py`; it uses no `FILTER_ORDER` selector -- the order-2 path an earlier draft of this chapter tried has been deleted from the code entirely, not just left unused, since the bench result in Part 5 above showed it actively causing instability rather than merely being unnecessary.
+This is the full `knee_ankle_trajectory_controller_blpf_filter.py` -- everything from `knee_ankle_trajectory_controller_nofilter.py` (§3.6) unchanged, plus the order-1 Butterworth filter this section just derived. Diff the two files and there are exactly two kinds of difference: the `_check_cutoff()` / `design_butterworth_1st_order()` / `RealtimeButterworthLPF` block (new), and the single line inside the control loop where `v_filt = joint.filt.update(v_raw)` replaces the raw reading in the `Kd` term -- everything else, including the dataset loader, the sign correction, the joint-limit check, homing, and the wrap-glitch guard, is byte-for-byte the same script you already read in §3.6. Save this as `knee_ankle_trajectory_controller_blpf_filter.py`; it uses no `FILTER_ORDER` selector -- the order-2 path an earlier draft of this chapter tried has been deleted from the code entirely, not just left unused, since the bench result in Part 5 above showed it actively causing instability rather than merely being unnecessary.
 
 ```python
 #!/usr/bin/env python3
@@ -1781,7 +1755,7 @@ every difference is either the filter itself (the
 RealtimeButterworthLPF class and its supporting functions) or the single
 line inside the control loop where v_filt replaces v_raw in the Kd term.
 Everything else -- dataset loader, sign correction, joint limits, homing,
-startup ramp, wrap-glitch guard, tracking-error guard, logging, and
+wrap-glitch guard, tracking-error guard, logging, and
 plotting -- is unchanged on purpose.
 
 WHAT THIS PROGRAM DOES
@@ -1853,12 +1827,13 @@ logged) are still produced.
 # ===========================================================================
 
 # --- Paths to the Scherpereel et al. (2023) trial files --------------------
-# Both files come from the SAME trial folder, "normal_walk_1_1-2" (the
-# Walk / 1.2 m/s condition -- Ch 15 §3.1). Verified against the real
-# download: this trial's left leg completes one gait cycle (heel-strike to
+# Both files come from the SAME trial folder AB01 > "normal_walk_1_1-2" (the
+# Walk / 1.2 m/s condition -- Ch 15 §3.1).
+# This trial's left leg completes one gait cycle (heel-strike to
 # heel-strike) in 1.085 s at a 200 Hz sample rate, cadence ~110 steps/min.
-ANGLE_CSV_PATH = "AB01_normal_walk_1_1-2_angle.csv"
-GRF_CSV_PATH   = "AB01_normal_walk_1_1-2_grf.csv"
+# USE YOUR OWN PATHS: the ones below are only valid on the author's Pi, not yours.
+ANGLE_CSV_PATH = "/home/pi/ak80-9_tutorials/AB01_normal_walk_1_1-2_angle.csv"
+GRF_CSV_PATH   = "/home/pi/ak80-9_tutorials/AB01_normal_walk_1_1-2_grf.csv"
 
 # How many CONSECUTIVE strides, starting from the trial's very first
 # heel-strike, to send to the motors as one continuous trajectory. There
@@ -1935,18 +1910,18 @@ KNEE_SIGN  = +1.0
 ANKLE_SIGN = +1.0
 
 # --- Joint hardware limits (OSL v2 mechanical range), degrees --------------
-# Matches the OSL's own convention (0 deg = full extension, 120 deg = max
-# flexion for the knee) and the OSL's own example impedance-control state
-# machine, whose ankle setpoints range from -20 deg (push-off
-# plantarflexion) to +25 deg (swing dorsiflexion clearance) -- the ankle
-# limits below give that a little headroom. If your own leg's real
+# Matches the OSL v2's own mechanical design specification: 0 deg = full
+# extension, 120 deg = maximum flexion for the knee; +30 deg = full
+# dorsiflexion (swing) to -30 deg = full plantarflexion (push-off) for the
+# ankle. These are the leg's actual hardstop limits, not merely inferred
+# headroom around an example setpoint range. If your own leg's real
 # hardstops differ, update these to match -- these bound BOTH the
 # pre-flight trajectory check below AND the runtime limit guard inside the
 # control loop.
 KNEE_LIMIT_MIN_DEG  = 0.0
 KNEE_LIMIT_MAX_DEG  = 120.0
-ANKLE_LIMIT_MIN_DEG = -25.0
-ANKLE_LIMIT_MAX_DEG = 25.0
+ANKLE_LIMIT_MIN_DEG = -30.0
+ANKLE_LIMIT_MAX_DEG = 30.0
 
 # --- Dataset start angle -------------------------------------------------
 # No manual constant here: this used to be a pair of hardcoded literals
@@ -1983,7 +1958,7 @@ HOME_LOOP_HZ       = 50
 HOME_SPEED_ERPM    = 1500    # cruise speed while homing, wire units (Ch 10 §5)
 HOME_ACCEL_ERPM_S  = 3000    # ramp rate while homing
 HOME_TOLERANCE_DEG = 1.0     # "close enough" -- stop polling once within this
-HOME_TIMEOUT_S     = 8.0     # SECONDS (not milliseconds). If a joint has not
+HOME_TIMEOUT_S     = 15.0     # SECONDS (not milliseconds). If a joint has not
                               # reached its start angle within this many
                               # seconds, home_joint() raises RuntimeError and
                               # the script aborts before the control loop
@@ -1995,24 +1970,6 @@ TIME_SCALE = 2.0   # stretches the whole trajectory by this factor (2.0 =
                    # half of real walking speed). Use a bigger number for
                    # your very first run; approach 1.0 (real gait speed)
                    # only once you trust your gains and your bench setup.
-
-# --- Startup torque ramp --------------------------------------------------
-# The gait cycle begins mid-motion, so Vd(0) is NOT zero. The shaft,
-# however, IS stationary at t=0, so on the very first tick the damper term
-# alone asks for Kd*Vd(0) of torque -- a real, audible bang on a bench with
-# two motors if left uneased.
-#
-# STARTUP_RAMP_S is a DURATION in seconds, NOT a slope. It is how long the
-# ease-in period lasts: the commanded torque is scaled by a factor that
-# rises from 0 -> 1 over exactly this many seconds, then stays at 1 for
-# the rest of the run. The shape of that rise is a smoothstep S-curve
-# (3u^2 - 2u^3, u = t/STARTUP_RAMP_S going from 0 to 1) -- NOT a straight
-# ramp. A straight line has a slope corner at the moment it hits 1.0, and
-# that corner is itself a small impulse that rings the joint's resonance;
-# the smoothstep arrives at 1.0 with zero slope, so there is no corner to
-# ring. Set to 0.0 to disable the ease-in entirely (and hear what it was
-# doing).
-STARTUP_RAMP_S = 0.25
 
 # --- Runaway guards --------------------------------------------------------
 # A phase-margin mistake in the Kd path does not fail gracefully: it builds
@@ -2458,13 +2415,12 @@ print(f"Velocity filter: order 1 Butterworth, "
 # Vd(0) is NOT zero -- the gait cycle begins mid-motion. The shaft, however,
 # IS stationary at t=0, so the damper term contributes Kd*Vd(0) of torque
 # on the very first tick. It is small at these gains, but it is real, and
-# it is worth knowing about before it surprises you (see STARTUP_RAMP_S).
+# it is worth knowing about before it surprises you.
 for joint in JOINTS:
     vd0 = float(joint.vel_spline(0.0))
     print(f"  {joint.label:5s}: Vd(0) = {vd0:+.3f} rad/s -> "
           f"startup damper torque {joint.kd * vd0:+.3f} N*m "
-          f"({joint.kd * vd0 / KT:+.2f} A) before the "
-          f"{STARTUP_RAMP_S:.2f} s ease-in ramp")
+          f"({joint.kd * vd0 / KT:+.2f} A)")
 
 
 # ---------------------------------------------------------------------------
@@ -2679,17 +2635,6 @@ try:
             break
         t_traj = t_wall   # position along the whole (non-repeating) trajectory
 
-        # Ease-in factor: 0 -> 1 over STARTUP_RAMP_S, then constant at 1.
-        # Smoothstep (3u^2 - 2u^3) rather than a straight line, so the ramp
-        # arrives at 1.0 with zero slope and does not kick the resonance on
-        # its way out. Applied identically to both joints so they stay
-        # synchronized.
-        if STARTUP_RAMP_S > 0.0 and t_wall < STARTUP_RAMP_S:
-            u = t_wall / STARTUP_RAMP_S
-            ramp = u * u * (3.0 - 2.0 * u)
-        else:
-            ramp = 1.0
-
         for joint in JOINTS:
             pd = float(joint.pos_spline(t_traj))
             vd = float(joint.vel_spline(t_traj))
@@ -2723,7 +2668,7 @@ try:
             # knee_ankle_trajectory_controller_nofilter.py.
             tau_position = joint.kp * (pd - p)
             tau_velocity = joint.kd * (vd - v_filt)
-            tau = (tau_position + tau_velocity) * ramp
+            tau = tau_position + tau_velocity
             current = tau / KT   # see MAX_CURRENT_A in USER SETTINGS
             if abs(current) > MAX_CURRENT_A:
                 current = math.copysign(MAX_CURRENT_A, current)
@@ -3074,7 +3019,7 @@ If you are tuning this on your own bench, follow the exact same procedure §3.10
 
 #### Part 8: The Complete, Filtered Controller (Using EMA)
 
-This is the full `knee_ankle_trajectory_controller_ema_filter.py`. It is `knee_ankle_trajectory_controller_blpf_filter.py` (§3.10 Part 8) with exactly one thing swapped: the `design_butterworth_1st_order()` / `RealtimeButterworthLPF` pair is replaced by `design_ema_alpha()` / `RealtimeEMALPF`, and every place the old class was referenced now names the new one. Diff the two files and, other than that filter block and its docstring/comment references, they are byte-for-byte identical — same dataset loader, same sign correction, same joint-limit check, same homing routine, same startup ramp, same wrap-glitch guard, same tracking-error and current-clamp guards, same logging, same three plots. Save this as `knee_ankle_trajectory_controller_ema_filter.py` in the same folder you have been using since Chapter 13 (e.g. `~/ak80-9/`), right alongside the other two scripts from this chapter — you can take it straight to your RPi + dual-motor bench and run it exactly as it stands.
+This is the full `knee_ankle_trajectory_controller_ema_filter.py`. It is `knee_ankle_trajectory_controller_blpf_filter.py` (§3.10 Part 8) with exactly one thing swapped: the `design_butterworth_1st_order()` / `RealtimeButterworthLPF` pair is replaced by `design_ema_alpha()` / `RealtimeEMALPF`, and every place the old class was referenced now names the new one. Diff the two files and, other than that filter block and its docstring/comment references, they are byte-for-byte identical — same dataset loader, same sign correction, same joint-limit check, same homing routine, same wrap-glitch guard, same tracking-error and current-clamp guards, same logging, same three plots. Save this as `knee_ankle_trajectory_controller_ema_filter.py` in the same folder you have been using since Chapter 13 (e.g. `~/ak80-9/`), right alongside the other two scripts from this chapter — you can take it straight to your RPi + dual-motor bench and run it exactly as it stands.
 
 ```python
 #!/usr/bin/env python3
@@ -3098,7 +3043,7 @@ applied: diff it against knee_ankle_trajectory_controller_nofilter.py and
 every difference is either the filter itself (the RealtimeEMALPF class and
 its supporting function) or the single line inside the control loop where
 v_filt replaces v_raw in the Kd term. Everything else -- dataset loader,
-sign correction, joint limits, homing, startup ramp, wrap-glitch guard,
+sign correction, joint limits, homing, wrap-glitch guard,
 tracking-error guard, logging, and plotting -- is unchanged on purpose,
 and is in fact byte-for-byte identical to
 knee_ankle_trajectory_controller_blpf_filter.py as well: the ONLY
@@ -3175,12 +3120,13 @@ logged) are still produced.
 # ===========================================================================
 
 # --- Paths to the Scherpereel et al. (2023) trial files --------------------
-# Both files come from the SAME trial folder, "normal_walk_1_1-2" (the
-# Walk / 1.2 m/s condition -- Ch 15 §3.1). Verified against the real
-# download: this trial's left leg completes one gait cycle (heel-strike to
+# Both files come from the SAME trial folder AB01 > "normal_walk_1_1-2" (the
+# Walk / 1.2 m/s condition -- Ch 15 §3.1). 
+# This trial's left leg completes one gait cycle (heel-strike to
 # heel-strike) in 1.085 s at a 200 Hz sample rate, cadence ~110 steps/min.
-ANGLE_CSV_PATH = "AB01_normal_walk_1_1-2_angle.csv"
-GRF_CSV_PATH   = "AB01_normal_walk_1_1-2_grf.csv"
+# USE YOUR OWN PATHS: the ones below are only valid on the author's Pi, not yours.
+ANGLE_CSV_PATH = "/home/pi/ak80-9_tutorials/AB01_normal_walk_1_1-2_angle.csv"
+GRF_CSV_PATH   = "/home/pi/ak80-9_tutorials/AB01_normal_walk_1_1-2_grf.csv"
 
 # How many CONSECUTIVE strides, starting from the trial's very first
 # heel-strike, to send to the motors as one continuous trajectory. There
@@ -3259,18 +3205,18 @@ KNEE_SIGN  = +1.0
 ANKLE_SIGN = +1.0
 
 # --- Joint hardware limits (OSL v2 mechanical range), degrees --------------
-# Matches the OSL's own convention (0 deg = full extension, 120 deg = max
-# flexion for the knee) and the OSL's own example impedance-control state
-# machine, whose ankle setpoints range from -20 deg (push-off
-# plantarflexion) to +25 deg (swing dorsiflexion clearance) -- the ankle
-# limits below give that a little headroom. If your own leg's real
+# Matches the OSL v2's own mechanical design specification: 0 deg = full
+# extension, 120 deg = maximum flexion for the knee; +30 deg = full
+# dorsiflexion (swing) to -30 deg = full plantarflexion (push-off) for the
+# ankle. These are the leg's actual hardstop limits, not merely inferred
+# headroom around an example setpoint range. If your own leg's real
 # hardstops differ, update these to match -- these bound BOTH the
 # pre-flight trajectory check below AND the runtime limit guard inside the
 # control loop.
 KNEE_LIMIT_MIN_DEG  = 0.0
 KNEE_LIMIT_MAX_DEG  = 120.0
-ANKLE_LIMIT_MIN_DEG = -25.0
-ANKLE_LIMIT_MAX_DEG = 25.0
+ANKLE_LIMIT_MIN_DEG = -30.0
+ANKLE_LIMIT_MAX_DEG = 30.0
 
 # --- Dataset start angle -------------------------------------------------
 # No manual constant here: this used to be a pair of hardcoded literals
@@ -3307,7 +3253,7 @@ HOME_LOOP_HZ       = 50
 HOME_SPEED_ERPM    = 1500    # cruise speed while homing, wire units (Ch 10 §5)
 HOME_ACCEL_ERPM_S  = 3000    # ramp rate while homing
 HOME_TOLERANCE_DEG = 1.0     # "close enough" -- stop polling once within this
-HOME_TIMEOUT_S     = 8.0     # SECONDS (not milliseconds). If a joint has not
+HOME_TIMEOUT_S     = 15.0     # SECONDS (not milliseconds). If a joint has not
                               # reached its start angle within this many
                               # seconds, home_joint() raises RuntimeError and
                               # the script aborts before the control loop
@@ -3319,24 +3265,6 @@ TIME_SCALE = 2.0   # stretches the whole trajectory by this factor (2.0 =
                    # half of real walking speed). Use a bigger number for
                    # your very first run; approach 1.0 (real gait speed)
                    # only once you trust your gains and your bench setup.
-
-# --- Startup torque ramp --------------------------------------------------
-# The gait cycle begins mid-motion, so Vd(0) is NOT zero. The shaft,
-# however, IS stationary at t=0, so on the very first tick the damper term
-# alone asks for Kd*Vd(0) of torque -- a real, audible bang on a bench with
-# two motors if left uneased.
-#
-# STARTUP_RAMP_S is a DURATION in seconds, NOT a slope. It is how long the
-# ease-in period lasts: the commanded torque is scaled by a factor that
-# rises from 0 -> 1 over exactly this many seconds, then stays at 1 for
-# the rest of the run. The shape of that rise is a smoothstep S-curve
-# (3u^2 - 2u^3, u = t/STARTUP_RAMP_S going from 0 to 1) -- NOT a straight
-# ramp. A straight line has a slope corner at the moment it hits 1.0, and
-# that corner is itself a small impulse that rings the joint's resonance;
-# the smoothstep arrives at 1.0 with zero slope, so there is no corner to
-# ring. Set to 0.0 to disable the ease-in entirely (and hear what it was
-# doing).
-STARTUP_RAMP_S = 0.25
 
 # --- Runaway guards --------------------------------------------------------
 # A phase-margin mistake in the Kd path does not fail gracefully: it builds
@@ -3763,13 +3691,12 @@ print(f"Velocity filter: Exponential Moving Average (EMA), "
 # Vd(0) is NOT zero -- the gait cycle begins mid-motion. The shaft, however,
 # IS stationary at t=0, so the damper term contributes Kd*Vd(0) of torque
 # on the very first tick. It is small at these gains, but it is real, and
-# it is worth knowing about before it surprises you (see STARTUP_RAMP_S).
+# it is worth knowing about before it surprises you.
 for joint in JOINTS:
     vd0 = float(joint.vel_spline(0.0))
     print(f"  {joint.label:5s}: Vd(0) = {vd0:+.3f} rad/s -> "
           f"startup damper torque {joint.kd * vd0:+.3f} N*m "
-          f"({joint.kd * vd0 / KT:+.2f} A) before the "
-          f"{STARTUP_RAMP_S:.2f} s ease-in ramp")
+          f"({joint.kd * vd0 / KT:+.2f} A)")
 
 
 # ---------------------------------------------------------------------------
@@ -3984,17 +3911,6 @@ try:
             break
         t_traj = t_wall   # position along the whole (non-repeating) trajectory
 
-        # Ease-in factor: 0 -> 1 over STARTUP_RAMP_S, then constant at 1.
-        # Smoothstep (3u^2 - 2u^3) rather than a straight line, so the ramp
-        # arrives at 1.0 with zero slope and does not kick the resonance on
-        # its way out. Applied identically to both joints so they stay
-        # synchronized.
-        if STARTUP_RAMP_S > 0.0 and t_wall < STARTUP_RAMP_S:
-            u = t_wall / STARTUP_RAMP_S
-            ramp = u * u * (3.0 - 2.0 * u)
-        else:
-            ramp = 1.0
-
         for joint in JOINTS:
             pd = float(joint.pos_spline(t_traj))
             vd = float(joint.vel_spline(t_traj))
@@ -4028,7 +3944,7 @@ try:
             # knee_ankle_trajectory_controller_nofilter.py.
             tau_position = joint.kp * (pd - p)
             tau_velocity = joint.kd * (vd - v_filt)
-            tau = (tau_position + tau_velocity) * ramp
+            tau = tau_position + tau_velocity
             current = tau / KT   # see MAX_CURRENT_A in USER SETTINGS
             if abs(current) > MAX_CURRENT_A:
                 current = math.copysign(MAX_CURRENT_A, current)

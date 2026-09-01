@@ -1,7 +1,5 @@
 # Chapter 14 — The Complete Phrasebook: Every Control Mode from Python
 
-[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 15 — Capstone Project →](15_Capstone_Project.md)
-
 ---
 
 **FirstAuthor:** Pritam Ranjan Kalita, Project Assistant, WeRoCon Laboratory, August 2026. <br>
@@ -771,7 +769,3 @@ Chapter 13 §6's chain-walk table still handles everything electrical and everyt
 3. **EPICally Powerful — documentation**, gatech-epic-power.github.io/epically-powerful (accessed August 2026) — the *API → Actuation* pages for `ActuatorGroup`, `CubeMarsServo`, and `CubeMarsV3` (method signatures, the amperes-not-N·m Servo convention, available type strings), cited in §1.3, §3, §4.
 4. **TMotorCANControl — source code**, pypi.org/project/TMotorCANControl (v1.2.6, accessed August 2026) — `servo_can.py`'s `power_on()`/`power_off()`, the origin of the `lifecycle()` frames (via Ch 13 §5), reinterpreted in §4.2 as MIT mode's documented Enter/Exit Motor Mode codes.
 5. **This tutorial series** — Ch 2 §6 (0.5701 N·m/A, used in §3.2), §9 ("encodable is not operable", quoted in the Safety Notes); Ch 3 §2 (the ÷189), §6 (the master units table behind §2 and §3.6); Ch 4 §1 (Set Origin), §6 (the ground rules); Ch 5–Ch 11 (each mode's full chapter, referenced from its recipe); Ch 12 §7.2 (the gait-controller framing of §4.4); Ch 13 §§3–6 (the stack, the EP vocabulary, the `lifecycle()` backstory, and the troubleshooting chain every recipe assumes).
-
----
-
-[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 15 — Capstone Project →](15_Capstone_Project.md)
