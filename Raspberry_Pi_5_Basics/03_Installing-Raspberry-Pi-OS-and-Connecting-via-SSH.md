@@ -137,15 +137,15 @@ Click **Next**.
 ## 7.2 Select Your City/Time Zone/Keyboard Layout
 
 ```
-City: New Delhi
+City: Washington D.C
 ```
 
 ```
-Time Zone: Asia/Kolkata  (By Default)
+Time Zone: Asia/Kolkata
 ```
 
 ```
-Keyboard Layout: in (By Default)
+Keyboard Layout: us
 ```
 
 > 💡 **Note**: By default, the keyboard layout will be set to "IN". Change it to English US or English UK to match your computer's or laptop's keyboard layout.
