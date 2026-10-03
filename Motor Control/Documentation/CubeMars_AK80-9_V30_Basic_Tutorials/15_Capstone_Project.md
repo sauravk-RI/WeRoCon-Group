@@ -306,7 +306,7 @@ Every figure and constant in this chapter comes from the trial's **left** leg, n
 Two different corrections turn the dataset's raw numbers into what this controller actually commands, and it matters to keep them straight:
 
 1. **Dataset-convention correction (applied once, inside the data loader).** The Scherpereel dataset's own summary figures describe the knee column as *extension-positive*. Every other convention in this chapter — and the OSL's own hardware convention (0° = extension, 120° = maximum flexion) — is *flexion-positive*. So the knee angle column is negated, once, at the exact line it is read from the CSV. **The ankle column is confirmed correct as-is, with no negation**: the raw `ankle_angle_l` column peaks at +11.4° right at midstance (47% of the cycle) and bottoms out at −21.6° right around toe-off (62% of the cycle) — textbook dorsiflexion-at-midstance, plantarflexion-at-push-off. That means the column is **already dorsiflexion-positive**, matching both this project's convention and the OSL's own example impedance code.
-2. **Physical-mounting correction (`KNEE_SIGN` / `ANKLE_SIGN`, a separate USER SETTING).** Even after the dataset's own sign convention is corrected, the direction a *specific* motor spins depends on how it was physically bolted onto *this* leg — something no paper can tell you. `KNEE_SIGN` and `ANKLE_SIGN` are a single, explicit switch each (+1.0 or −1.0) for exactly this, applied at one point in the script — to the trajectory arrays **and** to the homing start angles together — so the trajectory, the joint-limit check, and the homing target all inherit the correction consistently. Verify each by hand before trusting either switch to +1.0: for the knee, turn the shaft toward more *flexion* (bending the knee) and confirm `get_position()` increases; for the ankle, turn the shaft toward more *dorsiflexion* (toes drawing up toward the shin) and confirm `get_position()` increases.
+2. **Physical-mounting correction (`KNEE_SIGN` / `ANKLE_SIGN`, a separate USER SETTING).** Even after the dataset's own sign convention is corrected, the direction a *specific* motor spins depends on how it was physically bolted onto *this* leg — something no paper can tell you. `KNEE_SIGN` and `ANKLE_SIGN` are a single, explicit switch each (+1.0 or −1.0) for exactly this, applied at one point in the script — to the trajectory arrays **and** to the homing start angles together — so the trajectory, the joint-limit check, and the homing target all inherit the correction consistently. The joint limits are written in the *anatomical* frame and are mirrored into motor coordinates by the same sign — with `KNEE_SIGN = −1.0`, a knee range of [0°, 120°] is checked as [−120°, 0°] — so you never edit the limits when you flip a sign. Verify each by hand before trusting either switch to +1.0: for the knee, turn the shaft toward more *flexion* (bending the knee) and confirm `get_position()` increases; for the ankle, turn the shaft toward more *dorsiflexion* (toes drawing up toward the shin) and confirm `get_position()` increases.
 
 Keeping these two corrections separate matters: if a joint ever moves the wrong way on the bench, this is what tells you which one to check.
 
@@ -384,7 +384,9 @@ A trajectory-tracking controller has no idea, on its own, that a real leg's knee
 - **Shift the whole trajectory** so it fits inside the joint's real range. This changes *where* the leg sits throughout the stride (a few degrees more flexed on average) but not the *shape* of the motion — the leg still reproduces the recorded gait, just from a slightly different baseline posture. This is what `AUTO_FIT_TO_LIMITS = True` does automatically, and it prints exactly how far it shifted each joint, every run.
 - **Accept that this joint cannot reach this dataset's exact recorded extremes**, run it anyway with `AUTO_FIT_TO_LIMITS = False`, and let the pre-flight check hard-abort — the right choice once you are validating a real leg's real limits and want to be told immediately rather than have the script quietly compensate for you.
 
-> Setting either `LIMIT_MIN_DEG`/`LIMIT_MAX_DEG` pair to `None` disables that joint's checks entirely (loudly, with a printed warning) — useful only for a bare bench shaft with no mechanical stops nearby; never for a leg with real hardstops.
+> **Mounting direction and the limits.** Write the limits in the anatomical frame, exactly as above, whatever `KNEE_SIGN`/`ANKLE_SIGN` is set to. The script multiplies each pair by the joint's sign *and* re-sorts it, so with `KNEE_SIGN = −1.0` the knee's [0°, 120°] becomes [−120°, 0°] in motor coordinates (it prints a `[limits]` line showing the mirrored range). The pre-flight check, the auto-fit shift, the homing target, and the runtime guard all use that motor-frame pair — the same frame the spline and `get_position()` already live in.
+
+> **Disabling the limits.** Setting **both** numbers of a joint's pair — e.g. `KNEE_LIMIT_MIN_DEG` and `KNEE_LIMIT_MAX_DEG` — to `None` disables that joint's checks entirely: the script prints a `[WARNING] … joint limits are DISABLED` line at startup and skips that joint's pre-flight check, auto-fit, and runtime guard. The other joint is unaffected. Use it only for a bare bench shaft with no mechanical stops nearby; never for a leg with real hardstops. Setting only one number of a pair to `None` is rejected with an error, since it is ambiguous which bound you meant to keep.
 
 ### Homing: Starting From the Right Place
 
@@ -578,6 +580,17 @@ ANKLE_SIGN = +1.0
 # hardstops differ, update these to match -- these bound BOTH the
 # pre-flight trajectory check below AND the runtime limit guard inside the
 # control loop.
+#
+# Write these in the ANATOMICAL frame, as above, whatever KNEE_SIGN /
+# ANKLE_SIGN is set to. The script mirrors them into motor coordinates for
+# you (KNEE_SIGN = -1.0 turns [0, 115] into [-115, 0]), so you never edit
+# the limits when you flip a mounting sign.
+#
+# To disable one joint's limits, set BOTH of its numbers to None -- only
+# for a bare bench shaft with no hardstops within reach, NEVER for a leg
+# with real hardstops. The script prints a warning and skips that joint's
+# pre-flight check, auto-fit and runtime guard. Setting just ONE of the
+# pair to None is rejected.
 KNEE_LIMIT_MIN_DEG  = 0.0
 KNEE_LIMIT_MAX_DEG  = 120.0
 ANKLE_LIMIT_MIN_DEG = -30.0
@@ -701,6 +714,7 @@ import math
 import time
 import datetime
 from dataclasses import dataclass, field
+from typing import Optional
 
 import can
 import numpy as np
@@ -857,6 +871,48 @@ print(f"  Knee start (auto-detected from dataset @ t=0):  "
 print(f"  Ankle start (auto-detected from dataset @ t=0): "
       f"{ankle_start_deg:+.2f} deg")
 
+
+def motor_frame_limits(label, sign, min_deg, max_deg):
+    """Express one joint's USER SETTINGS limits in MOTOR coordinates.
+
+    The *_LIMIT_*_DEG settings are written in the anatomical frame (knee:
+    0 deg = full extension, flexion positive). Everything the controller
+    commands or reads back -- the spline, the homing target, get_position()
+    -- is in motor coordinates, i.e. already multiplied by KNEE_SIGN /
+    ANKLE_SIGN. A -1.0 sign flips the sign of the limits AND swaps which one
+    is the lower bound ([0, 115] -> [-115, 0]), so the pair is re-sorted
+    here. Without this, a reversed mounting would be checked against
+    limits on the wrong side of zero.
+
+    Returns (min_deg, max_deg) in motor coordinates, or (None, None) when
+    BOTH settings are None (this joint's limits are disabled). Exactly one
+    None is rejected as ambiguous.
+    """
+    if min_deg is None and max_deg is None:
+        return None, None
+    if min_deg is None or max_deg is None:
+        raise ValueError(
+            f"{label}: set BOTH limit settings to numbers, or BOTH to None "
+            f"to disable this joint's limits -- one None and one number is "
+            f"ambiguous.")
+    if min_deg >= max_deg:
+        raise ValueError(
+            f"{label}: LIMIT_MIN_DEG ({min_deg}) must be below "
+            f"LIMIT_MAX_DEG ({max_deg}).")
+    a, b = sign * min_deg, sign * max_deg
+    lo, hi = min(a, b) + 0.0, max(a, b) + 0.0   # "+ 0.0" turns -0.0 into 0.0
+    if sign < 0:
+        print(f"  [limits] {label}: sign {sign:+.0f} mirrors anatomical "
+              f"[{min_deg:+.1f}, {max_deg:+.1f}] deg into motor-frame "
+              f"[{lo:+.1f}, {hi:+.1f}] deg.")
+    return lo, hi
+
+
+knee_limit_min_deg, knee_limit_max_deg = motor_frame_limits(
+    "Knee", KNEE_SIGN, KNEE_LIMIT_MIN_DEG, KNEE_LIMIT_MAX_DEG)
+ankle_limit_min_deg, ankle_limit_max_deg = motor_frame_limits(
+    "Ankle", ANKLE_SIGN, ANKLE_LIMIT_MIN_DEG, ANKLE_LIMIT_MAX_DEG)
+
 traj_duration = t_raw[-1] * TIME_SCALE
 print(f"Loaded {STRIDE_COUNT} continuous stride(s): {len(t_raw)} samples, "
       f"{t_raw[-1]:.3f} s of recorded data at real speed -> "
@@ -898,8 +954,8 @@ class Joint:
     kp: float
     kd: float
     start_deg: float
-    limit_min_deg: float
-    limit_max_deg: float
+    limit_min_deg: Optional[float]   # MOTOR-frame limits (motor_frame_limits());
+    limit_max_deg: Optional[float]   # both None = limits disabled for this joint
     pos_spline: CubicSpline
     vel_spline: CubicSpline
     P0: float = 0.0        # motor's absolute starting angle, rad -- filled
@@ -915,10 +971,10 @@ class Joint:
 
 JOINTS = [
     Joint(KNEE_ID, "Knee", KNEE_KP, KNEE_KD,
-          knee_start_deg, KNEE_LIMIT_MIN_DEG, KNEE_LIMIT_MAX_DEG,
+          knee_start_deg, knee_limit_min_deg, knee_limit_max_deg,
           knee_pos_spline, knee_vel_spline),
     Joint(ANKLE_ID, "Ankle", ANKLE_KP, ANKLE_KD,
-          ankle_start_deg, ANKLE_LIMIT_MIN_DEG, ANKLE_LIMIT_MAX_DEG,
+          ankle_start_deg, ankle_limit_min_deg, ankle_limit_max_deg,
           ankle_pos_spline, ankle_vel_spline),
 ]
 JOINTS_BY_ID = {j.id: j for j in JOINTS}
@@ -954,6 +1010,13 @@ def check_joint_limits():
     """
     t_check = np.linspace(0.0, traj_duration, 500)
     for joint in JOINTS:
+        if joint.limit_min_deg is None:
+            print(f"  [WARNING] {joint.label}: joint limits are DISABLED "
+                  f"(both set to None) -- no pre-flight range check, no "
+                  f"auto-fit and no runtime limit guard for this joint. "
+                  f"Only safe on a bare bench shaft with no mechanical "
+                  f"stops within reach.")
+            continue
         rel_deg = np.degrees(joint.pos_spline(t_check))
         abs_min = joint.start_deg + rel_deg.min()
         abs_max = joint.start_deg + rel_deg.max()
@@ -1197,7 +1260,9 @@ try:
                 )
 
             abs_deg = math.degrees(joint.P0 + p)
-            if abs_deg < joint.limit_min_deg or abs_deg > joint.limit_max_deg:
+            if joint.limit_min_deg is not None and (
+                    abs_deg < joint.limit_min_deg
+                    or abs_deg > joint.limit_max_deg):
                 abort_reason = (
                     f"{joint.label} reached {abs_deg:+.1f} deg, "
                     f"outside its hardware limits "
@@ -1918,6 +1983,17 @@ ANKLE_SIGN = +1.0
 # hardstops differ, update these to match -- these bound BOTH the
 # pre-flight trajectory check below AND the runtime limit guard inside the
 # control loop.
+#
+# Write these in the ANATOMICAL frame, as above, whatever KNEE_SIGN /
+# ANKLE_SIGN is set to. The script mirrors them into motor coordinates for
+# you (KNEE_SIGN = -1.0 turns [0, 115] into [-115, 0]), so you never edit
+# the limits when you flip a mounting sign.
+#
+# To disable one joint's limits, set BOTH of its numbers to None -- only
+# for a bare bench shaft with no hardstops within reach, NEVER for a leg
+# with real hardstops. The script prints a warning and skips that joint's
+# pre-flight check, auto-fit and runtime guard. Setting just ONE of the
+# pair to None is rejected.
 KNEE_LIMIT_MIN_DEG  = 0.0
 KNEE_LIMIT_MAX_DEG  = 120.0
 ANKLE_LIMIT_MIN_DEG = -30.0
@@ -2110,6 +2186,7 @@ import math
 import time
 import datetime
 from dataclasses import dataclass, field
+from typing import Optional
 
 import can
 import numpy as np
@@ -2336,6 +2413,48 @@ print(f"  Knee start (auto-detected from dataset @ t=0):  "
 print(f"  Ankle start (auto-detected from dataset @ t=0): "
       f"{ankle_start_deg:+.2f} deg")
 
+
+def motor_frame_limits(label, sign, min_deg, max_deg):
+    """Express one joint's USER SETTINGS limits in MOTOR coordinates.
+
+    The *_LIMIT_*_DEG settings are written in the anatomical frame (knee:
+    0 deg = full extension, flexion positive). Everything the controller
+    commands or reads back -- the spline, the homing target, get_position()
+    -- is in motor coordinates, i.e. already multiplied by KNEE_SIGN /
+    ANKLE_SIGN. A -1.0 sign flips the sign of the limits AND swaps which one
+    is the lower bound ([0, 115] -> [-115, 0]), so the pair is re-sorted
+    here. Without this, a reversed mounting would be checked against
+    limits on the wrong side of zero.
+
+    Returns (min_deg, max_deg) in motor coordinates, or (None, None) when
+    BOTH settings are None (this joint's limits are disabled). Exactly one
+    None is rejected as ambiguous.
+    """
+    if min_deg is None and max_deg is None:
+        return None, None
+    if min_deg is None or max_deg is None:
+        raise ValueError(
+            f"{label}: set BOTH limit settings to numbers, or BOTH to None "
+            f"to disable this joint's limits -- one None and one number is "
+            f"ambiguous.")
+    if min_deg >= max_deg:
+        raise ValueError(
+            f"{label}: LIMIT_MIN_DEG ({min_deg}) must be below "
+            f"LIMIT_MAX_DEG ({max_deg}).")
+    a, b = sign * min_deg, sign * max_deg
+    lo, hi = min(a, b) + 0.0, max(a, b) + 0.0   # "+ 0.0" turns -0.0 into 0.0
+    if sign < 0:
+        print(f"  [limits] {label}: sign {sign:+.0f} mirrors anatomical "
+              f"[{min_deg:+.1f}, {max_deg:+.1f}] deg into motor-frame "
+              f"[{lo:+.1f}, {hi:+.1f}] deg.")
+    return lo, hi
+
+
+knee_limit_min_deg, knee_limit_max_deg = motor_frame_limits(
+    "Knee", KNEE_SIGN, KNEE_LIMIT_MIN_DEG, KNEE_LIMIT_MAX_DEG)
+ankle_limit_min_deg, ankle_limit_max_deg = motor_frame_limits(
+    "Ankle", ANKLE_SIGN, ANKLE_LIMIT_MIN_DEG, ANKLE_LIMIT_MAX_DEG)
+
 traj_duration = t_raw[-1] * TIME_SCALE
 print(f"Loaded {STRIDE_COUNT} continuous stride(s): {len(t_raw)} samples, "
       f"{t_raw[-1]:.3f} s of recorded data at real speed -> "
@@ -2378,8 +2497,8 @@ class Joint:
     kd: float
     cutoff_hz: float
     start_deg: float
-    limit_min_deg: float
-    limit_max_deg: float
+    limit_min_deg: Optional[float]   # MOTOR-frame limits (motor_frame_limits());
+    limit_max_deg: Optional[float]   # both None = limits disabled for this joint
     pos_spline: CubicSpline
     vel_spline: CubicSpline
     filt: "RealtimeButterworthLPF" = field(init=False, default=None)
@@ -2399,10 +2518,10 @@ class Joint:
 
 JOINTS = [
     Joint(KNEE_ID, "Knee", KNEE_KP, KNEE_KD, CUTOFF_KNEE_HZ,
-          knee_start_deg, KNEE_LIMIT_MIN_DEG, KNEE_LIMIT_MAX_DEG,
+          knee_start_deg, knee_limit_min_deg, knee_limit_max_deg,
           knee_pos_spline, knee_vel_spline),
     Joint(ANKLE_ID, "Ankle", ANKLE_KP, ANKLE_KD, CUTOFF_ANKLE_HZ,
-          ankle_start_deg, ANKLE_LIMIT_MIN_DEG, ANKLE_LIMIT_MAX_DEG,
+          ankle_start_deg, ankle_limit_min_deg, ankle_limit_max_deg,
           ankle_pos_spline, ankle_vel_spline),
 ]
 JOINTS_BY_ID = {j.id: j for j in JOINTS}
@@ -2442,6 +2561,13 @@ def check_joint_limits():
     """
     t_check = np.linspace(0.0, traj_duration, 500)
     for joint in JOINTS:
+        if joint.limit_min_deg is None:
+            print(f"  [WARNING] {joint.label}: joint limits are DISABLED "
+                  f"(both set to None) -- no pre-flight range check, no "
+                  f"auto-fit and no runtime limit guard for this joint. "
+                  f"Only safe on a bare bench shaft with no mechanical "
+                  f"stops within reach.")
+            continue
         rel_deg = np.degrees(joint.pos_spline(t_check))
         abs_min = joint.start_deg + rel_deg.min()
         abs_max = joint.start_deg + rel_deg.max()
@@ -2688,7 +2814,9 @@ try:
                 )
 
             abs_deg = math.degrees(joint.P0 + p)
-            if abs_deg < joint.limit_min_deg or abs_deg > joint.limit_max_deg:
+            if joint.limit_min_deg is not None and (
+                    abs_deg < joint.limit_min_deg
+                    or abs_deg > joint.limit_max_deg):
                 abort_reason = (
                     f"{joint.label} reached {abs_deg:+.1f} deg, "
                     f"outside its hardware limits "
@@ -3213,6 +3341,17 @@ ANKLE_SIGN = +1.0
 # hardstops differ, update these to match -- these bound BOTH the
 # pre-flight trajectory check below AND the runtime limit guard inside the
 # control loop.
+#
+# Write these in the ANATOMICAL frame, as above, whatever KNEE_SIGN /
+# ANKLE_SIGN is set to. The script mirrors them into motor coordinates for
+# you (KNEE_SIGN = -1.0 turns [0, 115] into [-115, 0]), so you never edit
+# the limits when you flip a mounting sign.
+#
+# To disable one joint's limits, set BOTH of its numbers to None -- only
+# for a bare bench shaft with no hardstops within reach, NEVER for a leg
+# with real hardstops. The script prints a warning and skips that joint's
+# pre-flight check, auto-fit and runtime guard. Setting just ONE of the
+# pair to None is rejected.
 KNEE_LIMIT_MIN_DEG  = 0.0
 KNEE_LIMIT_MAX_DEG  = 120.0
 ANKLE_LIMIT_MIN_DEG = -30.0
@@ -3396,6 +3535,7 @@ import math
 import time
 import datetime
 from dataclasses import dataclass, field
+from typing import Optional
 
 import can
 import numpy as np
@@ -3612,6 +3752,48 @@ print(f"  Knee start (auto-detected from dataset @ t=0):  "
 print(f"  Ankle start (auto-detected from dataset @ t=0): "
       f"{ankle_start_deg:+.2f} deg")
 
+
+def motor_frame_limits(label, sign, min_deg, max_deg):
+    """Express one joint's USER SETTINGS limits in MOTOR coordinates.
+
+    The *_LIMIT_*_DEG settings are written in the anatomical frame (knee:
+    0 deg = full extension, flexion positive). Everything the controller
+    commands or reads back -- the spline, the homing target, get_position()
+    -- is in motor coordinates, i.e. already multiplied by KNEE_SIGN /
+    ANKLE_SIGN. A -1.0 sign flips the sign of the limits AND swaps which one
+    is the lower bound ([0, 115] -> [-115, 0]), so the pair is re-sorted
+    here. Without this, a reversed mounting would be checked against
+    limits on the wrong side of zero.
+
+    Returns (min_deg, max_deg) in motor coordinates, or (None, None) when
+    BOTH settings are None (this joint's limits are disabled). Exactly one
+    None is rejected as ambiguous.
+    """
+    if min_deg is None and max_deg is None:
+        return None, None
+    if min_deg is None or max_deg is None:
+        raise ValueError(
+            f"{label}: set BOTH limit settings to numbers, or BOTH to None "
+            f"to disable this joint's limits -- one None and one number is "
+            f"ambiguous.")
+    if min_deg >= max_deg:
+        raise ValueError(
+            f"{label}: LIMIT_MIN_DEG ({min_deg}) must be below "
+            f"LIMIT_MAX_DEG ({max_deg}).")
+    a, b = sign * min_deg, sign * max_deg
+    lo, hi = min(a, b) + 0.0, max(a, b) + 0.0   # "+ 0.0" turns -0.0 into 0.0
+    if sign < 0:
+        print(f"  [limits] {label}: sign {sign:+.0f} mirrors anatomical "
+              f"[{min_deg:+.1f}, {max_deg:+.1f}] deg into motor-frame "
+              f"[{lo:+.1f}, {hi:+.1f}] deg.")
+    return lo, hi
+
+
+knee_limit_min_deg, knee_limit_max_deg = motor_frame_limits(
+    "Knee", KNEE_SIGN, KNEE_LIMIT_MIN_DEG, KNEE_LIMIT_MAX_DEG)
+ankle_limit_min_deg, ankle_limit_max_deg = motor_frame_limits(
+    "Ankle", ANKLE_SIGN, ANKLE_LIMIT_MIN_DEG, ANKLE_LIMIT_MAX_DEG)
+
 traj_duration = t_raw[-1] * TIME_SCALE
 print(f"Loaded {STRIDE_COUNT} continuous stride(s): {len(t_raw)} samples, "
       f"{t_raw[-1]:.3f} s of recorded data at real speed -> "
@@ -3654,8 +3836,8 @@ class Joint:
     kd: float
     cutoff_hz: float
     start_deg: float
-    limit_min_deg: float
-    limit_max_deg: float
+    limit_min_deg: Optional[float]   # MOTOR-frame limits (motor_frame_limits());
+    limit_max_deg: Optional[float]   # both None = limits disabled for this joint
     pos_spline: CubicSpline
     vel_spline: CubicSpline
     filt: "RealtimeEMALPF" = field(init=False, default=None)
@@ -3675,10 +3857,10 @@ class Joint:
 
 JOINTS = [
     Joint(KNEE_ID, "Knee", KNEE_KP, KNEE_KD, CUTOFF_KNEE_HZ,
-          knee_start_deg, KNEE_LIMIT_MIN_DEG, KNEE_LIMIT_MAX_DEG,
+          knee_start_deg, knee_limit_min_deg, knee_limit_max_deg,
           knee_pos_spline, knee_vel_spline),
     Joint(ANKLE_ID, "Ankle", ANKLE_KP, ANKLE_KD, CUTOFF_ANKLE_HZ,
-          ankle_start_deg, ANKLE_LIMIT_MIN_DEG, ANKLE_LIMIT_MAX_DEG,
+          ankle_start_deg, ankle_limit_min_deg, ankle_limit_max_deg,
           ankle_pos_spline, ankle_vel_spline),
 ]
 JOINTS_BY_ID = {j.id: j for j in JOINTS}
@@ -3718,6 +3900,13 @@ def check_joint_limits():
     """
     t_check = np.linspace(0.0, traj_duration, 500)
     for joint in JOINTS:
+        if joint.limit_min_deg is None:
+            print(f"  [WARNING] {joint.label}: joint limits are DISABLED "
+                  f"(both set to None) -- no pre-flight range check, no "
+                  f"auto-fit and no runtime limit guard for this joint. "
+                  f"Only safe on a bare bench shaft with no mechanical "
+                  f"stops within reach.")
+            continue
         rel_deg = np.degrees(joint.pos_spline(t_check))
         abs_min = joint.start_deg + rel_deg.min()
         abs_max = joint.start_deg + rel_deg.max()
@@ -3964,7 +4153,9 @@ try:
                 )
 
             abs_deg = math.degrees(joint.P0 + p)
-            if abs_deg < joint.limit_min_deg or abs_deg > joint.limit_max_deg:
+            if joint.limit_min_deg is not None and (
+                    abs_deg < joint.limit_min_deg
+                    or abs_deg > joint.limit_max_deg):
                 abort_reason = (
                     f"{joint.label} reached {abs_deg:+.1f} deg, "
                     f"outside its hardware limits "

@@ -1,6 +1,6 @@
 # Chapter 13 — From Bench to Robot: Controlling the AK80-9 from a Raspberry Pi 5 using Python
 
-[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 14 — The Complete Phrasebook →](14_Different_Control_Modes_Using_Python___EpicallyPowerFullAPI.md)
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 14 — The Complete Phrasebook →](14_Different_Control_Modes_Using_Python_EpicallyPowerFullAPI.md)
 
 ---
 
@@ -740,4 +740,4 @@ This chapter closes the loop the series opened on page one: Chapter 1's "robot's
 
 ---
 
-[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 14 — The Complete Phrasebook →](14_Different_Control_Modes_Using_Python___EpicallyPowerFullAPI.md)
+[← Back to Contents](00_Contents.md) | [Next Lesson: Chapter 14 — The Complete Phrasebook →](14_Different_Control_Modes_Using_Python_EpicallyPowerFullAPI.md)
