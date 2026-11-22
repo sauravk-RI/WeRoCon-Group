@@ -1,0 +1,14 @@
+# Python packages for the standalone hardware test codes (leg Raspberry Pi only).
+# Pinned to the versions this project's leg Pi was validated against
+# (Raspberry Pi OS Bookworm/Trixie, 64-bit, Python 3.11-3.13, aarch64).
+# All of these have piwheels.org ARM64 wheels, so nothing is compiled on the Pi.
+#
+# Install:  python3 -m venv .venv && .venv/bin/python -m pip install -r requirements.txt
+numpy==2.5.2
+scipy==1.18.1            # CubicSpline (trajectory scripts), signal (bode_noise_tools)
+pandas==3.0.5            # reading the gait dataset CSVs
+matplotlib==3.11.1       # result plots (scripts fall back to the headless "Agg" backend)
+python-can==4.6.1        # CAN bus to the CubeMars AK80-9 actuators (SocketCAN, can0)
+smbus2==0.6.1            # I2C to the AS5048B magnetic encoders
+epicallypowerful==1.0.5  # ActuatorGroup / TimedLoop motor API
+opensourceleg==3.5.0     # NBLoadcellDAQ (SPI load cell: loadcell_test.py, resistance-torque test)
