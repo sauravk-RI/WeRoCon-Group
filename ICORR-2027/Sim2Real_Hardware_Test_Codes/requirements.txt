@@ -1,0 +1,12 @@
+# OSL V2 leg hardware controllers (leg Raspberry Pi only).
+# Pinned to the versions this project's leg Pi was validated against
+# (Raspberry Pi OS Bookworm/Trixie, 64-bit, Python 3.11-3.13, aarch64).
+# All of these have piwheels.org ARM64 wheels, so nothing is compiled on the Pi.
+numpy==2.5.2
+scipy==1.18.1
+pandas==3.0.5
+matplotlib==3.11.1
+python-can==4.6.1
+smbus2==0.6.1
+epicallypowerful==1.0.5
+opensourceleg==3.5.0

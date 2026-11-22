@@ -1,0 +1,13 @@
+# OSL V2 MuJoCo simulation + sim-to-real pipeline (simulation computer only).
+# Same core versions as the reference MuJoCo research code's requirements.txt; wheels
+# exist for Windows x64, Linux x86-64 and Linux ARM64 (Raspberry Pi) for Python 3.10-3.13.
+mujoco==3.12.0
+numpy==2.2.6
+scipy==1.15.3
+matplotlib==3.10.9
+glfw==2.10.2
+PyOpenGL==3.1.10
+imageio-ffmpeg==0.6.0
+# Optional, only for tools/rehearse_hardware_script.py and tools/check_reference_parity.py
+# (they execute the hardware scripts, which use pandas):
+#   python -m pip install pandas

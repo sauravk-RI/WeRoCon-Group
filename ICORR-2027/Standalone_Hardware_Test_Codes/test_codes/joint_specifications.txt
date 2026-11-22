@@ -1,0 +1,17 @@
+1. Knee Joint 
+================
+
+- i2c address : 0x40
+- Encoder convention: Flexion negative as well as extension negative  --- from the home position 
+- Magnetic Encoder offset of knee = 120.0 degrees
+- The sign convention of knee dataset and knee encoder is same
+- The sign convention of knee encoder and knee motor is opposite
+
+2. Ankle Joint
+=================
+
+- i2c address: 0x41
+- Encoder convention: Dorsiflexion Negative and Plantarflexion positive --- from the mean postion.
+- Magnetic Encoder offset of the ankle joint at its mean postion = 200.0
+- The sign convention of ankle dataset and knee encoder is opposite
+- The sign convention of ankle encoder and ankle motor is opposite
