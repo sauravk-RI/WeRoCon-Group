@@ -1,18 +1,16 @@
-> [!WARNING]
-> **Work-in-progress draft — not peer reviewed.** Results and figures may change, and the
-> reference list still contains placeholder links that must be replaced with real citations
-> before this text is reused anywhere.
+> [!NOTE]
+> **Intern report — work in progress, not peer reviewed.** Results and figures may change.
 
 # Real-Time Gait Trajectory Tracking Using CubeMars AK80-9 Actuators: 
 ## A Python-Based Approach to Prosthetic Joint Control
 
-**Authors:** WeRoCon Research Group
+**Intern Report** · WeRoCon Lab (Wearable Robotics & Control), IIT Jodhpur
 
 ---
 
 ## Abstract
 
-This paper presents a comprehensive framework for real-time trajectory tracking of prosthetic joints using low-cost, high-performance actuators. We demonstrate the implementation of sophisticated motor control algorithms for tracking human gait trajectories derived from the Winter gait dataset using a CubeMars AK80-9 actuator interfaced via CAN bus communication. Our approach combines MIT mode low-level control with high-level servo mode implementations using the OpenSourceLeg library, achieving RMS position tracking errors below 2° across continuous multi-cycle gait patterns. The study validates the effectiveness of lead-time feedforward compensation, velocity filtering, and adaptive slew-rate limiting in maintaining stable joint motion during dynamic gait cycles. Results demonstrate that our Python-based control framework on Raspberry Pi 4 can reliably execute complex biomimetic trajectories, making it viable for prosthetic device applications.
+This report presents a comprehensive framework for real-time trajectory tracking of prosthetic joints using low-cost, high-performance actuators. We demonstrate the implementation of sophisticated motor control algorithms for tracking human gait trajectories derived from the Winter gait dataset using a CubeMars AK80-9 actuator interfaced via CAN bus communication. Our approach combines MIT mode low-level control with high-level servo mode implementations using the OpenSourceLeg library, achieving RMS position tracking errors below 2° across continuous multi-cycle gait patterns. The study validates the effectiveness of lead-time feedforward compensation, velocity filtering, and adaptive slew-rate limiting in maintaining stable joint motion during dynamic gait cycles. Results demonstrate that our Python-based control framework on Raspberry Pi 4 can reliably execute complex biomimetic trajectories, making it viable for prosthetic device applications.
 
 **Keywords:** Motor Control, Trajectory Tracking, Prosthetics, CAN Communication, Real-time Control, Gait Analysis
 
@@ -22,7 +20,7 @@ This paper presents a comprehensive framework for real-time trajectory tracking 
 
 ### 1.1 Background
 
-Prosthetic joint actuation represents a critical frontier in assistive robotics and biomedical engineering. Unlike passive prosthetics, active prosthetics can modulate joint impedance and provide powered motion assistance, dramatically improving user mobility and biomechanical efficiency [[1](https://example.com/ref1), [2](https://example.com/ref2)].
+Prosthetic joint actuation represents a critical frontier in assistive robotics and biomedical engineering. Unlike passive prosthetics, active prosthetics can modulate joint impedance and provide powered motion assistance, dramatically improving user mobility and biomechanical efficiency [1, 2].
 
 The primary challenges in prosthetic joint design are:
 - **Real-time performance:** Motor control loops must execute at high frequencies (≥100 Hz) to maintain smooth motion and responsiveness
@@ -32,19 +30,19 @@ The primary challenges in prosthetic joint design are:
 
 ### 1.2 Motivation
 
-The Winter gait dataset provides biomechanically accurate reference trajectories for ankle and knee joints across multiple gait cycles. However, mapping these trajectories to physical actuators requires sophisticated control algorithms that account for:
+The Winter gait dataset [12] provides biomechanically accurate reference trajectories for ankle and knee joints across multiple gait cycles. However, mapping these trajectories to physical actuators requires sophisticated control algorithms that account for:
 - Motor nonlinearities and saturation
 - Sensor noise and measurement delays
 - Actuator dynamics and bandwidth limitations
 - Tracking lag at high-frequency motion transients
 
-This paper addresses these challenges through a multi-layer control architecture combining low-level MIT mode impedance control with high-level servo mode velocity regulation.
+This report addresses these challenges through a multi-layer control architecture combining low-level MIT mode impedance control with high-level servo mode velocity regulation.
 
 ### 1.3 Contributions
 
 Our primary contributions are:
 
-1. **Comprehensive two-layer control framework:** Integration of MIT mode (raw CAN) and Servo mode (OpenSourceLeg API) implementations for flexible actuation strategies
+1. **Comprehensive two-layer control framework:** Integration of MIT mode (raw CAN) and Servo mode (OpenSourceLeg API [13]) implementations for flexible actuation strategies
 
 2. **Adaptive lead-time feedforward compensation:** Novel approach using trajectory prediction to reduce phase lag during rapid gait transitions, achieving peak error reduction from 9.21° to near-target specifications
 
@@ -60,20 +58,20 @@ Our primary contributions are:
 
 ### 2.1 Motor Control for Prosthetics
 
-Powered prosthetics have evolved significantly over the past decade. Early systems relied on simple position control [[3](https://example.com/ref3)], but modern approaches employ impedance control [[4](https://example.com/ref4)] and model predictive control [[5](https://example.com/ref5)] to achieve human-like biomechanics.
+Powered prosthetics have evolved significantly over the past decade. Early systems relied on simple position control [3], but modern approaches employ impedance control [4] and model predictive control [5] to achieve human-like biomechanics.
 
-The AK80-9 actuator used in this work represents a new class of affordable, high-torque density motors specifically designed for legged robotics applications [[6](https://example.com/ref6)].
+The AK80-9 actuator used in this work represents a new class of affordable, high-torque density motors specifically designed for legged robotics applications [6].
 
 ### 2.2 CAN Bus for Real-Time Control
 
-CAN (Controller Area Network) is the de facto standard for real-time distributed control in robotics and automotive applications [[7](https://example.com/ref7)]. Its deterministic communication and robustness make it ideal for safety-critical prosthetic applications.
+CAN (Controller Area Network) is the de facto standard for real-time distributed control in robotics and automotive applications [7]. Its deterministic communication and robustness make it ideal for safety-critical prosthetic applications.
 
 ### 2.3 Trajectory Tracking Control
 
-Classical trajectory tracking employs PID control with feedforward compensation [[8](https://example.com/ref8)]. Recent advances include:
-- Lead-time prediction for phase advance [[9](https://example.com/ref9)]
-- Adaptive feedforward scaling [[10](https://example.com/ref10)]
-- Nonlinear feedback linearization [[11](https://example.com/ref11)]
+Classical trajectory tracking employs PID control with feedforward compensation [8]. Recent advances include:
+- Lead-time prediction for phase advance [9]
+- Adaptive (learning-based) feedforward compensation [10]
+- Nonlinear feedback linearization [11]
 
 Our work combines classical PID with adaptive feedforward and prediction, demonstrating practical implementation on embedded hardware.
 
@@ -508,7 +506,7 @@ Instead of fixed lead-time, use:
 
 ## 9. Conclusion
 
-This paper demonstrates a complete framework for real-time trajectory tracking of prosthetic joints using commodity hardware and open-source software. By combining MIT mode low-level control with high-level servo mode APIs, we achieve the flexibility needed for both research prototyping and deployed systems.
+This report demonstrates a complete framework for real-time trajectory tracking of prosthetic joints using commodity hardware and open-source software. By combining MIT mode low-level control with high-level servo mode APIs, we achieve the flexibility needed for both research prototyping and deployed systems.
 
 Key achievements:
 - **RMS tracking error < 2°** across multi-cycle continuous gait patterns
@@ -525,31 +523,31 @@ Future work will extend this to loaded conditions, multi-joint systems, and real
 
 ## References
 
-[1] Herr, H. M., & Grabowski, A. M. (2012). Bionic ankle-foot prosthesis normalizes walking gait for persons with leg amputation. *Proceedings of the Royal Society B*, 279(1728), 457-464.
+[1] Herr, H. M., & Grabowski, A. M. (2012). Bionic ankle–foot prosthesis normalizes walking gait for persons with leg amputation. *Proceedings of the Royal Society B: Biological Sciences*, 279(1728), 457–464.
 
-[2] Collins, S. H., Wiggin, M. B., & Sawicki, G. S. (2015). Reducing the energy cost of walking with an exoskeleton based on biomechanics. *IEEE Transactions on Neural Systems and Rehabilitation Engineering*, 23(3), 467-476.
+[2] Au, S., Berniker, M., & Herr, H. (2008). Powered ankle–foot prosthesis to assist level-ground and stair-descent gaits. *Neural Networks*, 21(4), 654–666. https://doi.org/10.1016/j.neunet.2008.03.006
 
-[3] Au, S., Berniker, M., & Herr, H. (2008). Powered ankle–foot prosthesis to assist level-ground and stair-climbing gaits. *Neural Networks*, 21(4), 654-666.
+[3] Grimes, D. L., Flowers, W. C., & Donath, M. (1977). Feasibility of an active control scheme for above knee prostheses. *Journal of Biomechanical Engineering*, 99(4), 215–221. https://doi.org/10.1115/1.3426293
 
-[4] Vallery, H., Veneman, J., van Asseldonk, E., Ekkelenkamp, R., Buss, M., & van der Kooij, H. (2008). Compliant actuation of rehabilitation robots. *IEEE Robotics & Automation Magazine*, 15(3), 60-69.
+[4] Sup, F., Bohara, A., & Goldfarb, M. (2008). Design and control of a powered transfemoral prosthesis. *The International Journal of Robotics Research*, 27(2), 263–273. https://doi.org/10.1177/0278364907084588
 
-[5] Beard, R. W., & McLain, T. W. (2012). *Small unmanned aircraft: Theory and practice*. Princeton University Press.
+[5] Clark, G., & Ben Amor, H. (2023). Learning ergonomic control in human–robot symbiotic walking. *IEEE Transactions on Robotics*, 39(1), 327–342.
 
-[6] CubeMars. (2024). AK80-9 V3.0 Technical Specifications. Retrieved from https://www.cubemars.com/
+[6] CubeMars. AK80-9 V3.0 robotic actuator — product specifications. https://www.cubemars.com/
 
-[7] Bosch. (2012). CAN specification, version 2.0. Retrieved from https://www.bosch-semiconductors.de/
+[7] Robert Bosch GmbH. (1991). *CAN Specification, Version 2.0*. Stuttgart, Germany.
 
 [8] Kuo, B. C. (1995). *Automatic control systems* (7th ed.). Prentice Hall.
 
-[9] Doyle, J. C., Francis, B. A., & Tannenbaum, A. R. (2013). *Feedback control theory*. Dover Publications.
+[9] Smith, O. J. M. (1957). Closer control of loops with dead time. *Chemical Engineering Progress*, 53(5), 217–219.
 
-[10] Skogestad, S., & Postlethwaite, I. (2005). *Multivariable feedback control: Analysis and design*. John Wiley & Sons.
+[10] Bristow, D. A., Tharayil, M., & Alleyne, A. G. (2006). A survey of iterative learning control: A learning-based method for high-performance tracking control. *IEEE Control Systems Magazine*, 26(3), 96–114. https://doi.org/10.1109/MCS.2006.1636313
 
-[11] Isidori, A. (2013). *Nonlinear control systems*. Springer Science+Business Media.
+[11] Isidori, A. (1995). *Nonlinear control systems* (3rd ed.). Springer.
 
-[12] Winter, D. A. (1989). *Biomechanics and motor control of human movement*. John Wiley & Sons.
+[12] Winter, D. A. (2009). *Biomechanics and motor control of human movement* (4th ed.). John Wiley & Sons.
 
-[13] OpenSourceLeg Contributors. (2023). OpenSourceLeg: An open-source library for legged robotics. Retrieved from https://github.com/neurobionics/opensourceleg
+[13] Azocar, A. F., Mooney, L. M., Duval, J.-F., Simon, A. M., Hargrove, L. J., & Rouse, E. J. (2020). Design and clinical implementation of an open-source bionic leg. *Nature Biomedical Engineering*, 4(10), 941–953. https://doi.org/10.1038/s41551-020-00619-3. Software: https://github.com/neurobionics/opensourceleg
 
 ---
 

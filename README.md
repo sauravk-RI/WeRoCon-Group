@@ -19,7 +19,7 @@ that a new student can rebuild it from scratch.
 | [`Motor Control/`](Motor%20Control) | CAN-bus control of CubeMars AK80-9 actuators (MIT and servo modes), knee and ankle trajectory tracking, AS5048B joint encoders |
 | [`Mechanical/`](Mechanical) | Mechanical design of the prosthetic leg (coming soon) |
 | [`Raspberry_Pi_5_Basics/`](Raspberry_Pi_5_Basics) | Beginner tutorial series: OS install, SSH, VNC, Wi-Fi and everyday terminal commands |
-| [`Research_Paper.md`](Research_Paper.md) | Work-in-progress write-up of the AK80-9 trajectory-tracking results |
+| [`Intern_Report.md`](Intern_Report.md) | Intern report on AK80-9 knee/ankle trajectory tracking (work in progress) |
 
 ## Where to start
 
