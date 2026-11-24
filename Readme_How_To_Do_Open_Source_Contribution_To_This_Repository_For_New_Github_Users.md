@@ -114,7 +114,7 @@ https://github.com/johnsmith/MyProject
 
 Click the **Fork** button in the top-right corner.
 
-![](Raspberry_Pi_5_Basics\ImageFiles\2026-07-24-16-10-34.png)
+![](Raspberry_Pi_5_Basics/ImageFiles/2026-07-24-16-10-34.png)
 
 GitHub creates
 
@@ -122,7 +122,7 @@ GitHub creates
 yourname/MyProject
 ```
 
-![](Raspberry_Pi_5_Basics\ImageFiles\2026-07-24-16-12-18.png)
+![](Raspberry_Pi_5_Basics/ImageFiles/2026-07-24-16-12-18.png)
 
 This repository belongs entirely to you.
 
@@ -139,7 +139,7 @@ Example:
 ```
 https://github.com/yourname/MyProject.git
 ```
-![](Raspberry_Pi_5_Basics\ImageFiles\2026-07-24-16-15-02.png)
+![](Raspberry_Pi_5_Basics/ImageFiles/2026-07-24-16-15-02.png)
 
 Open a Terminal inside the folder that you want to copy your codebase in your local computer. Run the following command to clone the repository into that folder:
 
@@ -147,7 +147,7 @@ Open a Terminal inside the folder that you want to copy your codebase in your lo
 git clone <paste the copied link here>
 ```
 
-![](Raspberry_Pi_5_Basics\ImageFiles\2026-07-24-16-33-10.png)
+![](Raspberry_Pi_5_Basics/ImageFiles/2026-07-24-16-33-10.png)
 
 > 💡 **Note:** Cloning is different from simply downloading the entire repositiory. For Open-source contribution, it is always recomended that you clone a project and not download it directly. Although, github also provides the feature for downloading the entire repository or any of the codes/files within it.
 

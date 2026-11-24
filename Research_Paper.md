@@ -1,3 +1,8 @@
+> [!WARNING]
+> **Work-in-progress draft — not peer reviewed.** Results and figures may change, and the
+> reference list still contains placeholder links that must be replaced with real citations
+> before this text is reused anywhere.
+
 # Real-Time Gait Trajectory Tracking Using CubeMars AK80-9 Actuators: 
 ## A Python-Based Approach to Prosthetic Joint Control
 

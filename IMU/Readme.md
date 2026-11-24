@@ -13,15 +13,19 @@ Real-time roll/pitch/yaw estimation for a prosthetic leg using an
 MPU9250 (accelerometer + gyroscope + AK8963 magnetometer) on a
 Raspberry Pi 5, fused with a discrete Kalman filter.
 
-This repo contains two tracks:
+## What's in this folder
 
-| File              | Purpose                                                              |
-|-------------------|-----------------------------------------------------------------------|
-| `imu_server.py`   | Live WebSocket server — streams filtered roll/pitch/yaw to a browser dashboard |
-| `dashboard.html`  | Browser dashboard with live gauges, charts, footstrike detection, and customizable scale |
-| `imu_logger.py`   | Standalone CSV logger (10 s capture) for offline analysis in MATLAB   |
-| `imu_analysis.m`  | MATLAB script to load the CSV and generate angle / diagnostic plots   |
-| `calibration.json`| Optional calibration file (gyro offsets, accel offsets/scale, mag hard/soft iron) used by the **extended** logger |
+| Path | Contents |
+|------|----------|
+| [`Codes/`](Codes) | Python loggers, calibration and tuning scripts (MPU9250 and MicroStrain 3DM-GV7-AR), a live browser dashboard, and MATLAB plotting scripts |
+| [`Documentation/`](Documentation) | Step-by-step setup guides — start with [MPU9250_setup.md](Documentation/MPU9250_setup.md) or [3DM-GV7-AR-Microstrain_setup.md](Documentation/3DM-GV7-AR-Microstrain_setup.md) |
+| [`Results/`](Results) | Sample CSV logs and result plots (PDF) from front- and side-mounted trials |
+
+> [!NOTE]
+> Sections 3–7 below describe an earlier version of the pipeline (`imu_server.py`, `dashboard.html`,
+> `imu_logger.py`, `imu_analysis.m`, `calibration.json`) whose files are **not** in this repository.
+> The Kalman-filter and mounting notes still apply. For the current scripts, follow
+> [MPU9250_setup.md](Documentation/MPU9250_setup.md) (`phase_variable_mpu_9250.py`) and the MicroStrain guides.
 
 ---
 

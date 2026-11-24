@@ -456,7 +456,7 @@ The Low Pass Filter smooths noise but cannot fix bias. Calibration fixes bias.
 
 ### Before Calibration — Actual Plot
 
-![Before Calibration](before_calibration.png)
+![Before Calibration](before_calibration_mpu6050.png)
 )
 
 > X axis sitting at ~65 m/s² instead of 0, Z at ~13 m/s² instead of 9.81 m/s² — clear sensor bias.
@@ -636,7 +636,7 @@ Signal path:
 ---
 ### After Calibration — Actual Plot
 
-![After Calibration](after_calibration.png)
+![After Calibration](after_calibration_mpu6050.png)
 
 > X axis now at ~0 m/s², Z sitting cleanly at ~9.81 m/s² (gravity). Calibration successful ✅
 
