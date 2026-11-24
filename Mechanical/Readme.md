@@ -8,4 +8,3 @@ Planned contents:
 - `Videos/`: links to assembly and test videos
 
 Want to help? See [CONTRIBUTING.md](../CONTRIBUTING.md).
-
