@@ -17,4 +17,3 @@ joints of the prosthetic leg along human gait trajectories from the Winter gait 
 | 8 | [Simultaneous knee + ankle](Documentation/Knee_Ankle_Simultaenous_trajectory.md) | Two actuators on one CAN bus |
 
 The scripts are embedded in each guide.
-
